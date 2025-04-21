@@ -1,7 +1,6 @@
 from ketirtc_operator.RemoteRobotController import RemoteRobotController
 from pubsub import pub
 
-
 class WebRtcOperator:
     def __init__(self, robot_id, user_id):
         self.robot = None

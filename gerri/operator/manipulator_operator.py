@@ -1,13 +1,8 @@
-import sys
-import os
 import time
 from pubsub import pub
-CURRENT_FILE = os.path.abspath(__file__)
-VENV_DIR = os.path.dirname(sys.executable)
-PROJECT_ROOT = os.path.abspath(os.path.join(VENV_DIR, "../.."))
-sys.path.insert(0, PROJECT_ROOT)
 
-
+import os, sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
 import gerri.operator.mobile_command
 import gerri.operator.pantilt_command
@@ -100,6 +95,9 @@ class ManipulatorOperator:
         map_value = self.clamp((value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min, out_min, out_max)
 
         return map_value
+
+    def master_arm_control(self, command):
+        pass
 
     def key_mouse_control(self, command):
         # print(command)

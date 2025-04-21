@@ -3,16 +3,13 @@ from PySide6.QtWidgets import QApplication, QLabel, QMainWindow
 from PySide6.QtCore import QTimer, Qt
 from PySide6.QtGui import QImage, QPixmap
 
-import os
-import sys
-CURRENT_FILE = os.path.abspath(__file__)
-VENV_DIR = os.path.dirname(sys.executable)
-PROJECT_ROOT = os.path.abspath(os.path.join(VENV_DIR, "../.."))
-sys.path.insert(0, PROJECT_ROOT)
 
-from avatar_darm.robot.network_tools.webrtc.stereo_camera_combiner import StereoCameraCombiner
-from avatar_darm.robot.network_tools.webrtc.stereo_vr_processor import StereoVRProcessor, StereoVROption
-from avatar_darm.robot.network_tools.webrtc.cam_manager import CameraManager
+import os, sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
+
+from _and_.keti_rtc.stereo_camera_combiner import StereoCameraCombiner
+from _and_.keti_rtc.stereo_vr_processor import StereoVRProcessor, StereoVROption
+from _and_.keti_rtc.cam_manager import CameraManager
 
 
 def convert_frame_to_pixmap(frame):

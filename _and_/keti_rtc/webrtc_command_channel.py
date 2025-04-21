@@ -9,6 +9,8 @@ from pubsub import pub
 import asyncio
 import time
 
+# old version port = 8180
+# new version port = 9980
 
 class WebRtcCommandChannel:
     def __init__(self, robot_id, password, server_host, server_port, camera=DummyCamera(), loop: AbstractEventLoop = None, message_duration_time=100):

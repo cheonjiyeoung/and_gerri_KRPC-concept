@@ -5,14 +5,10 @@ from aiortc.mediastreams import MediaStreamError
 from av import VideoFrame
 import time
 
-import os
-import sys
-CURRENT_FILE = os.path.abspath(__file__)
-VENV_DIR = os.path.dirname(sys.executable)
-PROJECT_ROOT = os.path.abspath(os.path.join(VENV_DIR, "../.."))
-sys.path.insert(0, PROJECT_ROOT)
+import os, sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-from avatar_darm.robot.network_tools.webrtc.cam_manager import CameraManager
+from _and_.keti_rtc.cam_manager import CameraManager
 
 
 class StereoCameraCombiner:
