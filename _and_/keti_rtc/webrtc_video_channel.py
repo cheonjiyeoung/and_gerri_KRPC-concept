@@ -17,7 +17,7 @@ from gerri.robot.gerri_config import ROBOT_ID, CAMERA_INDEX, CAMERA_WIDTH, CAMER
 
 
 class WebRtcVideoChannel:
-    def __init__(self, robot_id, password, server_host, server_port,
+    def __init__(self, robot_id, password, server_host, server_port, robot_group_id=None,
                  camera=None, loop: AbstractEventLoop = None, message_duration_time=100):
         """
         WebRTC 기반 원격 스트리밍 및 메시지 처리를 담당하는 클래스
@@ -37,7 +37,9 @@ class WebRtcVideoChannel:
             signalling_password=self.password,
             camera=self.camera,
             signalling_server_host=self.server_host,
-            signalling_server_port=self.server_port
+            signalling_server_port=self.server_port,
+            is_control_channel=False,
+            robot_group_id=robot_group_id,
         )
 
         self.user_clients_manager = UserClientConnectionManager()
