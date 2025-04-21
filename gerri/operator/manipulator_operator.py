@@ -22,6 +22,7 @@ class ManipulatorOperator:
     def __init__(self, **kwargs):
         self.puppet = [PUPPET_ARM_NAME_LEFT, PUPPET_ARM_NAME_RIGHT]
         self.control_target = 'all'
+        self.use_master_arm = False
         self.master_control = False
 
         pub.subscribe(self.key_mouse_control, 'key_mouse_control')

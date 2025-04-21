@@ -1,9 +1,10 @@
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from avatar_darm.robot.robot_tools.status_manager import StatusManager
-from pubsub import pub
 import asyncio
+from pubsub import pub
+
+import os, sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
+
+from gerri.robot.status_manager import StatusManager
 
 
 class MobileController:
@@ -25,7 +26,7 @@ class MobileController:
         :return: 특정 모델 컨트롤러 인스턴스
         """                                     
         if robot_model == 'gyd_mobile':
-            from avatar_darm.robot.robot_tools.gyd.gyd_controller import GydMobileController
+            from gerri.robot.examples.gyd_mobile.gyd_mobile_controller import GydMobileController
             return GydMobileController(port="/dev/ttyUSB0",baudrate=115200,timeout=1)
         else:
             raise ValueError(f"Unsupported robot model: {robot_model}")
@@ -47,7 +48,7 @@ class MobileController:
                     elif topic == 'joy':
                         self.controller.joy(value)
                     elif topic == 'relocate':
-                        self.controller.reloc_absolute(value)
+                        self.controller.relocate(value)
                     elif topic == 'move_floor':
                         self.controller.move_floor(value)
                     elif topic == 'map_change':

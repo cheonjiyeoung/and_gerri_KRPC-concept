@@ -15,7 +15,7 @@ class CameraManager:
     - .last_frame or .get_frame() 제공으로 WebRTC 브릿지에 사용 가능
     - 내부 스레드로 영상 스트리밍 루프 수행
     """
-    def __init__(self, camera_index=0, width=640, height=480, fps=30, camera_name='cam'):
+    def __init__(self, camera_index=0, width=640, height=480, fps=30, camera_name='cam', auto_start=True):
         self.camera_name = camera_name
         self.camera_index = camera_index
         self.width = width
@@ -26,6 +26,9 @@ class CameraManager:
         self.last_frame_time = None
         self.cap = None
         self.thread = None
+
+        if auto_start:
+            self.start()
 
     def start(self):
         if self.running:

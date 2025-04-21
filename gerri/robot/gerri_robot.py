@@ -1,16 +1,13 @@
-import os
-import sys
+import asyncio
+import time
 
-CURRENT_FILE = os.path.abspath(__file__)
-VENV_DIR = os.path.dirname(sys.executable)
-PROJECT_ROOT = os.path.abspath(os.path.join(VENV_DIR, "../.."))
-sys.path.insert(0, PROJECT_ROOT)
+import os, sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
 from _and_.keti_rtc.webrtc_command_channel import WebRtcCommandChannel
 from _and_.keti_rtc.webrtc_video_channel import WebRtcVideoChannel
 from _and_.keti_rtc.webrtc_audio_channel import WebRtcAudioChannel
-import asyncio
-import time
+
 
 from _and_.keti_rtc.cam_manager import CameraManager
 from _and_.keti_rtc.video_streamer import VideoStreamer

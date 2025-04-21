@@ -3,10 +3,16 @@ import ntplib
 import time
 import uuid
 from pubsub import pub
-from datetime import datetime, timezone, timedelta
-from time_sync_manager import TimeSyncManager
 
-TimeSync = TimeSyncManager(sample_count=5)
+import os, sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
+
+from utils.time_sync_manager import time_sync
+
+print(time_sync.timestamp())
+
+def timestamp():
+    return time_sync.timestamp()
 
 class StatusManager:
     def __init__(self, name, category, model, controller, interval=0.1):
@@ -52,7 +58,7 @@ class StatusManager:
         robot_status = {
             'robot_info': self.robot_info,
             'metadata': {
-                'timestamp': TimeSync.get_scaled_server_time(),  # KST 기준 보정된 현재 시간
+                'timestamp': timestamp(),  # KST 기준 보정된 현재 시간
                 'uuid': str(uuid.uuid4()),  # 메시지 고유 식별자
             },
         }

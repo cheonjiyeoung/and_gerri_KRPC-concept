@@ -52,16 +52,14 @@ if __name__ == "__main__":
 
     # 🎥 카메라 구성
     cam = CameraManager(camera_name="front_cam", camera_index=0, width=1920, height=1080, fps=30)
-    cam.start()
-
-    streamer = VideoStreamer(cam)
+    cam_streamer = VideoStreamer(cam)
 
     # 🚀 데몬 실행
     daemon = AdaptiveNetworkDaemon(
         robot_id=ROBOT_ID,
         backend="ketirtc",
         command="command",
-        video=streamer,
+        video=cam_streamer,
         audio="audio"
     )
 

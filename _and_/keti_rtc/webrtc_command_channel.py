@@ -26,7 +26,8 @@ class WebRtcCommandChannel:
         self.signalling_server = WebRtcConnectionManager(robot_id=robot_id, signalling_password=password,
                                                          camera=camera,
                                                          signalling_server_host=server_host,
-                                                         signalling_server_port=server_port)
+                                                         signalling_server_port=server_port,
+                                                         )
 
         self.user_clients_manager = UserClientConnectionManager()
         self.user_clients_manager.add_connection_manager_channel(self.signalling_server)

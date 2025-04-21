@@ -1,9 +1,10 @@
-import sys
-import os
 from pubsub import pub
+
+import os, sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
+
 from gerri.robot.status_manager import StatusManager
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 class ManipulatorController:
     def __init__(self, robot_name, robot_model, **params):
@@ -31,10 +32,10 @@ class ManipulatorController:
         :return: 특정 모델 컨트롤러 인스턴스
         """
         if self.bridge:
-            from robot_bridge.robot_bridge import RobotBridge
+            from gerri.robot.examples.robot_bridge.robot_bridge import RobotBridge
             return RobotBridge(self.robot_name)
         if self.robot_model == 'piper':
-            from piper.piper_controller import PiperController
+            from gerri.robot.examples.piper.piper_controller import PiperController
             return PiperController(can_port=self.robot_name)
         else:
             raise ValueError(f"Unsupported robot model: {self.robot_model}")

@@ -1,22 +1,19 @@
 import threading
 import json
 import uuid
-import os
-import sys
 import time
 from pubsub import pub
 from datetime import datetime
-CURRENT_FILE = os.path.abspath(__file__)
-VENV_DIR = os.path.dirname(sys.executable)
-PROJECT_ROOT = os.path.abspath(os.path.join(VENV_DIR, "../.."))
-sys.path.insert(0, PROJECT_ROOT)
 
-from gerri.robot.time_sync_manager import TimeSyncManager
+import os, sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
+
+from utils.time_sync_manager import TimeSyncManager
 
 
 TimeSync = TimeSyncManager(sample_count=1)
 
-class RldsDatasetBuilder:
+class RaasDatasetBuilder:
     def __init__(self, controller, camera_info, interval=0.1, discount_factor=1, save_dir="../../../RLDS_dataset", **kwargs):
         self.controller = controller
         self.camera_info = camera_info

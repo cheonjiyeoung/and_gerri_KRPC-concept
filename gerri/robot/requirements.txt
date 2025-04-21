@@ -3,7 +3,7 @@ pypubsub
 pyaudio
 --trusted-host 175.126.123.199
 --index-url http://keti:dev123@175.126.123.199:7070
-ketirtc
+ketirtc==0.1.3.7
 piper_sdk
 python-can
 dynamixel_sdk

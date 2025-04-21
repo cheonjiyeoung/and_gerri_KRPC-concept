@@ -17,7 +17,7 @@ from gerri.robot.gerri_config import ROBOT_ID, AUDIO_INPUT, AUDIO_OUTPUT
 
 
 class WebRtcAudioChannel:
-    def __init__(self, robot_id, password, server_host, server_port):
+    def __init__(self, robot_id, password, server_host, server_port, audio_input=AUDIO_INPUT, audio_output=AUDIO_OUTPUT):
         """
         WebRTC 기반 원격 오디오 스트리밍 및 메시지 처리를 담당하는 클래스
         """
@@ -29,12 +29,12 @@ class WebRtcAudioChannel:
         self.camera = DummyCamera()
 
         mic_config = {
-            "device_name": AUDIO_INPUT,
+            "device_name": audio_input,
         }
         self.microphone = PyAudioMicrophone(mic_config)
 
         speaker_config = {
-            "device_name": AUDIO_OUTPUT,
+            "device_name": audio_output,
         }
         self.audio_recorder = MultipleAudioTrackPlayer(config=speaker_config)
 
