@@ -5,6 +5,7 @@ import logging
 from aiortc import VideoStreamTrack
 from av import VideoFrame
 from aiortc.mediastreams import MediaStreamError
+from pubsub import pub
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,10 @@ class CameraManager:
         self.cap = None
         self.thread = None
 
+
+        # ✅ PubSub 구독 (외부 요청이 오면 save_frame 실행)
+        pub.subscribe(self.save_frame, "save_frame")
+
         if auto_start:
             self.start()
 
@@ -44,6 +49,7 @@ class CameraManager:
 
         self.thread = threading.Thread(target=self._capture_loop, daemon=True)
         self.thread.start()
+        self.print_feature()
         logger.info(f"📷 카메라 {self.camera_index} 시작됨")
 
     def _capture_loop(self):
@@ -72,3 +78,48 @@ class CameraManager:
         if self.cap:
             self.cap.release()
         logger.info("🛑 카메라 중지됨")
+
+
+    def print_feature(self):
+        print("🎥 카메라 속성 정보")
+        print(f" - Width: {self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)} px")
+        print(f" - Height: {self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)} px")
+        print(f" - FPS: {self.cap.get(cv2.CAP_PROP_FPS)}")
+
+        # ✅ FourCC 코드 변환
+        fourcc_int = int(self.cap.get(cv2.CAP_PROP_FOURCC))
+        fourcc_str = "".join([chr((fourcc_int >> 8 * i) & 0xFF) for i in range(4)])
+        print(f" - FourCC: {fourcc_str}")
+
+        # ✅ Auto Exposure 값 확인
+        auto_exp = self.cap.get(cv2.CAP_PROP_AUTO_EXPOSURE)
+        auto_exp = "지원되지 않음" if auto_exp == -1 else auto_exp
+        print(f" - Auto Exposure: {auto_exp}")
+
+        # ✅ 기타 설정 확인
+        params = {
+            "Exposure": self.cap.get(cv2.CAP_PROP_EXPOSURE),
+            "Brightness": self.cap.get(cv2.CAP_PROP_BRIGHTNESS),
+            "Contrast": self.cap.get(cv2.CAP_PROP_CONTRAST),
+            "Saturation": self.cap.get(cv2.CAP_PROP_SATURATION),
+            "Gain": self.cap.get(cv2.CAP_PROP_GAIN),
+            "Buffer Size": self.cap.get(cv2.CAP_PROP_BUFFERSIZE)
+        }
+        for key, value in params.items():
+            print(f" - {key}: {'지원되지 않음' if value == -1 else value}")
+
+    def save_frame(self, file_path, file_name):
+        """
+        ✅ PubSub을 통해 호출될 때만 프레임 저장
+        """
+        if self.last_frame is None:
+            logger.warning("🚨 저장할 프레임이 없습니다!")
+            return
+
+        # ✅ 파일명 생성
+        filename = f"{self.camera_name}_{file_name:05d}.jpg"
+        file_path = os.path.join(file_path, filename)
+
+        # ✅ 프레임 저장
+        cv2.imwrite(file_path, self.last_frame)
+        logger.info(f"📸 프레임 저장됨: {file_path}")

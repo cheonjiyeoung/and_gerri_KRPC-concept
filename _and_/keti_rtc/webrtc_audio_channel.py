@@ -13,11 +13,9 @@ from ketirtc_robot.audio.MultipleAudioTrackPlayer import MultipleAudioTrackPlaye
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-from gerri.robot.gerri_config import ROBOT_ID, AUDIO_INPUT, AUDIO_OUTPUT
-
 
 class WebRtcAudioChannel:
-    def __init__(self, robot_id, password, server_host, server_port, robot_group_id=None, audio_input=AUDIO_INPUT, audio_output=AUDIO_OUTPUT):
+    def __init__(self, robot_id, password, server_host, server_port, robot_group_id=None, audio_input=None, audio_output=None):
         """
         WebRTC 기반 원격 오디오 스트리밍 및 메시지 처리를 담당하는 클래스
         """
@@ -87,7 +85,7 @@ class WebRtcAudioChannel:
 
 if __name__ == "__main__":
     robot = WebRtcAudioChannel(
-        robot_id=ROBOT_ID + "_audio",
+        robot_id="TEST" + "_audio",
         password="",
         server_host="175.126.123.199",
         server_port="8180"
