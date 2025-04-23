@@ -16,7 +16,7 @@ def timestamp():
 
 class StatusManager:
     def __init__(self, robot_info, controller, interval=0.1):
-        self.name = robot_info['name']
+        self.name = robot_info['id']
         self.category = robot_info['category']
         self.model = robot_info['model']
         self.controller = controller
@@ -40,7 +40,7 @@ class StatusManager:
         if 'pose' in robot_status:
             robot_info['pose'] = robot_status['pose']
         if 'battery_state' in robot_status:
-            robot_info['battery'] = robot_status['battery']
+            robot_info['battery_state'] = robot_status['battery_state']
         if 'robot_shape' in robot_status:
             robot_info['robot_shape'] = robot_status['robot_shape']
         if 'joint_state' in robot_status:
@@ -79,7 +79,7 @@ class StatusManager:
         def loop():
             while True:
                 self.robot_info = self.get_robot_status()  # 최신 상태 갱신
-                # self.send_status()  # 상태 전송
+                self.send_status()  # 상태 전송
                 time.sleep(self.interval)  # 주어진 간격만큼 대기
 
         # 백그라운드에서 실행될 스레드 생성

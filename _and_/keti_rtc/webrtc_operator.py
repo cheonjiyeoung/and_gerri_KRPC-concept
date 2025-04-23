@@ -4,17 +4,19 @@ from pubsub import pub
 class WebRtcOperator:
     def __init__(self, ROBOT_INFO, OPERATOR_INFO=None):
         self.robot = None
-        self.robot_id = ROBOT_INFO["id"]
+        self.robot_id = ROBOT_INFO["id"] + '_command'
 
         self.server_host = '175.126.123.199'
         self.server_port = 9980
 
-        self.user_id = OPERATOR_INFO['id'] if OPERATOR_INFO else 'python_operator'
+        self.user_id = OPERATOR_INFO['id']
+        self.password = OPERATOR_INFO['password']
 
         pub.subscribe(self.send_message, 'send_message')
 
     def connect(self):
-        self.robot = RemoteRobotController(self.robot_id, self.server_host, self.server_port, user_id=self.user_id)
+        self.robot = RemoteRobotController(self.robot_id, self.server_host, self.server_port, user_id=self.user_id, password=self.password)
+        print(self.robot_id)
         self.robot.set_message_received_handler(self.handle_robot_message)
         try:
             self.robot.start_thread()

@@ -8,7 +8,7 @@ from gerri.robot.status_manager import StatusManager
 
 class ManipulatorController:
     def __init__(self, robot_info, **params):
-        self.robot_name = robot_info['name']
+        self.robot_name = robot_info['id']
         self.robot_category = robot_info['category']
         self.robot_model = robot_info['model']
         if 'use_bridge' in params and params['use_bridge']:

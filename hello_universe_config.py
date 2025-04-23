@@ -19,5 +19,6 @@ AUDIO_INFO = {
 ### OPERATOR
 
 OPERATOR_INFO = {
-    'id': "sunfish01",
+    'id': "keti_kanghyun",
+    'password': 'keti_kanghyun',
 }
