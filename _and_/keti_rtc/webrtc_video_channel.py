@@ -13,12 +13,11 @@ import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
 from _and_.keti_rtc.cv2_camera_new import CV2StreamCamera
-from gerri.robot.gerri_config import ROBOT_ID, CAMERA_INDEX, CAMERA_WIDTH, CAMERA_HEIGHT
 
 
 class WebRtcVideoChannel:
-    def __init__(self, robot_id, password, server_host, server_port, robot_group_id=None,
-                 camera=None, loop: AbstractEventLoop = None, message_duration_time=100):
+    def __init__(self, robot_id, password, server_host, server_port, camera, robot_group_id=None,
+                 loop: AbstractEventLoop = None, message_duration_time=100):
         """
         WebRTC 기반 원격 스트리밍 및 메시지 처리를 담당하는 클래스
         """
@@ -29,9 +28,7 @@ class WebRtcVideoChannel:
         self.server_port = server_port
         self.message_duration_time = message_duration_time
         self.last_message_time = time.time()
-
-        self.camera = camera or CV2StreamCamera(camera_index=CAMERA_INDEX, width=CAMERA_WIDTH, height=CAMERA_HEIGHT)
-
+        self.camera = camera
         self.signalling_server = WebRtcConnectionManager(
             robot_id=self.robot_id,
             signalling_password=self.password,

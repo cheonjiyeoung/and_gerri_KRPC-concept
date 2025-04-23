@@ -34,8 +34,7 @@ class StereoVRGuiTest(QMainWindow):
         # self.cam1.start()
         # self.cam2.start()
 
-        self.cam0 = CameraManager('zed', camera_index=1, width=9999, height=9999, fps=30)
-        self.cam0.start()
+        self.cam0 = CameraManager(camera_index=0, width=9999, height=9999, fps=30)
 
 
         # self.combiner = StereoCameraCombiner(self.cam1, self.cam2)
@@ -46,6 +45,8 @@ class StereoVRGuiTest(QMainWindow):
             target_aspect_ratio="2:1"
         )
         self.processor = StereoVRProcessor(self.cam0, self.vr_option)
+
+        # self.processor = self.cam0
 
         # 타이머 프레임 업데이트
         self.timer = QTimer(self)

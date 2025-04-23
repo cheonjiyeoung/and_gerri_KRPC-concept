@@ -1,7 +1,9 @@
+### ROBOT
+
 ROBOT_INFO = {
-    "id": "avatar_piper_01",
-    "model": "piper",
-    "type": "manipulator",
+    "id": "hello_universe",
+    "model": "dummy",
+    "category": "mobile",
 }
 
 VIDEO_INFO = {
@@ -14,9 +16,8 @@ AUDIO_INFO = {
     "audio": {"input": "default", "output": "default"},
 }
 
+### OPERATOR
 
-PUPPET_ARM_NAME_LEFT        = "puppet_left"
-PUPPET_ARM_NAME_RIGHT       = "puppet_right"
-
-PAN_TILT_NAME               = "pan_tilt"
-PAN_TILT_USB                = "/dev/ttyUSB0"
+OPERATOR_INFO = {
+    'id': "sunfish01",
+}

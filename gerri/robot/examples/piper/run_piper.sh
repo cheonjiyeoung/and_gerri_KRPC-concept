@@ -14,7 +14,7 @@ sleep 5
 #python ~/dev/avatar/avatar_darm/robot/webrtc/webrtc_audio_channel.py &
 # sudo chmod 777 /dev/ttyUSB0
 python ~/dev/avatar/avatar_darm/robot/avatar_robot.py
-# python /home/rb5keti/dev/avatar/avatar_darm/robot/robot_tools/piper/avatar_piper_robot.py
+# python /home/rb5keti/dev/avatar/avatar_darm/robot/robot_tools/piper/piper_robot.py
 #PROJECT_DIR="~/dev/avatar"
 #TOOL_DIR="$PROJECT_DIR/avatar_darm/robot/webrtc"
 #source "$PROJECT_DIR/venv/bin/activate"

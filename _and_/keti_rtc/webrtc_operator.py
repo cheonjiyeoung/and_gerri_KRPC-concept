@@ -2,14 +2,14 @@ from ketirtc_operator.RemoteRobotController import RemoteRobotController
 from pubsub import pub
 
 class WebRtcOperator:
-    def __init__(self, robot_id, user_id):
+    def __init__(self, ROBOT_INFO, OPERATOR_INFO=None):
         self.robot = None
-        self.robot_id = robot_id
+        self.robot_id = ROBOT_INFO["id"]
 
         self.server_host = '175.126.123.199'
-        self.server_port = 8180
+        self.server_port = 9980
 
-        self.user_id = user_id
+        self.user_id = OPERATOR_INFO['id'] if OPERATOR_INFO else 'python_operator'
 
         pub.subscribe(self.send_message, 'send_message')
 

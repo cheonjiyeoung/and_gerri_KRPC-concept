@@ -1,13 +1,11 @@
-import sys
-
-from gerri_config import ROBOT_ID, OPERATOR_ID
+from gerri.operator.examples.piper.piper_config import ROBOT_ID, OPERATOR_ID
 from webrtc_tools.webrtc_operator_bridge import WebRtcBridgeOperator
 from PySide6.QtWidgets import QApplication
 
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-from gerri.operator.keyboard_mouse_controller import KeyboardMouseController
+from gerri.operator.input_interface.keyboard_mouse_controller import KeyboardMouseController
 from gerri.operator.manipulator_operator import ManipulatorOperator
 from gerri.operator.examples.sample_operator import SampleOperator
 
@@ -16,7 +14,7 @@ piper_master = ManipulatorOperator()
 
 robot_group = {
             'manipulator': piper_master,
-            # 'pan_tilt': pantilt,
+            # 'pan_tilt': pantilt_2kng,
 }
 
 # robot_group = {"SAMPLE_OPERATOR": SampleOperator()}

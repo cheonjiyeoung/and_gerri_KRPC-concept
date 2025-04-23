@@ -4,42 +4,16 @@ from pubsub import pub
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-import gerri.operator.mobile_command
-import gerri.operator.pantilt_command
 from gerri.operator import manipulator_command
-
-from gerri.operator.master_arm.master_arm import MasterArm
-from gerri.operator.gerri_config import (
-    MASTER_ARM_USB_LEFT, MASTER_ARM_USB_RIGHT,
-    PUPPET_ARM_NAME_LEFT, PUPPET_ARM_NAME_RIGHT,
-    JOINT_LIMIT_LEFT, JOINT_LIMIT_RIGHT)
-
-MASTER_ARM_PORT_L = MASTER_ARM_USB_LEFT
-MASTER_ARM_PORT_R = MASTER_ARM_USB_RIGHT
-
 
 class ManipulatorOperator:
     def __init__(self, **kwargs):
-        self.puppet = [PUPPET_ARM_NAME_LEFT, PUPPET_ARM_NAME_RIGHT]
         self.control_target = 'all'
-        self.use_master_arm = False
-        self.master_control = False
-
         pub.subscribe(self.key_mouse_control, 'key_mouse_control')
         pub.subscribe(self.message_handler, 'received_message')
 
-    def initialize(self):
-        if self.master_arm_left is not None:
-            self.master_arm_left.updateDefaultPosCnt()
-
-        if self.master_arm_right is not None:
-            self.master_arm_right.updateDefaultPosCnt()
-
     def connect(self):
-        self.master_arm_left = MasterArm(7, MASTER_ARM_PORT_L)
-        self.master_arm_right = MasterArm(7, MASTER_ARM_PORT_R)
-        self.initialize()
-
+        pass
 
     def disconnect(self):
         pass
@@ -54,17 +28,6 @@ class ManipulatorOperator:
             value = message['value']
             if 'target' in message:
                 target = message['target']
-
-    def enable_master_arm(self):
-        self.initialize()
-
-        time.sleep(1)
-
-        self.master_control = True
-
-
-    def disable_master_arm(self):
-        self.master_control = False
 
 
     def clamp(self, value, min_value, max_value, absolute_limit=None):
@@ -97,9 +60,6 @@ class ManipulatorOperator:
 
         return map_value
 
-    def master_arm_control(self, command):
-        pass
-
     def key_mouse_control(self, command):
         # print(command)
         key = command['key_control']
@@ -112,83 +72,9 @@ class ManipulatorOperator:
             self.send_message('ENTER button clicked')
             self.send_message(manipulator_command.get_robot_status(target=self.control_target))
 
+        elif key:
+            self.send_message(key)
 
-        if "TAB" in key:
-            current_index = self.puppet.index(self.control_target)
-            next_index = (current_index + 1) % len(self.puppet)
-            self.control_target = self.puppet[next_index]
-            print(f"Switched control target to: {self.control_target}")
-
-        if "SHIFT" in key:
-            if mouse_d_move[0] or mouse_d_move[1] or mouse_d_wheel[0]:
-                joint_command = manipulator_command.joint_ctrl_step(joint_angle_step=[-mouse_d_move[0] * 20, mouse_d_wheel[0] * 20, -mouse_d_wheel[0] * 20, 0, mouse_d_move[1] * 20, 0], target=self.control_target)
-                self.send_message(joint_command)
-            if mouse_click[0]:
-                gripper_command = manipulator_command.gripper_ctrl(gripper_width=0, target=self.control_target)
-                self.send_message(gripper_command)
-            if mouse_click[2]:
-                gripper_command = manipulator_command.gripper_ctrl(gripper_width=100000000, target=self.control_target)
-                self.send_message(gripper_command)
-
-        if "F10" in key:
-            self.send_message(manipulator_command.connect_robot(target=self.control_target))
-
-        if "F4" in key:
-            self.send_message(manipulator_command.set_master_joint(target=self.control_target))
-
-        if "F5" in key:
-            self.enable_master_arm()
-
-        if "F6" in key:
-            self.disable_master_arm()
-
-        if "F1" in key:
-            joint_command = manipulator_command.joint_preset(preset_name='home', target=self.control_target)
-            self.send_message(joint_command)
-        if "F2" in key:
-            joint_command = manipulator_command.joint_preset(preset_name='ready', target=self.control_target)
-            self.send_message(joint_command)
-
-        if 'CONTROL' in key:
-            if '1' in key:
-                joint_command = manipulator_command.joint_preset(preset_name='1', target='puppet_right')
-                self.send_message(joint_command)
-
-            if '2' in key:
-                joint_command = manipulator_command.joint_preset(preset_name='2', target='puppet_right')
-                self.send_message(joint_command)
-
-            if '3' in key:
-                joint_command = manipulator_command.joint_preset(preset_name='3', target='puppet_right')
-                self.send_message(joint_command)
-
-            if '4' in key:
-                joint_command = manipulator_command.joint_preset(preset_name='4', target='puppet_right')
-                self.send_message(joint_command)
-
-            if '5' in key:
-                joint_command = manipulator_command.joint_preset(preset_name='5', target='puppet_left')
-                self.send_message(joint_command)
-
-            if '6' in key:
-                joint_command = manipulator_command.joint_preset(preset_name='6', target='puppet_left')
-                self.send_message(joint_command)
-
-
-        if self.master_control:
-            joint_value_left = self.master_arm_left.get_position_deg()
-            if self.limit_e_stop(joint_value_left, JOINT_LIMIT_LEFT) is False:
-                joint_command = manipulator_command.joint_ctrl_master(joint_value_left[:6], target=PUPPET_ARM_NAME_LEFT)
-                self.send_message(joint_command)
-                gripper_command = manipulator_command.gripper_ctrl_master(master_gripper_width=joint_value_left[6], target=PUPPET_ARM_NAME_LEFT)
-                self.send_message(gripper_command)
-
-            joint_value_right = self.master_arm_right.get_position_deg()
-            if self.limit_e_stop(joint_value_right, JOINT_LIMIT_RIGHT) is False:
-                joint_command = manipulator_command.joint_ctrl_master(joint_value_right[:6], target=PUPPET_ARM_NAME_RIGHT)
-                self.send_message(joint_command)
-                gripper_command = manipulator_command.gripper_ctrl_master(master_gripper_width=joint_value_right[6], target=PUPPET_ARM_NAME_RIGHT)
-                self.send_message(gripper_command)
 
 
     def limit_e_stop(self, joint_value, joint_limit):

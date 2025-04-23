@@ -8,13 +8,18 @@ from gerri.robot.status_manager import StatusManager
 
 
 class MobileController:
-    def __init__(self, robot_name, robot_model, **params):
-        self.robot_name = robot_name
-        self.robot_category = 'mobile'
-        self.robot_model = robot_model
+    def __init__(self, robot_info, **params):
+        self.robot_name = robot_info['name']
+        self.robot_category = robot_info['category']
+        self.robot_model = robot_info['model']
 
-        self.controller = self._initialize_robot(robot_model, **params)
-        self.status_manager = StatusManager(self.robot_name, self.robot_category, self.robot_model, self.controller)
+        if 'use_bridge' in params and params['use_bridge']:
+            self.bridge = True
+        else:
+            self.bridge = False
+
+        self.controller = self._initialize_robot(self.robot_model, **params)
+        self.status_manager = StatusManager(robot_info, self.controller)
         pub.subscribe(self.message_handler,"receive_message")
 
     def _initialize_robot(self, robot_model, **params):
@@ -37,24 +42,34 @@ class MobileController:
             value = message['value']
             if 'target' in message:
                 if message['target'] in self.robot_name or message['target'] == 'all':
-                    if topic == 'change_mode':
-                        self.controller.change_mode(value)
-                    elif topic == 'move_waypoint':
-                        self.controller.move_waypoint(value)
-                    elif topic == 'move_coord':
-                        self.controller.move_coord(value)
-                    elif topic == 'dock':
-                        self.controller.dock(value)
-                    elif topic == 'joy':
-                        self.controller.joy(value)
-                    elif topic == 'relocate':
-                        self.controller.relocate(value)
-                    elif topic == 'move_floor':
-                        self.controller.move_floor(value)
-                    elif topic == 'map_change':
-                        self.controller.map_change(value)
-            else:
-                print('command not defined')
+                    try:
+                        if topic == 'change_mode':
+                            self.controller.change_mode(value)
+                        elif topic == 'move_waypoint':
+                            self.controller.move_waypoint(value)
+                        elif topic == 'move_coord':
+                            self.controller.move_coord(value)
+                        elif topic == 'dock':
+                            self.controller.dock(value)
+                        elif topic == 'joy':
+                            self.controller.joy(value)
+                        elif topic == 'relocate':
+                            self.controller.relocate(value)
+                        elif topic == 'move_floor':
+                            self.controller.move_floor(value)
+                        elif topic == 'map_change':
+                            self.controller.map_change(value)
+                        elif topic == 'get_robot_status':
+                            pub.sendMessage('send_message', message=self.controller.update_status())
+                        elif topic == 'connect_robot':
+                            self.connect()
+                        else:
+                            print(f"⚠️ Unknown topic received: {topic}")
+                    except AttributeError as e:
+                        print(f"❌ Controller does not support topic '{topic}': {e}")
+                    except Exception as e:
+                        print(f"❌ Error processing topic '{topic}': {e}")
+
 
 
     def connect(self):

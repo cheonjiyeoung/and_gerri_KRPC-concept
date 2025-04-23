@@ -15,10 +15,10 @@ def timestamp():
     return time_sync.timestamp()
 
 class StatusManager:
-    def __init__(self, name, category, model, controller, interval=0.1):
-        self.name = name
-        self.category = category
-        self.model = model
+    def __init__(self, robot_info, controller, interval=0.1):
+        self.name = robot_info['name']
+        self.category = robot_info['category']
+        self.model = robot_info['model']
         self.controller = controller
         self.interval = interval
         self.status = vars(self.controller)
@@ -36,20 +36,22 @@ class StatusManager:
             'robot_name': self.name,
             'robot_type': {'category': self.category, 'model': self.model}
         }
-        # MOBILE
+
         if 'pose' in robot_status:
             robot_info['pose'] = robot_status['pose']
         if 'battery_state' in robot_status:
             robot_info['battery'] = robot_status['battery']
         if 'robot_shape' in robot_status:
             robot_info['robot_shape'] = robot_status['robot_shape']
-        if 'wheel_state' in robot_status:
-            robot_info['wheel_state'] = robot_status['wheel_state']
-
-        # MANIPULATOR
-
         if 'joint_state' in robot_status:
             robot_info['joint_state'] = robot_status['joint_state']
+        if 'sensor' in robot_status:
+            robot_info['sensor'] = robot_status['sensor']
+        if 'path_plan' in robot_status:
+            robot_info['path_plan'] = robot_status['path_plan']
+        if 'map' in robot_status:
+            robot_info['map'] = robot_status['map']
+
         return robot_info
 
 

@@ -1,8 +1,44 @@
-class CustomRobotController:
+class SampleRobotController:
     def __init__(self):
         """
         ROBOT INIT CODE
         """
+        self.robot_state = 'idle'
+        self.pose = {
+            'position': [0, 0, 0],
+            'orientation': [0, 0, 0],
+        }
+        self.velocity = {
+            'linear': [0, 0, 0],
+            'angular': [0, 0, 0],
+        }
+        self.battery_state = {
+            'voltage': 0,
+            'current': 0,
+            'percentage': 0,
+            'temperature': 0,
+            'capacity': 0,
+        }
+        self.joint_state = {
+            'name': ['left_wheel', 'right_wheel', 'left_arm', 'right_arm'],
+            'position': [0, 0, 0, 0],
+            'velocity': [0, 0, 0, 0],
+            'effort': [0, 0, 0, 0],
+        }
+        self.sensor = {
+            'ultrasonic': [0, 0, 0],
+            'laser': [0, 0, 0],
+        }
+        self.path_plan = {
+            'global': [],
+            'local': [],
+        }
+        self.map = {
+            'name': 'default',
+            'origin': [0, 0],
+            'size': [0, 0],
+            'scale': 1
+        }
 
     def get_joint_angles(self):
         """

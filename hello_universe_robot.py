@@ -18,9 +18,10 @@ daemon = AdaptiveNetworkDaemon(
 )
 
 daemon.connect()
+daemon.run_forever()
 
 ### Robot system setting ###
 
-from gerri.robot.dummy_robot_controller import DummyController
-
-
+from gerri.robot.manipulator_controller import ManipulatorController
+robot = ManipulatorController(ROBOT_INFO)
+robot.connect()

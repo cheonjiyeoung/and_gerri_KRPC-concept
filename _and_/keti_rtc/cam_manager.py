@@ -2,9 +2,7 @@ import cv2
 import time
 import threading
 import logging
-from aiortc import VideoStreamTrack
-from av import VideoFrame
-from aiortc.mediastreams import MediaStreamError
+import os
 from pubsub import pub
 
 logger = logging.getLogger(__name__)
@@ -60,7 +58,7 @@ class CameraManager:
                     raise RuntimeError("❌ 프레임 읽기 실패")
                 self.last_frame = frame
                 self.last_frame_time = time.time()
-                time.sleep(1 / self.fps)
+                # time.sleep(1 / self.fps)
             except Exception as e:
                 logger.error(f"⚠️ 캡처 오류 발생: {e}")
                 self.restart()

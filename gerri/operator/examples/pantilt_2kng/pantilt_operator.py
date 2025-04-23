@@ -1,7 +1,6 @@
 import math
 import sys
 import os
-import time
 from pubsub import pub
 
 CURRENT_FILE = os.path.abspath(__file__)
@@ -9,7 +8,7 @@ VENV_DIR = os.path.dirname(sys.executable)
 PROJECT_ROOT = os.path.abspath(os.path.join(VENV_DIR, "../.."))
 sys.path.insert(0, PROJECT_ROOT)
 
-from gerri.operator import pantilt_command
+from gerri.operator.examples.pantilt_2kng import pantilt_command
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -87,7 +86,7 @@ class PantiltOperator:
             self.send_message(pan_tilt_command)
 
     def vr_pose_control(self, position, orientation):
-        pan_tilt_command = pantilt_command.pan_tilt(pan_tilt_angle=[round(math.degrees(orientation.y)*1.5), round(math.degrees(orientation.x)*1.5)])
+        pan_tilt_command = pantilt_command.pan_tilt(pan_tilt_angle=[round(math.degrees(orientation.y) * 1.5), round(math.degrees(orientation.x) * 1.5)])
         self.send_message(pan_tilt_command)
         # round(math.degrees(orientation.x * 1.3))
         # round(math.degrees(orientation.y * 1.5))

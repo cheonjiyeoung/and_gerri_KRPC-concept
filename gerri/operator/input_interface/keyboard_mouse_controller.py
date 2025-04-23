@@ -13,8 +13,8 @@ class KeyboardMouseController(QMainWindow):
         self.showMaximized()  # 창을 최대화합니다
         self.browser = QWebEngineView()
         # self.browser_url = "http://175.126.123.199"
-        self.browser_url = "http://175.126.123.199/robot-camera/{robot_id}?hide-menu-bar=true&show-delay=true".format(robot_id=robot_id)
-        self.browser.load("http://175.126.123.199")
+        self.browser_url = "https://rubberneck.kr/remote-monitor/{robot_id}?hide-menu-bar=true&show-delay=true".format(robot_id=robot_id)
+        self.browser.load("https://rubberneck.kr")
 
         layout = QVBoxLayout()
         layout.addWidget(self.browser)
