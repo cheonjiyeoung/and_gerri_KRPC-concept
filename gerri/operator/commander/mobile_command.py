@@ -50,12 +50,12 @@ def move_coord(coord, target=None, **option):
         command['option'] = option
     return command
 
-def dock(dock, target=None, **option):
+def dock(docking_station, target=None, **option):
     """
     docking to docking station.
 
     Parameters:
-    - dock (str): docking station name
+    - docking_station (str): docking station name
     - target (str, optional): 특정 로봇을 지정 (기본값: None)
     - option (dict, optional): 추가 설정값 (예: speed, acceleration 등)
       // gyde mobile need type of docking
@@ -66,7 +66,7 @@ def dock(dock, target=None, **option):
     print(f"**option = {option}")
     command = {
         'topic': 'dock',
-        'value': dock
+        'value': docking_station
     }
     if target:
         command['target'] = target

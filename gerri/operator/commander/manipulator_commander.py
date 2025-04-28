@@ -1,5 +1,3 @@
-# manipulator_commander.py (대분류, 명령 실행 + 소분류 커맨더 관리)
-
 from pubsub import pub
 
 import os, sys
@@ -12,7 +10,6 @@ class ManipulatorCommander:
         self.robot_name = robot_info['id']
         self.robot_category = robot_info['category']
         self.robot_model = robot_info['model']
-        self.command = manipulator_command
         self.sub_commander = self._initialize_commander()
 
         pub.subscribe(self.received_message, 'received_message')
@@ -67,38 +64,3 @@ class ManipulatorCommander:
     def set_master_joint(self, target='all'):
         command = manipulator_command.set_master_joint(target=target)
         self.send_message(command)
-
-
-# piper_commander.py (소분류, 입력 해석 및 base 호출)
-
-class PiperCommander:
-    def __init__(self, base_commander):
-        self.base = base_commander
-        self.control_target = self.base.control_target
-
-    def key_mouse_control(self, command):
-        key = command['key_control']
-        mouse_d_move = command['mouse_d_move']
-        mouse_d_wheel = command['mouse_d_wheel']
-        mouse_click = command['mouse_click']
-
-        if "RETURN" in key:
-            self.base.request_status()
-
-        if "SHIFT" in key:
-            self.handle_shift_movement(mouse_d_move, mouse_d_wheel, mouse_click)
-
-        if "F1" in key:
-            self.base.move_joint([0, 0, 0, 0, 0, 0])
-
-        if "F2" in key:
-            self.base.move_joint([0, 30, -30, 0, 0, 0])
-
-    def handle_shift_movement(self, mouse_d_move, mouse_d_wheel, mouse_click):
-        step = [-mouse_d_move[0] * 20, mouse_d_wheel[0] * 20, -mouse_d_wheel[0] * 20, 0, mouse_d_move[1] * 20, 0]
-        self.base.move_joint_step(step)
-
-        if mouse_click[0]:
-            self.base.move_gripper(0)
-        if mouse_click[2]:
-            self.base.move_gripper(100000000)

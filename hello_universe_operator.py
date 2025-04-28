@@ -13,3 +13,4 @@ app = QApplication(sys.argv)
 operator_controller = KeyboardMouseController(ROBOT_INFO['id'])
 operator_controller.show()
 sys.exit(app.exec())
+
