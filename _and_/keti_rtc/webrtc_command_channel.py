@@ -60,13 +60,19 @@ class WebRtcCommandChannel:
             self.send_message('message too slow')
 
         self.last_message_time = time.time()
+
+        print(message)
         pub.sendMessage('receive_message', message=msg_data)
 
     async def _send_topic_to_remote(self, message):
         await self.user_clients_manager.send_to_all_users(message)
 
     def send_message(self, message):
-        asyncio.run_coroutine_threadsafe(self.user_clients_manager.send_to_all_users(message), self.loop)
+        try:
+            asyncio.run_coroutine_threadsafe(self.user_clients_manager.send_to_all_users(message), self.loop)
+            print(message)
+        except Exception as e:
+            print(e)
 
     def _run_loop_forever(self):
         """이벤트 루프를 백그라운드 스레드에서 실행"""

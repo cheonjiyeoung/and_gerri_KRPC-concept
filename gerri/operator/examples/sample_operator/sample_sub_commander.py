@@ -1,35 +1,26 @@
+import time
 from pubsub import pub
 
+import os, sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-class SampleOperator:
-    def __init__(self):
+
+class SampleCommander:
+    def __init__(self, base_commander, **kwargs):
+        self.base_commander = base_commander
         self.control_target = 'all'
-
+        self.use_master_arm = False
         self.master_control = False
 
         pub.subscribe(self.key_mouse_control, 'key_mouse_control')
-        pub.subscribe(self.message_handler, 'received_message')
-
-    def initialize(self):
-        pass
 
     def connect(self):
-        pass
-        ### TODO : ADD CONNECT FUNCTION
+        print('Connecting to Gerri...')
+
 
     def disconnect(self):
         pass
         ### TODO : ADD DISCONNECT FUNCTION
-
-    def send_message(self, message):
-        pub.sendMessage('send_message', message=message)
-
-    def message_handler(self, message):
-        if 'topic' in message:
-            topic = message['topic']
-            value = message['value']
-            if 'target' in message:
-                target = message['target']
 
 
     def clamp(self, value, min_value, max_value, absolute_limit=None):
@@ -63,14 +54,17 @@ class SampleOperator:
         return map_value
 
     def key_mouse_control(self, command):
-        print(command)
+        # print(command)
         key = command['key_control']
         mouse_d_move = command['mouse_d_move']
         mouse_d_wheel = command['mouse_d_wheel']
         mouse_click = command['mouse_click']
 
+
         if "RETURN" in key:
-            self.send_message('ENTER button clicked')
+            self.base_commander.get_robot_status(target=self.control_target)
+            self.base_commander.send_message({'topic':'test', 'value':key, 'target':self.control_target})
+
 
 
     def limit_e_stop(self, joint_value, joint_limit):

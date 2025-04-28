@@ -18,6 +18,9 @@ class ManipulatorCommander:
         if self.robot_model == 'piper':
             from gerri.operator.examples.piper.piper_commander import PiperCommander
             return PiperCommander(self)
+        elif self.robot_model == 'dummy':
+            from gerri.operator.examples.sample_operator.sample_sub_commander import SampleCommander
+            return SampleCommander(self)
         else:
             raise ValueError(f"Unsupported robot model: {self.robot_model}")
 
