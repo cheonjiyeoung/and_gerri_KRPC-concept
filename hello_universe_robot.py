@@ -24,7 +24,7 @@ daemon.connect()
 
 ### Robot system setting ###
 
-from gerri.robot.manipulator_controller import ManipulatorController
+from gerri.robot.controller.manipulator_controller import ManipulatorController
 robot = ManipulatorController(ROBOT_INFO)
 robot.connect()
 

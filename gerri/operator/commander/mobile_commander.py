@@ -1,19 +1,24 @@
-import time
 from pubsub import pub
 
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-from gerri.operator import manipulator_command
 
-class ManipulatorOperator:
-    def __init__(self, **kwargs):
+class MobileCommander:
+    def __init__(self):
         self.control_target = 'all'
+
+        self.master_control = False
+
         pub.subscribe(self.key_mouse_control, 'key_mouse_control')
         pub.subscribe(self.message_handler, 'received_message')
 
+    def initialize(self):
+        pass
+
     def connect(self):
         pass
+        ### TODO : ADD CONNECT FUNCTION
 
     def disconnect(self):
         pass
@@ -70,11 +75,6 @@ class ManipulatorOperator:
 
         if "RETURN" in key:
             self.send_message('ENTER button clicked')
-            self.send_message(manipulator_command.get_robot_status(target=self.control_target))
-
-        elif key:
-            self.send_message(key)
-
 
 
     def limit_e_stop(self, joint_value, joint_limit):

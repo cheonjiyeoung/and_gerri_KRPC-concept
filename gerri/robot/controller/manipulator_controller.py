@@ -18,7 +18,7 @@ class ManipulatorController:
         self.controller = self._initialize_robot(**params)
         self.status_manager = StatusManager(robot_info, self.controller)
 
-        pub.subscribe(self.message_handler, 'receive_message')
+        pub.subscribe(self.receive_message, 'receive_message')
 
     def _initialize_robot(self, **params):
         """
@@ -40,7 +40,7 @@ class ManipulatorController:
         else:
             raise ValueError(f"Unsupported robot model: {self.robot_model}")
 
-    def message_handler(self, message):
+    def receive_message(self, message):
         if 'topic' in message:
             topic = message['topic']
             value = message['value']

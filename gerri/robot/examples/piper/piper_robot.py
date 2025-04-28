@@ -22,7 +22,7 @@ daemon.connect()
 
 ### Robot system setting
 
-from gerri.robot.manipulator_controller import ManipulatorController
+from gerri.robot.controller.manipulator_controller import ManipulatorController
 from gerri.robot.examples.pantilt_2kng.pantilt_controller import PanTiltController
 from gerri.robot.examples.piper.piper_config import PUPPET_ARM_LEFT, PUPPET_ARM_RIGHT
 
