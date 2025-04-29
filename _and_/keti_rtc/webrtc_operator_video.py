@@ -1,10 +1,10 @@
 from ketirtc_operator.RemoteRobotController import RemoteRobotController
 from pubsub import pub
 
-class WebRtcOperator:
-    def __init__(self, ROBOT_INFO, OPERATOR_INFO=None):
+class WebRtcOperatorVideo:
+    def __init__(self, ROBOT_INFO, OPERATOR_INFO=None, VIDEO_INFO=None):
         self.robot = None
-        self.robot_id = ROBOT_INFO["id"] + '_command'
+        self.robot_id = ROBOT_INFO["id"] + VIDEO_INFO["id"]
 
         self.server_host = '175.126.123.199'
         self.server_port = 9980

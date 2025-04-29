@@ -77,6 +77,10 @@ class SampleRobotController:
         페러럴 그리퍼 컨트롤
         """
 
+    def update_status(self):
+        print('update status')
+        return 'hi'
+
     def send_message(self, message):
         pass
 

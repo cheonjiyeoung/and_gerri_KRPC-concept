@@ -15,7 +15,7 @@ def timestamp():
     return time_sync.timestamp()
 
 class StatusManager:
-    def __init__(self, robot_info, controller, interval=0.1):
+    def __init__(self, robot_info, controller, interval=1):
         self.name = robot_info['id']
         self.category = robot_info['category']
         self.model = robot_info['model']

@@ -63,7 +63,7 @@ class SampleCommander:
 
         if "RETURN" in key:
             self.base_commander.get_robot_status(target=self.control_target)
-            self.base_commander.send_message({'topic':'test', 'value':key, 'target':self.control_target})
+            # self.base_commander.send_message({'topic':'test', 'value':key, 'target':self.control_target})
 
 
 

@@ -16,7 +16,7 @@ class ManipulatorController:
         else:
             self.bridge = False
         self.controller = self._initialize_robot(**params)
-        self.status_manager = StatusManager(robot_info, self.controller)
+        # self.status_manager = StatusManager(robot_info, self.controller)
 
         pub.subscribe(self.receive_message, 'receive_message')
 
