@@ -7,7 +7,7 @@ sudo apt update
 sudo apt install -y software-properties-common
 sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt update
-sudo apt install -y python3.10 python3.10-venv python3.10-dev portaudio19-dev build-essential
+sudo apt install -y python3.10 python3.10-venv python3.10-dev python3-pip portaudio19-dev build-essential
 
 echo "🐍 [2/5] Python 가상환경 생성..."
 python3.10 -m venv venv
@@ -17,7 +17,7 @@ source venv/bin/activate
 pip install --upgrade pip
 
 echo "📜 [4/5] Python requirements 설치..."
-pip install -r gerri/robot/requirements.txt
+pip install -r requirements.txt
 
 echo ""
 echo "✅ 완료: 환경 준비가 끝났습니다!"

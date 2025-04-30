@@ -1,4 +1,4 @@
-class SampleRobotController:
+class SampleSubController:
     def __init__(self):
         """
         ROBOT INIT CODE

@@ -11,12 +11,17 @@ class ManipulatorController:
         self.robot_name = robot_info['id']
         self.robot_category = robot_info['category']
         self.robot_model = robot_info['model']
+
         if 'use_bridge' in params and params['use_bridge']:
             self.bridge = True
         else:
             self.bridge = False
-        self.controller = self._initialize_robot(**params)
-        # self.status_manager = StatusManager(robot_info, self.controller)
+
+        if 'controller' in params:
+            self.controller = params['controller']
+        else:
+            self.controller = self._initialize_robot(**params)
+        self.status_manager = StatusManager(robot_info, self.controller)
 
         pub.subscribe(self.receive_message, 'receive_message')
 
@@ -34,9 +39,6 @@ class ManipulatorController:
         if self.robot_model == 'piper':
             from gerri.robot.examples.piper.piper_controller import PiperController
             return PiperController(can_port=self.robot_name)
-        elif self.robot_model == 'dummy':
-            from gerri.robot.examples.sample_robot.sample_robot_controller import SampleRobotController
-            return SampleRobotController()
         else:
             raise ValueError(f"Unsupported robot model: {self.robot_model}")
 
@@ -77,8 +79,8 @@ class ManipulatorController:
                             print(f"❌ Error while handling topic '{topic}': {e}")
 
 
-    def send_message(self, topic, value, target='all'):
-        pub.sendMessage('send_message', message={'topic': topic, 'value': value, 'target': target})
+    def send_message(self, message):
+        pub.sendMessage('send_message', message=message)
 
     def connect(self):
         self.controller.connect()
