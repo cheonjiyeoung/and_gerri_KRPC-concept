@@ -9,7 +9,7 @@ from gerri.robot.status_manager import StatusManager
 
 class MobileController:
     def __init__(self, robot_info, **params):
-        self.robot_name = robot_info['name']
+        self.robot_id = robot_info['name']
         self.robot_category = robot_info['category']
         self.robot_model = robot_info['model']
 
@@ -46,7 +46,7 @@ class MobileController:
             topic = message['topic']
             value = message['value']
             if 'target' in message:
-                if message['target'] in self.robot_name or message['target'] == 'all':
+                if message['target'] in self.robot_id or message['target'] == 'all':
                     try:
                         if topic == 'change_mode':
                             self.controller.change_mode(value)
@@ -68,6 +68,8 @@ class MobileController:
                             pub.sendMessage('send_message', message=self.controller.update_status())
                         elif topic == 'connect_robot':
                             self.connect()
+                        elif topic == 'custom_command':
+                            self.controller.custom_command(value)
                         else:
                             print(f"⚠️ Unknown topic received: {topic}")
                     except AttributeError as e:

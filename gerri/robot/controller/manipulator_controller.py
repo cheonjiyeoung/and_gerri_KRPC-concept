@@ -8,7 +8,7 @@ from gerri.robot.status_manager import StatusManager
 
 class ManipulatorController:
     def __init__(self, robot_info, **params):
-        self.robot_name = robot_info['id']
+        self.robot_id = robot_info['id']
         self.robot_category = robot_info['category']
         self.robot_model = robot_info['model']
 
@@ -35,10 +35,10 @@ class ManipulatorController:
         """
         if self.bridge:
             from gerri.robot.examples.robot_bridge.robot_bridge import RobotBridge
-            return RobotBridge(self.robot_name)
+            return RobotBridge(self.robot_id)
         if self.robot_model == 'piper':
             from gerri.robot.examples.piper.piper_controller import PiperController
-            return PiperController(can_port=self.robot_name)
+            return PiperController(can_port=self.robot_id)
         else:
             raise ValueError(f"Unsupported robot model: {self.robot_model}")
 
@@ -47,7 +47,7 @@ class ManipulatorController:
             topic = message['topic']
             value = message['value']
             if 'target' in message:
-                if message['target'] in self.robot_name or message['target'] == 'all':
+                if message['target'] in self.robot_id or message['target'] == 'all':
                     if self.bridge:
                         pub.sendMessage('send_message_bridge', message=message)
                     else:
@@ -71,6 +71,8 @@ class ManipulatorController:
                                 self.connect()
                             elif topic == 'get_robot_status':
                                 pub.sendMessage('send_message', message=self.controller.update_status())
+                            elif topic == 'custom_command':
+                                self.controller.custom_command(value)
                             else:
                                 print(f"⚠️ Unsupported topic: {topic}")
                         except AttributeError as e:

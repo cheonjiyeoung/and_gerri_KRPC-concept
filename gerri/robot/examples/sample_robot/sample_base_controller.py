@@ -12,7 +12,7 @@ from gerri.robot.status_manager import StatusManager
 
 class SampleBaseController:
     def __init__(self, robot_info, **params):
-        self.robot_name = robot_info['name']
+        self.robot_id = robot_info['id']
         self.robot_category = robot_info['category']
         self.robot_model = robot_info['model']
 
@@ -25,11 +25,11 @@ class SampleBaseController:
         else:
             self.controller = self._initialize_robot(**params)
 
-        self.controller = self._initialize_robot(self.robot_model, **params)
+        self.controller = self._initialize_robot(**params)
         self.status_manager = StatusManager(robot_info, self.controller)
         pub.subscribe(self.receive_message,"receive_message")
 
-    def _initialize_robot(self, robot_model, **params):
+    def _initialize_robot(self, **params):
         """
         로봇 모델에 따라 적절한 컨트롤러를 초기화.
 
@@ -37,20 +37,23 @@ class SampleBaseController:
         :param kwargs: 추가적인 파라미터
         :return: 특정 모델 컨트롤러 인스턴스
         """                                     
-        if robot_model == 'gyd_mobile':
-            from gerri.robot.examples.gyd_mobile.gyd_mobile_controller import GydMobileController
-            return GydMobileController(port="/dev/ttyUSB0",baudrate=115200,timeout=1)
+        if self.robot_model == 'gerri':
+            from gerri.robot.examples.sample_robot.sample_sub_controller import SampleSubController
+            return SampleSubController()
         else:
-            raise ValueError(f"Unsupported robot model: {robot_model}")
+            raise ValueError(f"Unsupported robot model: {self.robot_model}")
 
     def receive_message(self, message):
         if 'topic' in message:
             topic = message['topic']
             value = message['value']
             if 'target' in message:
-                if message['target'] in self.robot_name or message['target'] == 'all':
+                if message['target'] in self.robot_id or message['target'] == 'all':
                     try:
-                        self.send_message({'topic': 'callback'+topic, 'value': 'callback'+value, 'target': 'all'})
+                        if topic == 'hello_universe':
+                            self.controller.hello_universe(value)
+                        else:
+                            self.send_message({'topic': 'callback_'+topic, 'value': 'callback_'+value, 'target': 'all'})
                     except AttributeError as e:
                         print(f"❌ Controller does not support topic '{topic}': {e}")
                     except Exception as e:

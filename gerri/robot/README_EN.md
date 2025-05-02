@@ -10,16 +10,23 @@ This repository provides a sample setup for robot and operator components, suppo
 
 ```
 and_gerri/
-├── gerri/                         # Core GERRI Framework
-│   ├── operator/                 # Operator-side modules
-│   ├── robot/                    # Robot-side modules
-│   └── interface/, examples/, ...
-├── _and_/                         # Adaptive Network Daemon core
-├── utils/                         # Utility scripts
-├── hello_universe_*              # Entry scripts for robot/operator
-├── requirements.txt              # Python dependencies
-├── install.sh                    # Setup script
-└── README.md                     # This file
+├── gerri/                       # GERRI(Global Extended Robot Remote Interface)
+│   ├── operator/                # Operator-side modules
+│   │   ├── commander/           # Command logic (base + per-robot)
+│   │   ├── interface/           # Input devices (keyboard, VR, master arm, etc.)
+│   │   ├── examples/            # Robot-specific implementations (e.g., Piper)
+│   │   └── ...
+│   ├── robot/                   # Robot-side modules
+│   │   ├── controller/          # Execution logic (base + per-robot)
+│   │   ├── interface/           # Onboard sensors, emergency buttons, etc.
+│   │   ├── examples/            # Robot-specific implementations (e.g., Piper, Gyd)
+│   │   └── ...
+├── _and_/                       # Adaptive Network Daemon core
+├── utils/                       # Utility scripts
+├── hello_universe_*             # Entry scripts for robot/operator
+├── requirements.txt             # Python dependencies
+├── install.sh                   # Setup script
+└── README.md                    # This file
 ```
 
 ---
@@ -126,28 +133,6 @@ python hello_universe_operator.py
 
 ---
 
-## 📚 Dependencies
-
-Installed from `requirements.txt` during `install.sh`. If you add new packages:
-
-```bash
-pip freeze > requirements.txt
-```
-
----
-
-## 📝 License
-
-MIT License (or your team's preferred license)
-
----
-
-## 🙋 Need Support?
-
-Contact: `your.name@yourdomain.com`  
-Or open an issue in this repository.
-
----
 
 ## 🧠 System Architecture Overview
 
@@ -224,3 +209,41 @@ Flow:
 ```
 
 This architecture enables **modular** extension and hardware abstraction between operator and robot logic.
+
+
+---
+
+## 🧩 Integrating a New Robot
+
+There are **two ways** to add a new robot controller:
+
+### Option 1: Register inside Base Controller
+
+Edit the `_initialize_robot()` method in your base controller:
+
+```python
+if robot_model == 'my_robot':
+    from gerri.robot.examples.my_robot.my_robot_controller import MyRobotController
+    return MyRobotController(port="your-port", ...)
+```
+
+This lets your base controller automatically instantiate the correct sub-controller based on `robot_model`.
+
+---
+
+### Option 2: Direct Controller Injection
+
+In your robot entry script (e.g., `hello_universe_robot.py`), instantiate your robot directly:
+
+```python
+from gerri.robot.examples.sample_robot.sample_base_controller import SampleBaseController
+from gerri.robot.examples.sample_robot.sample_sub_controller import SampleSubController
+
+robot = SampleBaseController(ROBOT_INFO, controller=SampleSubController)
+robot.connect()
+```
+
+This gives you **explicit control** over which sub-controller to use.
+
+Use this method for rapid prototyping or when bypassing automatic robot model detection.
+

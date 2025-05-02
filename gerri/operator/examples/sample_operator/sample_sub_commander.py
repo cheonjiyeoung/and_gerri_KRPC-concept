@@ -5,12 +5,12 @@ import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
 
-class SampleCommander:
-    def __init__(self, base_commander, **kwargs):
-        self.base_commander = base_commander
+class SampleSubCommander:
+    def __init__(self, **kwargs):
         self.control_target = 'all'
         self.use_master_arm = False
         self.master_control = False
+        self.base_commander = None
 
         pub.subscribe(self.key_mouse_control, 'key_mouse_control')
 
@@ -21,6 +21,9 @@ class SampleCommander:
     def disconnect(self):
         pass
         ### TODO : ADD DISCONNECT FUNCTION
+
+    def set_base_commander(self, base_commander):
+        self.base_commander = base_commander
 
 
     def clamp(self, value, min_value, max_value, absolute_limit=None):
@@ -60,11 +63,10 @@ class SampleCommander:
         mouse_d_wheel = command['mouse_d_wheel']
         mouse_click = command['mouse_click']
 
+        if self.base_commander:
 
-        if "RETURN" in key:
-            self.base_commander.get_robot_status(target=self.control_target)
-            # self.base_commander.send_message({'topic':'test', 'value':key, 'target':self.control_target})
-
+            if "RETURN" in key:
+                self.base_commander.hello_universe(message='Hello Universe!')
 
 
     def limit_e_stop(self, joint_value, joint_limit):

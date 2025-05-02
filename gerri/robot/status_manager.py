@@ -16,7 +16,7 @@ def timestamp():
 
 class StatusManager:
     def __init__(self, robot_info, controller, interval=1):
-        self.name = robot_info['id']
+        self.id = robot_info['id']
         self.category = robot_info['category']
         self.model = robot_info['model']
         self.controller = controller
@@ -33,7 +33,7 @@ class StatusManager:
             self.controller.update_status()
         robot_status = vars(self.controller)
         robot_info = {
-            'robot_name': self.name,
+            'robot_id': self.id,
             'robot_type': {'category': self.category, 'model': self.model}
         }
 
@@ -86,24 +86,3 @@ class StatusManager:
         thread = threading.Thread(target=loop, daemon=True)
         thread.start()
 
-
-# ✅ 테스트 실행 부분 (Main)
-if __name__ == "__main__":
-    class DummyController:
-        """가짜 컨트롤러 객체 (테스트용)"""
-        pose = [0.0, 0.0, 0.0]
-        battery = 100
-        robot_shape = "quadruped"
-        wheel_state = "stopped"
-        joint_state = [0.0] * 6
-
-
-    # ✅ `StatusManager` 인스턴스 생성
-    robot = StatusManager(name="Piper", category="quadruped", model="Piper-X", controller=DummyController())
-
-    print("✅ 서버 기반 KST 시간 보정 테스트 시작!")
-    for i in range(3):  # 3번 반복
-        status = robot.send_status()
-        print(status)
-        print(f"🔹 [{i + 1}] 상태 메시지 전송: {status['value']['metadata']['timestamp']} (UUID: {status['value']['metadata']['uuid']})")
-        time.sleep(2)  # 2초 대기

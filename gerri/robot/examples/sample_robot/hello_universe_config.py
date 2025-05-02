@@ -2,8 +2,8 @@
 
 ROBOT_INFO = {
     "id": "hello_universe",
-    "model": "sample_robot",
-    "category": "manipulator",
+    "model": "gerri",
+    "category": "sample",
 }
 
 VIDEO_INFO = {

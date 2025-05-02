@@ -35,6 +35,8 @@ daemon.connect()
 # Base controller is
 
 from gerri.robot.examples.sample_robot.sample_base_controller import SampleBaseController
+# robot = SampleBaseController(ROBOT_INFO)
+
 from gerri.robot.examples.sample_robot.sample_sub_controller import SampleSubController
 robot = SampleBaseController(ROBOT_INFO, controller=SampleSubController)
 robot.connect()

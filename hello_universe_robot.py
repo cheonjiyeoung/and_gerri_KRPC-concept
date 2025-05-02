@@ -24,9 +24,11 @@ daemon.connect()
 
 ### Robot system setting ###
 
-from gerri.robot.controller.manipulator_controller import ManipulatorController
-robot = ManipulatorController(ROBOT_INFO)
+from gerri.robot.examples.sample_robot.sample_base_controller import SampleBaseController
+robot = SampleBaseController(ROBOT_INFO)
 robot.connect()
+
+
 
 while True:
     time.sleep(1)

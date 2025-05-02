@@ -81,6 +81,13 @@ class SampleSubController:
         print('update status')
         return 'hi'
 
+    def hello_universe(self, value):
+        print('hello_universe')
+        return 'hello_universe_by_robot'
+
+    def custom_command(self, command):
+        return command
+
     def send_message(self, message):
         pass
 

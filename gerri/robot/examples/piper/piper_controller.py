@@ -154,6 +154,9 @@ class PiperController:
         else:
             raise TypeError("Input must be an int, float, list, tuple, or set")
 
+    def custom_command(self, command):
+        print("CUSTOM COMMAND")
+
     def update_status(self):
         self.joint_state['position'] = [round(rad, 3) for rad in self.deg2rad(self.get_joint_angles())]
 

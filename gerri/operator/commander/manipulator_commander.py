@@ -6,29 +6,30 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable),
 from gerri.operator.commander import manipulator_command
 
 class ManipulatorCommander:
-    def __init__(self, robot_info):
+    def __init__(self, robot_info, **params):
         self.robot_name = robot_info['id']
         self.robot_category = robot_info['category']
         self.robot_model = robot_info['model']
-        self.sub_commander = self._initialize_commander()
+
+        if 'commander' in params:
+            self.commander = params['commander']
+        else:
+            self.commander = self._initialize_commander(**params)
 
         pub.subscribe(self.received_message, 'received_message')
 
-    def _initialize_commander(self):
+    def _initialize_commander(self, **params):
         if self.robot_model == 'piper':
             from gerri.operator.examples.piper.piper_commander import PiperCommander
             return PiperCommander(self)
-        elif self.robot_model == 'dummy':
-            from gerri.operator.examples.sample_operator.sample_sub_commander import SampleCommander
-            return SampleCommander(self)
         else:
             raise ValueError(f"Unsupported robot model: {self.robot_model}")
 
     def connect(self):
-        self.sub_commander.connect()
+        self.commander.connect()
 
     def disconnect(self):
-        self.sub_commander.disconnect()
+        self.commander.disconnect()
 
     def send_message(self, message):
         pub.sendMessage('send_message', message=message)

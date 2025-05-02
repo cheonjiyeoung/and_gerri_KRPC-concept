@@ -3,9 +3,9 @@ from pubsub import pub
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-from gerri.operator.commander import mobile_command
+from gerri.operator.examples.sample_operator import sample_base_command
 
-class MobileCommander:
+class SampleBaseCommander:
     def __init__(self, robot_info, **params):
         self.robot_id = robot_info['id']
         self.robot_category = robot_info['category']
@@ -16,12 +16,15 @@ class MobileCommander:
         else:
             self.commander = self._initialize_commander(**params)
 
+        self.commander.set_base_commander(self)
+
         pub.subscribe(self.received_message, 'received_message')
 
     def _initialize_commander(self, **params):
-        if self.robot_model == 'gyd_mobile':
-            # from gerri.operator.examples.piper.piper_commander import PiperCommander
-            return "### TODO : ADD SUB COMMANDER"
+        if self.robot_model == 'gerri':
+            from gerri.operator.examples.sample_operator.sample_sub_commander import SampleSubCommander
+            return SampleSubCommander()
+
         else:
             raise ValueError(f"Unsupported robot model: {self.robot_model}")
 
@@ -41,26 +44,6 @@ class MobileCommander:
             if 'target' in message:
                 target = message['target']
 
-    def move_waypoint(self, waypoint, target='all'):
-        command = mobile_command.move_waypoint(waypoint, target=target)
-        self.send_message(command)
-
-    def move_coord(self, coord, target='all'):
-        command = mobile_command.move_coord(coord, target=target)
-        self.send_message(command)
-
-    def dock(self, docking_station, target='all'):
-        command = mobile_command.dock(docking_station, target=target)
-        self.send_message(command)
-
-    def change_mode(self, mode, target='all'):
-        command = mobile_command.change_mode(mode, target=target)
-        self.send_message(command)
-
-    def change_map(self, waypoint, target='all'):
-        command = mobile_command.change_map(waypoint, target=target)
-        self.send_message(command)
-
-    def relocate(self, waypoint, target='all'):
-        command = mobile_command.relocate(waypoint, target=target)
+    def hello_universe(self, message):
+        command = sample_base_command.hello_universe(message, target='all')
         self.send_message(command)
