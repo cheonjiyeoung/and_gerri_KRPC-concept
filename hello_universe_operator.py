@@ -1,3 +1,10 @@
+"""
+Main entry point for Hello Universe operator UI.
+- Connects to the robot using AND
+- Sets up command system (GERRI)
+- Launches keyboard/mouse input interface
+"""
+
 from PySide6.QtWidgets import QApplication
 
 import os, sys
@@ -10,9 +17,15 @@ webrtc_daemon = WebRtcOperator(ROBOT_INFO,OPERATOR_INFO)
 webrtc_daemon.connect()
 
 
-from gerri.operator.commander.manipulator_commander import ManipulatorCommander
+from gerri.operator.examples.sample_operator.sample_base_commander import SampleBaseCommander
 
-gerri_operator = ManipulatorCommander(ROBOT_INFO)
+# gerri_operator = SampleBaseCommander(ROBOT_INFO)
+# gerri_operator.connect()
+
+from gerri.operator.examples.sample_operator.sample_sub_commander import SampleSubCommander
+# If the model is not predefined in SampleBaseCommander,
+# we explicitly assign a sub-commander implementation.
+gerri_operator = SampleBaseCommander(ROBOT_INFO, commander=SampleSubCommander())
 gerri_operator.connect()
 
 from gerri.operator.interface.keyboard_mouse_controller import KeyboardMouseController

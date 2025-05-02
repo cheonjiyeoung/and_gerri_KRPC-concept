@@ -14,18 +14,32 @@ class SampleSubCommander:
 
         pub.subscribe(self.key_mouse_control, 'key_mouse_control')
 
+    """
+    Initializes the connection for the sub-commander (e.g., hardware setup, activation).
+    """
     def connect(self):
         print('Connecting to Gerri...')
 
 
+    """
+    Handles cleanup and shutdown for the sub-commander (if applicable).
+    """
     def disconnect(self):
         pass
         ### TODO : ADD DISCONNECT FUNCTION
 
+    """
+    Sets the reference to the base commander instance.
+    This allows the sub commander to call base-level methods.
+    """
     def set_base_commander(self, base_commander):
         self.base_commander = base_commander
 
 
+    """
+    Clamp a given value to a specified min-max range.
+    Optionally constrain further with an absolute limit.
+    """
     def clamp(self, value, min_value, max_value, absolute_limit=None):
         """
         값을 주어진 범위로 제한 (클램핑).
@@ -41,6 +55,9 @@ class SampleSubCommander:
             max_value = min(max_value, absolute_limit[1])
         return max(min_value, min(value, max_value))
 
+    """
+    Maps a value from one range into another using linear scaling.
+    """
     def map_value(self, value, in_min, in_max, out_min, out_max):
         """
         특정 값을 주어진 범위 내에서 다른 범위로 매핑하는 함수.
@@ -56,6 +73,9 @@ class SampleSubCommander:
 
         return map_value
 
+    """
+    Handles key and mouse input events and maps them to robot commands.
+    """
     def key_mouse_control(self, command):
         # print(command)
         key = command['key_control']
@@ -67,24 +87,3 @@ class SampleSubCommander:
 
             if "RETURN" in key:
                 self.base_commander.hello_universe(message='Hello Universe!')
-
-
-    def limit_e_stop(self, joint_value, joint_limit):
-        """
-        조인트 값이 리미트를 초과하면 긴급 정지.
-
-        :param joint_value: 조인트 값 리스트
-        :param joint_limit: 리미트 범위 리스트
-        :return: True (긴급 정지 필요), False (정상 범위)
-        """
-        # for idx, value in enumerate(joint_value):
-        #     min_limit, max_limit = joint_limit[idx]
-        #     if value < min_limit:
-        #         value = min_limit
-        #     elif value > max_limit:
-        #         value = max_limit
-        #         # self.disable_master_arm()
-        #         print(
-        #             f"JOINT LIMIT EXCEEDED: Joint {idx + 1} | Value: {value} | Limits: [{min_limit}, {max_limit}]")
-        #         # return True
-        return False

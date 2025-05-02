@@ -1,5 +1,6 @@
 from ketirtc_operator.RemoteRobotController import RemoteRobotController
 from pubsub import pub
+import json
 
 class WebRtcOperator:
     def __init__(self, ROBOT_INFO, OPERATOR_INFO=None):
@@ -32,12 +33,17 @@ class WebRtcOperator:
 
     async def handle_robot_message(self, message, channel):
         print(f"robot message received: {message}")
+
+        # 안전하게 JSON 파싱
+        if isinstance(message, str):
+            try:
+                message = json.loads(message)
+            except json.JSONDecodeError as e:
+                print(f"❌ Failed to parse JSON: {e}")
+                return
+
+        if not isinstance(message, dict):
+            print(f"❌ Unexpected message format: {type(message)}")
+            return
+
         pub.sendMessage('receive_message', message=message)
-
-
-'''
-            if track.kind == "video":
-                from operator_video import VideoReceiverTrack, display_video
-                receiver = VideoReceiverTrack(track, label=label)
-                asyncio.ensure_future(display_video(receiver))
-    '''

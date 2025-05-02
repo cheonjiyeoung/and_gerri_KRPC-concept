@@ -53,16 +53,23 @@ class TimeSyncManager:
         return self.server_start_time + elapsed
 
     def record_latency(self, sent_time):
-        """서버에서 받은 sent_time을 기반으로 지연 시간 기록"""
         if isinstance(sent_time, str):
             sent_time = datetime.fromisoformat(sent_time)
-        elif not isinstance(sent_time, datetime):
+            if sent_time.tzinfo is None:
+                sent_time = sent_time.replace(tzinfo=KST)  # ✅ 핵심: KST로 설정
+
+        elif isinstance(sent_time, datetime):
+            if sent_time.tzinfo is None:
+                sent_time = sent_time.replace(tzinfo=KST)
+
+        else:
             print(f"❌ 잘못된 시간 타입: {type(sent_time)}")
             return
 
-        now = self.get_scaled_server_time()
+        now = self.get_scaled_server_time()  # Already in KST
         latency_ms = (now - sent_time).total_seconds() * 1000
         self.latencies.append(latency_ms)
+
 
     def get_latency_stats(self):
         """현재까지 측정된 평균 지연과 1% low 값을 반환 (ms)"""

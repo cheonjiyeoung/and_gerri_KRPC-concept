@@ -16,7 +16,7 @@ class ManipulatorCommander:
         else:
             self.commander = self._initialize_commander(**params)
 
-        pub.subscribe(self.received_message, 'received_message')
+        pub.subscribe(self.receive_message, 'received_message')
 
     def _initialize_commander(self, **params):
         if self.robot_model == 'piper':
@@ -34,7 +34,7 @@ class ManipulatorCommander:
     def send_message(self, message):
         pub.sendMessage('send_message', message=message)
 
-    def received_message(self, message):
+    def receive_message(self, message):
         if 'topic' in message:
             topic = message['topic']
             value = message['value']

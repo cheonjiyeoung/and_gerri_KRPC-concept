@@ -8,13 +8,17 @@
 
 
 def hello_universe(message, target=None, **option):
-    '''
-    Args: Hello Universe!
-        target:
-        **option:
+    """
+    Args:
+    message (str): Message to send with the command
+    target (str, optional): Specific robot target ID
+    **option: Additional optional parameters Hello Universe!
+    target:
+    **option:
 
     Returns:
-    '''
+    dict: Formatted command dictionary with topic, value, and optional target/option
+    """
 
     command = {
         'topic': 'hello_universe',
