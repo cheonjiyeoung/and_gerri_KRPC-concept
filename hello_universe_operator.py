@@ -25,7 +25,7 @@ from gerri.operator.examples.sample_operator.sample_base_commander import Sample
 from gerri.operator.examples.sample_operator.sample_sub_commander import SampleSubCommander
 # If the model is not predefined in SampleBaseCommander,
 # we explicitly assign a sub-commander implementation.
-gerri_operator = SampleBaseCommander(ROBOT_INFO, commander=SampleSubCommander())
+gerri_operator = SampleBaseCommander(ROBOT_INFO, sub_commander=SampleSubCommander())
 gerri_operator.connect()
 
 from gerri.operator.interface.keyboard_mouse_controller import KeyboardMouseController

@@ -20,16 +20,20 @@ class SampleBaseController:
             self.bridge = True
         else:
             self.bridge = False
-        if 'controller' in params:
-            self.controller = params['controller']
-        else:
-            self.controller = self._initialize_robot(**params)
 
-        self.controller = self._initialize_robot(**params)
-        self.status_manager = StatusManager(robot_info, self.controller)
+        if 'sub_controller' in params:
+            self.sub_controller = params['sub_controller']
+        else:
+            self.sub_controller = self.init_sub_controller(**params)
+
+        if hasattr(self.sub_controller, 'init_base_controller'):
+            self.sub_controller.init_base_controller(self)
+
+        self.sub_controller = self.init_sub_controller(**params)
+        self.status_manager = StatusManager(robot_info, self.sub_controller)
         pub.subscribe(self.receive_message,"receive_message")
 
-    def _initialize_robot(self, **params):
+    def init_sub_controller(self, **params):
         """
         로봇 모델에 따라 적절한 컨트롤러를 초기화.
 
@@ -51,7 +55,7 @@ class SampleBaseController:
                 if message['target'] in self.robot_id or message['target'] == 'all':
                     try:
                         if topic == 'hello_universe':
-                            self.controller.hello_universe(value)
+                            self.sub_controller.hello_universe(value)
                         else:
                             self.send_message({'topic': 'callback_'+topic, 'value': 'callback_'+value, 'target': 'all'})
                     except AttributeError as e:
@@ -64,7 +68,7 @@ class SampleBaseController:
         pub.sendMessage('send_message', message=message)
 
     def connect(self):
-        self.controller.connect()
+        self.sub_controller.connect()
 
     def disconnect(self):
-        self.controller.disconnect()
+        self.sub_controller.disconnect()

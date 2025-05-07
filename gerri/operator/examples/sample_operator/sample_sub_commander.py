@@ -32,7 +32,7 @@ class SampleSubCommander:
     Sets the reference to the base commander instance.
     This allows the sub commander to call base-level methods.
     """
-    def set_base_commander(self, base_commander):
+    def init_base_commander(self, base_commander):
         self.base_commander = base_commander
 
 

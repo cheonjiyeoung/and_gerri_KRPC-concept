@@ -15,14 +15,17 @@ MASTER_ARM_PORT_R = MASTER_ARM_USB_RIGHT
 
 
 class PiperCommander:
-    def __init__(self, base_commander, **kwargs):
-        self.base_commander = base_commander
+    def __init__(self, **kwargs):
+        self.base_commander = None
         self.puppet = [PUPPET_ARM_NAME_LEFT, PUPPET_ARM_NAME_RIGHT]
         self.control_target = 'all'
         self.use_master_arm = False
         self.master_control = False
 
         pub.subscribe(self.key_mouse_control, 'key_mouse_control')
+
+    def init_base_commander(self, base_commander):
+        self.base_commander = base_commander
 
     def initialize(self):
         if self.master_arm_left is not None:

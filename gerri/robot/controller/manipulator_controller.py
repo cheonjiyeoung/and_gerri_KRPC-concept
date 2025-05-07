@@ -17,15 +17,19 @@ class ManipulatorController:
         else:
             self.bridge = False
 
-        if 'controller' in params:
-            self.controller = params['controller']
+        if 'sub_controller' in params:
+            self.sub_controller = params['sub_controller']
         else:
-            self.controller = self._initialize_robot(**params)
-        self.status_manager = StatusManager(robot_info, self.controller)
+            self.sub_controller = self.init_sub_controller(**params)
+        self.status_manager = StatusManager(robot_info, self.sub_controller)
+
+
+        if hasattr(self.sub_controller, 'init_base_controller'):
+            self.sub_controller.init_base_controller(self)
 
         pub.subscribe(self.receive_message, 'receive_message')
 
-    def _initialize_robot(self, **params):
+    def init_sub_controller(self, **params):
         """
         로봇 모델에 따라 적절한 컨트롤러를 초기화.
 
@@ -53,26 +57,26 @@ class ManipulatorController:
                     else:
                         try:
                             if topic == 'joint_ctrl':
-                                self.controller.joint_ctrl(value)
+                                self.sub_controller.joint_ctrl(value)
                             elif topic == 'joint_ctrl_step':
-                                self.controller.joint_ctrl_step(value)
+                                self.sub_controller.joint_ctrl_step(value)
                             elif topic == 'gripper_ctrl':
-                                self.controller.gripper_ctrl(value)
+                                self.sub_controller.gripper_ctrl(value)
                             elif topic == 'joint_ctrl_master':
-                                self.controller.joint_ctrl_puppet(value)
+                                self.sub_controller.joint_ctrl_puppet(value)
                             elif topic == 'gripper_ctrl_master':
-                                self.controller.gripper_ctrl_puppet(value)
+                                self.sub_controller.gripper_ctrl_puppet(value)
                             elif topic == 'joint_preset':
-                                if value in self.controller.joint_preset:
-                                    self.controller.joint_ctrl(self.controller.joint_preset[value])
+                                if value in self.sub_controller.joint_preset:
+                                    self.sub_controller.joint_ctrl(self.sub_controller.joint_preset[value])
                                 else:
                                     print(f"⚠️ Unknown joint_preset value: {value}")
                             elif topic == 'connect_robot':
                                 self.connect()
                             elif topic == 'get_robot_status':
-                                pub.sendMessage('send_message', message=self.controller.update_status())
+                                pub.sendMessage('send_message', message=self.sub_controller.update_status())
                             elif topic == 'custom_command':
-                                self.controller.custom_command(value)
+                                self.sub_controller.custom_command(value)
                             else:
                                 print(f"⚠️ Unsupported topic: {topic}")
                         except AttributeError as e:
@@ -85,7 +89,7 @@ class ManipulatorController:
         pub.sendMessage('send_message', message=message)
 
     def connect(self):
-        self.controller.connect()
+        self.sub_controller.connect()
 
     def disconnect(self):
-        self.controller.disconnect()
+        self.sub_controller.disconnect()

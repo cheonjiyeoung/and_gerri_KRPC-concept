@@ -18,16 +18,19 @@ class MobileController:
         else:
             self.bridge = False
 
-        if 'controller' in params:
-            self.controller = params['controller']
+        if 'sub_controller' in params:
+            self.sub_controller = params['sub_controller']
         else:
-            self.controller = self._initialize_robot(**params)
+            self.sub_controller = self.init_sub_controller(**params)
 
-        self.controller = self._initialize_robot(self.robot_model, **params)
-        self.status_manager = StatusManager(robot_info, self.controller)
+        if hasattr(self.sub_controller, 'init_base_controller'):
+            self.sub_controller.init_base_controller(self)
+
+        self.sub_controller = self.init_sub_controller(self.robot_model, **params)
+        self.status_manager = StatusManager(robot_info, self.sub_controller)
         pub.subscribe(self.receive_message,"receive_message")
 
-    def _initialize_robot(self, robot_model, **params):
+    def init_sub_controller(self, robot_model, **params):
         """
         로봇 모델에 따라 적절한 컨트롤러를 초기화.
 
@@ -49,27 +52,27 @@ class MobileController:
                 if message['target'] in self.robot_id or message['target'] == 'all':
                     try:
                         if topic == 'change_mode':
-                            self.controller.change_mode(value)
+                            self.sub_controller.change_mode(value)
                         elif topic == 'move_waypoint':
-                            self.controller.move_waypoint(value)
+                            self.sub_controller.move_waypoint(value)
                         elif topic == 'move_coord':
-                            self.controller.move_coord(value)
+                            self.sub_controller.move_coord(value)
                         elif topic == 'dock':
-                            self.controller.dock(value)
+                            self.sub_controller.dock(value)
                         elif topic == 'joy':
-                            self.controller.joy(value)
+                            self.sub_controller.joy(value)
                         elif topic == 'relocate':
-                            self.controller.relocate(value)
+                            self.sub_controller.relocate(value)
                         elif topic == 'move_floor':
-                            self.controller.move_floor(value)
+                            self.sub_controller.move_floor(value)
                         elif topic == 'map_change':
-                            self.controller.map_change(value)
+                            self.sub_controller.map_change(value)
                         elif topic == 'get_robot_status':
-                            pub.sendMessage('send_message', message=self.controller.update_status())
+                            pub.sendMessage('send_message', message=self.sub_controller.update_status())
                         elif topic == 'connect_robot':
                             self.connect()
                         elif topic == 'custom_command':
-                            self.controller.custom_command(value)
+                            self.sub_controller.custom_command(value)
                         else:
                             print(f"⚠️ Unknown topic received: {topic}")
                     except AttributeError as e:
@@ -80,7 +83,7 @@ class MobileController:
 
 
     def connect(self):
-        self.controller.connect()
+        self.sub_controller.connect()
 
     def disconnect(self):
-        self.controller.disconnect()
+        self.sub_controller.disconnect()

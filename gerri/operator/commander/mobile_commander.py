@@ -11,14 +11,18 @@ class MobileCommander:
         self.robot_category = robot_info['category']
         self.robot_model = robot_info['model']
 
-        if 'commander' in params:
-            self.commander = params['commander']
+        if 'sub_commander' in params:
+            self.sub_commander = params['sub_commander']
         else:
-            self.commander = self._initialize_commander(**params)
+            self.sub_commander = self.init_sub_commander(**params)
+
+
+        if hasattr(self.sub_commander, 'init_base_commander'):
+            self.sub_commander.init_base_commander(self)
 
         pub.subscribe(self.receive_message, 'receive_message')
 
-    def _initialize_commander(self, **params):
+    def init_sub_commander(self, **params):
         if self.robot_model == 'gyd_mobile':
             # from gerri.operator.examples.piper.piper_commander import PiperCommander
             return "### TODO : ADD SUB COMMANDER"
@@ -26,10 +30,10 @@ class MobileCommander:
             raise ValueError(f"Unsupported robot model: {self.robot_model}")
 
     def connect(self):
-        self.commander.connect()
+        self.sub_commander.connect()
 
     def disconnect(self):
-        self.commander.disconnect()
+        self.sub_commander.disconnect()
 
     def send_message(self, message):
         pub.sendMessage('send_message', message=message)

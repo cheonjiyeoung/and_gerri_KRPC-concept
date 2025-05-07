@@ -3,6 +3,7 @@ class SampleSubController:
         """
         ROBOT INIT CODE
         """
+        self.base_controller = None
         self.robot_state = 'idle'
         self.pose = {
             'position': [0, 0, 0],
@@ -39,6 +40,9 @@ class SampleSubController:
             'size': [0, 0],
             'scale': 1
         }
+
+    def init_base_controller(self, base_controller):
+        self.base_controller = base_controller
 
     def get_joint_angles(self):
         """
@@ -89,7 +93,7 @@ class SampleSubController:
         return command
 
     def send_message(self, message):
-        pass
+        self.base_controller.send_message(message)
 
     @staticmethod
     def clamp(value, min_value, max_value, absolute_limit=None):
