@@ -49,7 +49,9 @@ and_gerri/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/keti-ai/and_gerri.git
+mkdir ~/dev
+cd ~/dev
+git clone https://github.com/keti-ai/and_gerri.git # NEED ID and TOKEN
 cd and_gerri
 ```
 
