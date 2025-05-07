@@ -12,9 +12,8 @@ sudo apt install -y python3.10 python3.10-venv python3.10-dev python3-pip portau
 echo "🐍 [2/5] Creating Python virtual environment..."
 python3.10 -m venv venv
 
-echo "🔁 [3/5] Activating virtual environment and upgrading pip..."
+echo "🔁 [3/5] Activating virtual environment..."
 source venv/bin/activate
-pip install --upgrade pip
 
 echo "📜 [4/5] Installing Python requirements..."
 pip install -r requirements.txt

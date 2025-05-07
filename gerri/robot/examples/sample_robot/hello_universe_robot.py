@@ -24,7 +24,7 @@ daemon.connect()
 from gerri.robot.examples.sample_robot.sample_base_controller import SampleBaseController
 from gerri.robot.examples.sample_robot.sample_sub_controller import SampleSubController
 
-robot = SampleBaseController(ROBOT_INFO, sub_controller=SampleSubController)
+robot = SampleBaseController(ROBOT_INFO, sub_controller=SampleSubController())
 robot.connect()
 
 # Keep process alive

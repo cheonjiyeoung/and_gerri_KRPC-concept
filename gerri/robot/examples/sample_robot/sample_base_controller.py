@@ -27,9 +27,8 @@ class SampleBaseController:
             self.sub_controller = self.init_sub_controller(**params)
 
         if hasattr(self.sub_controller, 'init_base_controller'):
-            self.sub_controller.init_base_controller(self)
+            self.sub_controller.init_base_controller(base_controller=self)
 
-        self.sub_controller = self.init_sub_controller(**params)
         self.status_manager = StatusManager(robot_info, self.sub_controller)
         pub.subscribe(self.receive_message,"receive_message")
 
