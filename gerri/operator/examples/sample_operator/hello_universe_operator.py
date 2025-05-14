@@ -10,10 +10,10 @@ from PySide6.QtWidgets import QApplication
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-from _and_.keti_rtc.webrtc_operator import WebRtcOperator
+from _and_.keti_rtc.webrtc_operator_command import WebRtcOperatorCommand
 from hello_universe_config import ROBOT_INFO, OPERATOR_INFO
 
-webrtc_daemon = WebRtcOperator(ROBOT_INFO,OPERATOR_INFO)
+webrtc_daemon = WebRtcOperatorCommand(ROBOT_INFO,OPERATOR_INFO)
 webrtc_daemon.connect()
 
 

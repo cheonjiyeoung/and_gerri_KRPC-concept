@@ -3,11 +3,11 @@ from PySide6.QtWidgets import QApplication, QLabel, QMainWindow
 from PySide6.QtCore import QTimer, Qt
 from PySide6.QtGui import QImage, QPixmap
 
-
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
 from _and_.keti_rtc.stereo_camera_combiner import StereoCameraCombiner
+from _and_.keti_rtc.webrtc_operator_video_track import VideoManager
 from _and_.keti_rtc.stereo_vr_processor import StereoVRProcessor, StereoVROption
 from _and_.keti_rtc.cam_manager import CameraManager
 
@@ -19,7 +19,7 @@ def convert_frame_to_pixmap(frame):
     return QPixmap.fromImage(QImage(rgb.data, w, h, bytes_per_line, QImage.Format_RGB888))
 
 
-class StereoVRGuiTest(QMainWindow):
+class VrVideoPlayer(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("StereoVRProcessor GUI Test")
@@ -34,7 +34,9 @@ class StereoVRGuiTest(QMainWindow):
         # self.cam1.start()
         # self.cam2.start()
 
-        self.cam0 = CameraManager(camera_index=0, width=9999, height=9999, fps=30)
+        # self.cam0 = CameraManager(camera_index=0, width=9999, height=9999, fps=30)
+
+        self.cam = VideoManager()
 
 
         # self.combiner = StereoCameraCombiner(self.cam1, self.cam2)
@@ -44,14 +46,14 @@ class StereoVRGuiTest(QMainWindow):
             aspect_mode="resize",
             target_aspect_ratio="2:1"
         )
-        self.processor = StereoVRProcessor(self.cam0, self.vr_option)
+        self.processor = StereoVRProcessor(self.cam, self.vr_option)
 
         # self.processor = self.cam0
 
         # 타이머 프레임 업데이트
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_frame)
-        self.timer.start(10)
+        self.timer.start(30)
 
         # 전체화면 모드로 진입
         self.showFullScreen()
@@ -79,6 +81,6 @@ class StereoVRGuiTest(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = StereoVRGuiTest()
+    window = VrVideoPlayer()
     window.show()
     sys.exit(app.exec())

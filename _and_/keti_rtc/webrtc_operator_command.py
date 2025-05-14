@@ -2,16 +2,16 @@ from ketirtc_operator.RemoteRobotController import RemoteRobotController
 from pubsub import pub
 import json
 
-class WebRtcOperator:
-    def __init__(self, ROBOT_INFO, OPERATOR_INFO=None):
+class WebRtcOperatorCommand:
+    def __init__(self, robot_info, operator_info=None):
         self.robot = None
-        self.robot_id = ROBOT_INFO["id"] + '_command'
+        self.robot_id = robot_info["id"] + '_command'
 
         self.server_host = '175.126.123.199'
         self.server_port = 9980
 
-        self.user_id = OPERATOR_INFO['id']
-        self.password = OPERATOR_INFO['password']
+        self.user_id = operator_info['id']
+        self.password = operator_info['password']
 
         pub.subscribe(self.send_message, 'send_message')
 
