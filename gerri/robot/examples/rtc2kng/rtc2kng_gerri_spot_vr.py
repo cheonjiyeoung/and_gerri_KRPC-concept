@@ -16,6 +16,7 @@ daemon = AdaptiveNetworkDaemon(
     video=VIDEO_INFO,
     audio=AUDIO_INFO
 )
+
 daemon.connect()
 
 # Initialize robot controller (GERRI)
@@ -27,9 +28,10 @@ from gerri.robot.examples.sample_robot.sample_sub_controller import SampleSubCon
 
 from gerri.robot.examples.pantilt_2kng.pantilt_controller import PanTiltController
 pantilt = PanTiltController()
+pantilt.connect()
 
-robot = SampleBaseController(ROBOT_INFO, sub_controller=SampleSubController())
-robot.connect()
+# robot = SampleBaseController(ROBOT_INFO, sub_controller=SampleSubController())
+# robot.connect()
 
 # Keep process alive
 while True:

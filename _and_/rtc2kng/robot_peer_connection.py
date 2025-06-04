@@ -131,9 +131,9 @@ class RobotPeerConnectionHandler:
         all_codecs = caps.codecs
 
         # 선호 코덱 순서 정의 (MIME 타입 소문자로 비교)
-        preferred_mime_types = ["video/av1", "video/h264", "video/vp8"]
+        # preferred_mime_types = ["video/av1", "video/h264", "video/vp8"]
         # preferred_mime_types = ["video/av1", "video/h264"]
-        # preferred_mime_types = ["video/av1", "video/vp8", "video/h264"]
+        preferred_mime_types = ["video/av1", "video/vp8", "video/h264"]
 
         ordered_codecs = []
         # 사용 가능한 코덱 중에서 선호 코덱을 찾아 순서대로 추가
@@ -354,7 +354,14 @@ class RobotPeerConnectionHandler:
         @self.data_channel.on("message")
         def _on_data_channel_message(msg):
             print(f"[{timestamp()}] 📥 {self.operator_id}: {msg}")
-            self.data_channel.send(f"echo: {msg}")
+            # self.data_channel.send(f"echo: {msg}")
+            try:
+                msg_data = json.loads(msg)
+                pub.sendMessage('receive_message', message=msg_data)
+            except Exception as e:
+                print("ERROR :", e)
+
+
 
     async def _periodic_stats_logger_task(self):
         """Periodically log remote-inbound RTP stats (RTT, jitter)."""

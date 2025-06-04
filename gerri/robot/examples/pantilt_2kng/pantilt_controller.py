@@ -1,4 +1,5 @@
 # base_controller.py
+import time
 from logging import lastResort
 
 from pubsub import pub
@@ -14,8 +15,8 @@ ADDR_PRO_PRESENT_POSITION   = 132
 PROTOCOL_VERSION            = 2.0               # See which protocol version is used in the Dynamixel
 
 # Default setting
-PAN_DXL_ID                  = 1                                         # 좌우 모터
-TILT_DXL_ID                 = 2                                         # 상하 모터
+PAN_DXL_ID                  = 0                                         # 좌우 모터
+TILT_DXL_ID                 = 1                                         # 상하 모터
 BAUDRATE                    = 1000000                                   # Dynamixel default baudrate : 57600
 DEVICENAME                  = '/dev/ttyUSB0'                            # Check which port is being used on your controller
                                                                         # ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
@@ -103,7 +104,7 @@ class PanTiltController:           # 2개의 다이나믹셀을 목처럼 컨트
             topic = message['topic']
             value = message['value']
             if topic == "pan_tilt":
-                self.angle_control(pan_angle=value[0], tilt_angle=value[1])
+                self.angle_control(pan_angle=-value[0], tilt_angle=value[1])
             elif topic == "pan_tilt_step":
                 self.step_control(pan_step=int(value[0] * 100), tilt_step=int(value[1] * 100))
 
@@ -149,6 +150,11 @@ class PanTiltController:           # 2개의 다이나믹셀을 목처럼 컨트
 if __name__ == '__main__':
     neck = PanTiltController()
     neck.connect()
-    time.sleep(2)
+
+    for i in range(-90, 90):
+        neck.angle_control(i, i)
+        time.sleep(0.1)
+
+    time.sleep(100)
     neck.disconnect()
 

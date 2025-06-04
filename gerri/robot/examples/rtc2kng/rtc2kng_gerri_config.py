@@ -8,8 +8,8 @@ ROBOT_INFO = {
     "category": "sample",  # 로봇 카테고리
     "room_id": "test_room",  # 접속할 WebRTC 방 ID
     # "server_ip": "localhost",  # 접속할 서버 IP 주소
-    "server_ip": "172.20.1.250",  # 접속할 서버 IP 주소
-    # "server_ip": "125.131.105.165",  # 접속할 서버 IP 주소
+    # "server_ip": "172.20.1.250",  # 접속할 서버 IP 주소
+    "server_ip": "125.131.105.165",  # 접속할 서버 IP 주소
     "server_port": 25000,  # 접속할 서버 포트 번호
 }
 
@@ -18,9 +18,9 @@ ROBOT_INFO = {
 # 키 값(예: "front_cam")은 카메라의 레이블로 사용됩니다.
 VIDEO_INFO = {
     "front_cam": {
-        "index": 0,  # 카메라 장치 인덱스 (일반적으로 0부터 시작)
-        "width": 1920,  # 비디오 해상도 너비
-        "height": 1080,  # 비디오 해상도 높이
+        "index": 2,  # 카메라 장치 인덱스 (일반적으로 0부터 시작)
+        "width": 2000,  # 비디오 해상도 너비
+        "height": 1000,  # 비디오 해상도 높이
         "debug": False  # CameraManager의 디버그 모드 활성화 여부
     },
     # 추가 카메라가 있다면 여기에 정의할 수 있습니다.
