@@ -1,0 +1,7 @@
+aiortc
+opencv-python
+websockets
+requests
+pypubsub
+ntplib
+pyaudio
