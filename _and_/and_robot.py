@@ -16,6 +16,8 @@ class AdaptiveNetworkDaemon:
     def _setup_channels(self):
         if self.network == "ketirtc":
             from _and_.keti_rtc import webrtc_robot as backend
+        elif self.network == "rtc2kng":
+            from _and_.rtc2kng import rtc2kng_robot as backend
         elif self.network == "zeromq":
             from _and_.zeromq import zeromq_robot as backend
         else:

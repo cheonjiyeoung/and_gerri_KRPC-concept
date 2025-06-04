@@ -31,4 +31,5 @@ def create_channels(operator_info, command=None, video_info=None, audio_info=Non
             full_id = f'{operator_id}_{name}'
             channels[full_id] = video_channel
 
+
     return channels

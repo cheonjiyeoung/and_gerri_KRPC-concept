@@ -26,7 +26,7 @@ class MobileController:
         if hasattr(self.sub_controller, 'init_base_controller'):
             self.sub_controller.init_base_controller(self)
 
-        self.sub_controller = self.init_sub_controller(self.robot_model, **params)
+        # self.sub_controller = self.init_sub_controller(self.robot_model, **params)
         self.status_manager = StatusManager(robot_info, self.sub_controller)
         pub.subscribe(self.receive_message,"receive_message")
 

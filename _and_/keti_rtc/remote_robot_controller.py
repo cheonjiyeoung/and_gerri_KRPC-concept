@@ -239,7 +239,7 @@ class RemoteRobotController:
             if pc.connectionState == "failed":
                 await pc.close()
 
-        # pc.addTransceiver('audio', direction='recvonly')
+        # pc.addTransceiver('audio', direction='recvonly')      ### NEED CHANGE TO SEND AND RECEIVE
         self.pc.addTransceiver('video', direction='recvonly')
 
         logger.info("creating offer ...")
