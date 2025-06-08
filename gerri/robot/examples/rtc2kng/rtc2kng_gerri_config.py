@@ -18,7 +18,7 @@ ROBOT_INFO = {
 # 키 값(예: "front_cam")은 카메라의 레이블로 사용됩니다.
 VIDEO_INFO = {
     "front_cam": {
-        "index": 2,  # 카메라 장치 인덱스 (일반적으로 0부터 시작)
+        "index": 0,  # 카메라 장치 인덱스 (일반적으로 0부터 시작)
         "width": 2000,  # 비디오 해상도 너비
         "height": 1000,  # 비디오 해상도 높이
         "debug": False  # CameraManager의 디버그 모드 활성화 여부

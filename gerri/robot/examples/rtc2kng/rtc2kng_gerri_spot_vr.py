@@ -23,15 +23,15 @@ daemon.connect()
 # - If the model in ROBOT_INFO is predefined, the base controller will auto-select it.
 # - Otherwise, manually specify a sub-controller as shown below.
 
-from gerri.robot.examples.sample_robot.sample_base_controller import SampleBaseController
-from gerri.robot.examples.sample_robot.sample_sub_controller import SampleSubController
+from gerri.robot.examples.rtc2kng.sample_base_controller import SampleBaseController
+from gerri.robot.examples.rtc2kng.sample_sub_controller import SampleSubController
 
-from gerri.robot.examples.pantilt_2kng.pantilt_controller import PanTiltController
-pantilt = PanTiltController()
-pantilt.connect()
+# from gerri.robot.examples.pantilt_2kng.pantilt_controller import PanTiltController
+# pantilt = PanTiltController()
+# pantilt.connect()
 
-# robot = SampleBaseController(ROBOT_INFO, sub_controller=SampleSubController())
-# robot.connect()
+robot = SampleBaseController(ROBOT_INFO, sub_controller=SampleSubController())
+robot.connect()
 
 # Keep process alive
 while True:
