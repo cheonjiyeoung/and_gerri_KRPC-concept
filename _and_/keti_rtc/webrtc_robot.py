@@ -9,7 +9,7 @@ from _and_.keti_rtc.webrtc_audio_channel import WebRtcAudioChannel
 SERVER_HOST = "175.126.123.199"
 SERVER_PORT = 9980
 
-def create_channels(robot_info, command=None, video_info=None, audio_info=None, password=""):
+def create_channels(robot_info, api_key, command=None, video_info=None, audio_info=None, password=""):
     robot_id = robot_info["id"]
     loop = asyncio.get_event_loop()
     channels = {}

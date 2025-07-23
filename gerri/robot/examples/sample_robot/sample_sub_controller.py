@@ -1,45 +1,21 @@
+from robot_status import RobotStatus
+from hello_universe_config import ROBOT_INFO
+import threading
+import random
+import time
+
 class SampleSubController:
     def __init__(self):
-        """
-        ROBOT INIT CODE
-        """
-        self.base_controller = None
-        self.robot_state = 'idle'
-        self.pose = {
-            'position': [0, 0, 0],
-            'orientation': [0, 0, 0],
-        }
-        self.velocity = {
-            'linear': [0, 0, 0],
-            'angular': [0, 0, 0],
-        }
-        self.battery_state = {
-            'voltage': 0,
-            'current': 0,
-            'percentage': 0,
-            'temperature': 0,
-            'capacity': 0,
-        }
-        self.joint_state = {
-            'name': ['left_wheel', 'right_wheel', 'left_arm', 'right_arm'],
-            'position': [0, 0, 0, 0],
-            'velocity': [0, 0, 0, 0],
-            'effort': [0, 0, 0, 0],
-        }
-        self.sensor = {
-            'ultrasonic': [0, 0, 0],
-            'laser': [0, 0, 0],
-        }
-        self.path_plan = {
-            'global': [],
-            'local': [],
-        }
-        self.map = {
-            'name': 'default',
-            'origin': [0, 0],
-            'size': [0, 0],
-            'scale': 1
-        }
+        robot_id = ROBOT_INFO["id"]
+        robot_model= ROBOT_INFO["model"]
+        robot_category=ROBOT_INFO["category"]
+        self.status = RobotStatus(robot_id=robot_id,
+                                  model=robot_model,
+                                  category=robot_category)
+
+        self._status_thread = threading.Thread(target=self._update_loop, daemon=True)
+        self._status_thread.start()
+        self._lock = threading.Lock
 
     def init_base_controller(self, base_controller):
         self.base_controller = base_controller
@@ -48,6 +24,16 @@ class SampleSubController:
         """
         GET ROBOT JOINT ANGLES
         """
+
+    def _update_loop(self):
+        while True:
+            self._lock.acquire()
+            # For examples #
+            self.status.pose["2d"]["x"] = random.randint(0,15)
+            self.status.pose["2d"]["y"] = random.randint(0,15)
+            self.status.pose["2d"]["th"] = random.randint(0,15)
+            self._lock.release()
+            time.sleep(0.1)
 
     def connect(self):
         """

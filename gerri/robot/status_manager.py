@@ -29,28 +29,15 @@ class StatusManager:
         self.start_status_loop()
 
     def get_robot_status(self):
-        if hasattr(self.controller, 'update_status'):
-            self.controller.update_status()
-        robot_status = vars(self.controller)
+        robot_status:dict = vars(self.controller.status)
         robot_info = {
             'robot_id': self.id,
             'robot_type': {'category': self.category, 'model': self.model}
         }
 
-        if 'pose' in robot_status:
-            robot_info['pose'] = robot_status['pose']
-        if 'battery_state' in robot_status:
-            robot_info['battery_state'] = robot_status['battery_state']
-        if 'robot_shape' in robot_status:
-            robot_info['robot_shape'] = robot_status['robot_shape']
-        if 'joint_state' in robot_status:
-            robot_info['joint_state'] = robot_status['joint_state']
-        if 'sensor' in robot_status:
-            robot_info['sensor'] = robot_status['sensor']
-        if 'path_plan' in robot_status:
-            robot_info['path_plan'] = robot_status['path_plan']
-        if 'map' in robot_status:
-            robot_info['map'] = robot_status['map']
+        for key in robot_status.keys():
+            if key in robot_status:
+                robot_info[key] = robot_status[key]
 
         return robot_info
 
