@@ -5,6 +5,8 @@ import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
 from gerri.operator.examples.sample_operator import sample_base_command
+from gerri.operator.commander import manipulator_command
+from gerri.operator.commander import mobile_command
 from utils.time_sync_manager import time_sync
 
 print(time_sync.timestamp())
@@ -70,4 +72,12 @@ class SampleBaseCommander:
     """
     def hello_universe(self, message):
         command = sample_base_command.hello_universe(message, target='all')
+        self.send_message(command)
+
+    def joint_ctrl(self, joint_angles, target='all'):
+        command = manipulator_command.joint_ctrl(joint_angles, target=target)
+        self.send_message(command)
+
+    def move(self,value):
+        command = mobile_command.move(value=value)
         self.send_message(command)

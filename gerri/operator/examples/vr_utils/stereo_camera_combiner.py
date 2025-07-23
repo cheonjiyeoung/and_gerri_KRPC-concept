@@ -8,7 +8,7 @@ import time
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-from _and_.keti_rtc.cam_manager import CameraManager
+from _and_.keti_rtc.robot.cam_manager import CameraManager
 
 
 class StereoCameraCombiner:

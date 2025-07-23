@@ -2,15 +2,16 @@ import asyncio
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-from _and_.keti_rtc.webrtc_command_channel import WebRtcCommandChannel
-from _and_.keti_rtc.webrtc_video_channel import WebRtcVideoChannel
-from _and_.keti_rtc.webrtc_audio_channel import WebRtcAudioChannel
+from _and_.keti_rtc.robot.webrtc_command_channel import WebRtcCommandChannel
+from _and_.keti_rtc.robot.webrtc_video_channel import WebRtcVideoChannel
+from _and_.keti_rtc.robot.webrtc_audio_channel import WebRtcAudioChannel
 
 SERVER_HOST = "175.126.123.199"
 SERVER_PORT = 9980
 
-def create_channels(robot_info, api_key, command=None, video_info=None, audio_info=None, password=""):
+def create_channels(robot_info, command=None, video_info=None, audio_info=None, password=""):
     robot_id = robot_info["id"]
+    api_key = robot_info["api_key"]
     loop = asyncio.get_event_loop()
     channels = {}
 
@@ -31,8 +32,8 @@ def create_channels(robot_info, api_key, command=None, video_info=None, audio_in
 
     # Video
     if video_info:
-        from _and_.keti_rtc.cam_manager import CameraManager
-        from _and_.keti_rtc.video_streamer import VideoStreamer
+        from _and_.keti_rtc.robot.cam_manager import CameraManager
+        from _and_.keti_rtc.robot.video_streamer import VideoStreamer
         for name, cfg in video_info.items():
             if type(cfg["source"]) != int:
                 cam = cfg["source"]

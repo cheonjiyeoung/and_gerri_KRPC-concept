@@ -7,17 +7,19 @@ from dns.name import empty
 from pubsub import pub
 
 class KeyboardMouseController(QMainWindow):
-    def __init__(self, robot_id=None, polling_rate_ms=100):
+    def __init__(self, robot_id=None, polling_rate_ms=100, custom_ui=None):
         super().__init__()
         self.setWindowTitle("avatar web update")
         self.showMaximized()  # 창을 최대화합니다
-        self.browser = QWebEngineView()
-        # self.browser_url = "http://175.126.123.199"
-        self.browser_url = "https://rubberneck.kr/remote-monitor/{robot_id}?hide-menu-bar=true&show-delay=true".format(robot_id=robot_id)
-        self.browser.load("https://rubberneck.kr")
-
         layout = QVBoxLayout()
-        layout.addWidget(self.browser)
+        if custom_ui is None:
+            self.browser = QWebEngineView()
+            # self.browser_url = "http://175.126.123.199"
+            self.browser_url = "https://rubberneck.kr/remote-monitor/{robot_id}?hide-menu-bar=true&show-delay=true".format(robot_id=robot_id)
+            self.browser.load("https://rubberneck.kr")
+            layout.addWidget(self.browser)
+        else:
+            layout.addWidget(custom_ui)
 
         container = QWidget()
         container.setLayout(layout)

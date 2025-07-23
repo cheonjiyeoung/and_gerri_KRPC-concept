@@ -12,7 +12,6 @@ from pubsub import pub
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-from _and_.keti_rtc.cv2_camera_new import CV2StreamCamera
 
 
 class WebRtcVideoChannel:

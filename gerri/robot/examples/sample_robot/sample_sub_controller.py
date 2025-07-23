@@ -1,5 +1,5 @@
 from robot_status import RobotStatus
-from hello_universe_config import ROBOT_INFO
+from hello_universe_robot_config import ROBOT_INFO
 import threading
 import random
 import time
@@ -14,8 +14,8 @@ class SampleSubController:
                                   category=robot_category)
 
         self._status_thread = threading.Thread(target=self._update_loop, daemon=True)
+        self._lock = threading.Lock()
         self._status_thread.start()
-        self._lock = threading.Lock
 
     def init_base_controller(self, base_controller):
         self.base_controller = base_controller

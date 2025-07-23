@@ -24,6 +24,9 @@ class RobotStatus:
                 "z":None,
                 "w":None
             },
+            "2d":{"x":None,
+                  "y":None,
+                  "th":None}
         }
         self.velocity = {
             "linear": {

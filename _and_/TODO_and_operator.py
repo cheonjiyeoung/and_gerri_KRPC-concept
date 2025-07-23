@@ -21,7 +21,7 @@ class AdaptiveNetworkDaemon:
 
     def _setup_channels(self):
         if self.network == "ketirtc":
-            from _and_.keti_rtc import TODO_webrtc_operator as backend
+            from _and_.keti_rtc.operator import TODO_webrtc_operator as backend
 
         else:
             return

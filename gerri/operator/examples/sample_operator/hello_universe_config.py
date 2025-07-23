@@ -23,6 +23,7 @@ AUDIO_INFO = {
 # Operator account credentials for system login
 
 OPERATOR_INFO = {
-    'id': "keti_kanghyun",
-    'password': 'keti_kanghyun',
+    'id': "manta",
+    'password': 'cjy2709@',
 }
+

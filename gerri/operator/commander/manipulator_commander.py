@@ -71,3 +71,5 @@ class ManipulatorCommander:
     def set_master_joint(self, target='all'):
         command = manipulator_command.set_master_joint(target=target)
         self.send_message(command)
+
+

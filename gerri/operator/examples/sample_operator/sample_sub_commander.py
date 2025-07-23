@@ -13,6 +13,26 @@ class SampleSubCommander:
         self.base_commander = None
 
         pub.subscribe(self.key_mouse_control, 'key_mouse_control')
+        pub.subscribe(self.ui_control,'ui')
+
+    def ui_control(self,signel):
+        vx=0
+        vy=0
+        vth=0
+        if signel == "clicked_W":
+            vx=1
+        if signel == "clicked_A":
+            vy=-1
+        if signel == "clicked_S":
+            vx=-1
+        if signel == "clicked_D":
+            vy=1
+        if signel == "clicked_Q":
+            vth=-1
+        if signel == "clicked_E":
+            vth=1
+        value = {"vx":vx,"vy":vy,"vth":vth}
+        self.base_commander.move(value)
 
     """
     Initializes the connection for the sub-commander (e.g., hardware setup, activation).

@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable),
 from _and_.keti_rtc.stereo_camera_combiner import StereoCameraCombiner
 from _and_.keti_rtc.webrtc_operator_video_track import VideoManager
 from _and_.keti_rtc.stereo_vr_processor import StereoVRProcessor, StereoVROption
-from _and_.keti_rtc.cam_manager import CameraManager
+from _and_.keti_rtc.robot.cam_manager import CameraManager
 
 
 def convert_frame_to_pixmap(frame):

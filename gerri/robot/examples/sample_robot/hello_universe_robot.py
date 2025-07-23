@@ -5,7 +5,7 @@ import time
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
 from _and_.and_robot import AdaptiveNetworkDaemon
-from hello_universe_config import ROBOT_INFO, VIDEO_INFO, AUDIO_INFO
+from hello_universe_robot_config import ROBOT_INFO, VIDEO_INFO, AUDIO_INFO
 
 # Initialize communication module (AND)
 daemon = AdaptiveNetworkDaemon(
@@ -13,7 +13,7 @@ daemon = AdaptiveNetworkDaemon(
     network='ketirtc',
     command="command",
     video=VIDEO_INFO,
-    audio=AUDIO_INFO
+    audio=AUDIO_INFO,
 )
 daemon.connect()
 

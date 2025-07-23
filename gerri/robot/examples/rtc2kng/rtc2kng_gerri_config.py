@@ -1,4 +1,4 @@
-# hello_universe_config.py
+# hello_universe_robot_config.py
 
 ### ROBOT
 # 로봇의 ID, 모델, 분류 및 서버 접속 정보 등을 정의합니다.

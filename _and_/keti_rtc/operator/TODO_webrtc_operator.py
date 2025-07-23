@@ -2,7 +2,7 @@ import asyncio
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), '../..')))
 
-from _and_.keti_rtc.webrtc_operator_command import WebRtcOperatorCommand
+from _and_.keti_rtc.operator.webrtc_operator_command import WebRtcOperatorCommand
 from _and_.keti_rtc.webrtc_operator_video import WebRtcOperatorVideo
 
 SERVER_HOST = '175.126.123.199'

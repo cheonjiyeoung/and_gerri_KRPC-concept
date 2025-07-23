@@ -74,12 +74,12 @@ def dock(docking_station, target=None, **option):
         command['option'] = option
     return command
 
-def joy(joy, target=None, **option):
+def move(value, target=None, **option):
     """
     move to joy(cmd_vel).
     
     Parameters:
-    - joy (list): joy params ex)vx,vth
+    - joy (list): joy params ex: vx,vth
     - target (str, optional): 특정 로봇을 지정 (기본값: None)
     - option (dict, optional): 추가 설정값 (예: speed, acceleration 등)
 
@@ -87,8 +87,8 @@ def joy(joy, target=None, **option):
     - dict: 로봇 명령을 포함한 command 객체
     """
     command = {
-        'topic': 'joy',
-        'value': joy
+        'topic': 'move',
+        'value': value
     }
     if target:
         command['target'] = target
