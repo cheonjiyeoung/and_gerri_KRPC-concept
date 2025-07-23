@@ -13,11 +13,12 @@ import time
 # new version port = 9980
 
 class WebRtcCommandChannel:
-    def __init__(self, robot_id, password, server_host, server_port, robot_group_id=None, camera=DummyCamera(), loop: AbstractEventLoop = None, message_duration_time=100):
+    def __init__(self, robot_id, password, server_host, server_port, api_key, robot_group_id=None, camera=DummyCamera(), loop: AbstractEventLoop = None, message_duration_time=100):
         self.loop = loop
         self.message_duration_time = message_duration_time
         self.robot_id = robot_id
         self.password = password
+        self.api_key = api_key
         self.server_host = server_host
         self.server_port = server_port
         self.camera = camera
@@ -29,6 +30,7 @@ class WebRtcCommandChannel:
                                                          signalling_server_port=server_port,
                                                          is_control_channel=True,
                                                          robot_group_id=robot_group_id,
+                                                         api_key=self.api_key
                                                          )
 
         self.user_clients_manager = UserClientConnectionManager()

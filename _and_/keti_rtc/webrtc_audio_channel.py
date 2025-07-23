@@ -15,12 +15,13 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable),
 
 
 class WebRtcAudioChannel:
-    def __init__(self, robot_id, password, server_host, server_port, robot_group_id=None, audio_input=None, audio_output=None):
+    def __init__(self, robot_id, password, server_host, server_port, api_key, robot_group_id=None, audio_input=None, audio_output=None):
         """
         WebRTC 기반 원격 오디오 스트리밍 및 메시지 처리를 담당하는 클래스
         """
         self.robot_id = robot_id
         self.password = password
+        self.api_key = api_key
         self.server_host = server_host
         self.server_port = server_port
 
@@ -46,6 +47,7 @@ class WebRtcAudioChannel:
             signalling_server_port=self.server_port,
             is_control_channel=False,
             robot_group_id=robot_group_id,
+            api_key = self.api_key
         )
 
         self.user_clients_manager = UserClientConnectionManager()

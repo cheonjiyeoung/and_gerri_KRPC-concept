@@ -25,7 +25,8 @@ def create_channels(robot_info, command=None, video_info=None, audio_info=None, 
                 server_host=SERVER_HOST,
                 server_port=SERVER_PORT,
                 loop=loop,
-                robot_group_id=robot_id
+                robot_group_id=robot_id,
+                api_key=api_key
             )
 
     # Video
@@ -33,8 +34,12 @@ def create_channels(robot_info, command=None, video_info=None, audio_info=None, 
         from _and_.keti_rtc.cam_manager import CameraManager
         from _and_.keti_rtc.video_streamer import VideoStreamer
         for name, cfg in video_info.items():
-            cam = CameraManager(camera_name=name, camera_index=cfg["index"],
-                                width=cfg["width"], height=cfg["height"], fps=cfg.get("fps", 30))
+            if type(cfg["source"]) != int:
+                cam = cfg["source"]
+            else:
+                cam = CameraManager(camera_name=name, camera_index=cfg["source"],
+                            width=cfg["width"], height=cfg["height"], fps=cfg.get("fps", 30))
+
             streamer = VideoStreamer(cam)
             full_id = f"{robot_id}_{name}"
             channels[full_id] = WebRtcVideoChannel(
@@ -44,7 +49,8 @@ def create_channels(robot_info, command=None, video_info=None, audio_info=None, 
                 server_port=SERVER_PORT,
                 camera=streamer,
                 loop=loop,
-                robot_group_id=robot_id
+                robot_group_id=robot_id,
+                api_key=api_key
             )
 
     # Audio
@@ -57,6 +63,7 @@ def create_channels(robot_info, command=None, video_info=None, audio_info=None, 
                 server_host=SERVER_HOST,
                 server_port=SERVER_PORT,
                 robot_group_id=robot_id,
+                api_key=api_key,
                 audio_input=cfg.get("input"),
                 audio_output=cfg.get("output")
             )

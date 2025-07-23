@@ -16,7 +16,7 @@ from _and_.keti_rtc.cv2_camera_new import CV2StreamCamera
 
 
 class WebRtcVideoChannel:
-    def __init__(self, robot_id, password, server_host, server_port, camera, robot_group_id=None,
+    def __init__(self, robot_id, password, api_key, server_host, server_port, camera, robot_group_id=None,
                  loop: AbstractEventLoop = None, message_duration_time=100):
         """
         WebRTC 기반 원격 스트리밍 및 메시지 처리를 담당하는 클래스
@@ -24,6 +24,7 @@ class WebRtcVideoChannel:
         self.loop = loop or asyncio.get_event_loop()
         self.robot_id = robot_id
         self.password = password
+        self.api_key = api_key
         self.server_host = server_host
         self.server_port = server_port
         self.message_duration_time = message_duration_time
@@ -37,6 +38,7 @@ class WebRtcVideoChannel:
             signalling_server_port=self.server_port,
             is_control_channel=False,
             robot_group_id=robot_group_id,
+            api_key = self.api_key
         )
 
         self.user_clients_manager = UserClientConnectionManager()
