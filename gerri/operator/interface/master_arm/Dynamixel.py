@@ -3,15 +3,15 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-
-import dx_conf
+from gerri.operator.interface.master_arm import dx_conf
+# import dx_conf
 
 
 class Dynamixel:   # This cl]ass handles a bundle of DXs through U2D2. Each class should be assigned to each U2D2.
-    def __init__(self, device_name='/dev/ttyUSB0', protocol_version=2.0):
+    def __init__(self, baudrate=115200, device_name='/dev/ttyUSB0', protocol_version=2.0):
         self.portHandler = PortHandler(device_name)
         self.packetHandler = PacketHandler(protocol_version)
-
+        self.baudrate = baudrate
         # Open port
         if self.portHandler.openPort():
             print("Succeeded to open the port")
@@ -20,7 +20,7 @@ class Dynamixel:   # This cl]ass handles a bundle of DXs through U2D2. Each clas
             quit()
         
         # Set port baudrate
-        if self.portHandler.setBaudRate(dx_conf.BAUDRATE):
+        if self.portHandler.setBaudRate(self.baudrate):
             print("Succeeded to change the baudrate")
         else:
             print("Failed to change the baudrate")

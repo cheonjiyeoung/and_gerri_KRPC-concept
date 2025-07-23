@@ -4,7 +4,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from Dynamixel import *
+from gerri.operator.interface.master_arm.Dynamixel import *
 import random
 import numpy as np
 import ctypes
@@ -13,7 +13,7 @@ import copy
 import threading
 
 class MasterArm:
-    def __init__(self, n_dxls, port='/dev/ttyUSB0'):
+    def __init__(self, n_dxls, baurate=115200, port='/dev/ttyUSB0'):
         """
         Initialize the MasterArm class.
         :param n_dxls: Number of joints (axes) in the arm.
@@ -21,7 +21,7 @@ class MasterArm:
         """
         self.control_mode = 0  # Control mode for the robot arm (default: 0)
         self.n_dxls = n_dxls  # Number of joints (axes) in the robot arm
-        self.armDynamixel = Dynamixel(device_name=port)  # Dynamixel device object initialization
+        self.armDynamixel = Dynamixel(baudrate = baudrate, device_name=port)  # Dynamixel device object initialization
         self.armDynamixel_id = list(range(self.n_dxls))  # Dynamixel IDs for each joint
 
         # Initialize each Dynamixel motor
@@ -68,9 +68,10 @@ class MasterArm:
         print("Dynamixel port closed successfully.")
 
 
-    def updateDefaultPosCnt(self):
+    def updateDefaultPosCnt(self, default_pos_cnt = [0] * self.n_dxls):
         # Update the default position counts for all joints
         positions_cnt = self.readPosition_cnt()
+        self.arm_offsets_deg = default_pos_cnt
         for i in range(self.n_dxls):
             self.arm_default_pos_cnt[i] = positions_cnt[i]
         print("Reset complete:", self.arm_offsets_deg)
@@ -97,7 +98,10 @@ class MasterArm:
         self.position_deg = []
         self.position_rad = [0] * self.n_dxls
         for i in range(self.n_dxls):
-            _q = positions_cnt[i] * 360. / 4096. - self.arm_default_pos_cnt[i] * 360. / 4096. + self.arm_offsets_deg[i]
+            if i == 1 or i == 3:
+                _q =  self.arm_offsets_deg[i] - (positions_cnt[i] * 360. / 4096. - self.arm_default_pos_cnt[i] * 360. / 4096.)
+            else :
+                 _q = positions_cnt[i] * 360. / 4096. - self.arm_default_pos_cnt[i] * 360. / 4096. + self.arm_offsets_deg[i]
             self.position_deg.append(_q)
 
         # Normalize angles to the range [-360, 360]

@@ -72,7 +72,7 @@ elif MY_DXL == 'XL330':
     ADDR_LED_ENABLE             = 65
     ADDR_PRESENT_POSITION       = 132
     LEN_PRESENT_POSITION        = 4        # Data Byte Length
-    BAUDRATE                    = 1000000
+    BAUDRATE                    = 115200
     ADDR_TORQUE_ENABLE          = 64
 TORQUE_ENABLE               = 1     # Value for enabling the torque
 TORQUE_DISABLE              = 0     # Value for disabling the torque
