@@ -104,7 +104,7 @@ class ConstructionSubCommander(Node, ConstructionOperatorUI):
         # pub.subscribe(self.key_mouse_control, 'key_mouse_control')
 
     """
-    Initializes the connection for the sub-commander (e.g., hardware setup, activation).
+    Initializes the connection for the sub-function (e.g., hardware setup, activation).
     """
     def connect(self):
         print('######################### [Connecting to Gerri...] ####################################')
@@ -125,15 +125,15 @@ class ConstructionSubCommander(Node, ConstructionOperatorUI):
 
 
     """
-    Handles cleanup and shutdown for the sub-commander (if applicable).
+    Handles cleanup and shutdown for the sub-function (if applicable).
     """
     def disconnect(self):
         pass
         ### TODO : ADD DISCONNECT FUNCTION
 
     """
-    Sets the reference to the base commander instance.
-    This allows the sub commander to call base-level methods.
+    Sets the reference to the base function instance.
+    This allows the sub function to call base-level methods.
     """
     def init_base_commander(self, base_commander):
         self.base_commander = base_commander

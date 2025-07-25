@@ -44,7 +44,7 @@ class OperatorMediaReceiever:
                                                     user_id=self.user_id,
                                                     password=self.password,
                                                     audio_receiver=audio_player)
-        pub.subscribe(self.send_message, 'send_message')
+        # pub.subscribe(self.send_message, 'send_message')
 
     def addTrack(self, track: MediaStreamTrack):
         self._tracks.append(track)

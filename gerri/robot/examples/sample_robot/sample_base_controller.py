@@ -1,52 +1,22 @@
-import asyncio
 from pubsub import pub
 
 import os, sys
-
-from pubsub.pub import sendMessage
-
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
-
+from gerri.robot.controller.manipulator_controller import ManipulatorController
+from gerri.robot.controller.mobile_controller import MobileController
 from gerri.robot.status_manager import StatusManager
 
-
-class SampleBaseController:
+class SampleBaseController(MobileController,ManipulatorController):
     def __init__(self, robot_info, **params):
+        self.robot_info = robot_info
         self.robot_id = robot_info['id']
         self.robot_category = robot_info['category']
         self.robot_model = robot_info['model']
-
-        if 'use_bridge' in params and params['use_bridge']:
-            self.bridge = True
-        else:
-            self.bridge = False
-
-        if 'sub_controller' in params:
-            self.sub_controller = params['sub_controller']
-        else:
-            self.sub_controller = self.init_sub_controller(**params)
-
-        if hasattr(self.sub_controller, 'init_base_controller'):
-            self.sub_controller.init_base_controller(base_controller=self)
-
-        self.status_manager = StatusManager(robot_info, self.sub_controller)
-        pub.subscribe(self.receive_message,"receive_message")
-
-    def init_sub_controller(self, **params):
-        """
-        로봇 모델에 따라 적절한 컨트롤러를 초기화.
-
-        :param robot_model: 로봇 모델
-        :param kwargs: 추가적인 파라미터
-        :return: 특정 모델 컨트롤러 인스턴스
-        """                                     
-        if self.robot_model == 'gerri':
-            from gerri.robot.examples.sample_robot.sample_sub_controller import SampleSubController
-            return SampleSubController()
-        else:
-            raise ValueError(f"Unsupported robot model: {self.robot_model}")
+        self.sub_controller = None
 
     def receive_message(self, message):
+        MobileController.receive_message(self,message=message)
+        ManipulatorController.receive_message(self,message=message)
         if 'topic' in message:
             topic = message['topic']
             value = message['value']
@@ -68,6 +38,7 @@ class SampleBaseController:
 
     def connect(self):
         self.sub_controller.connect()
+        self.status_manager = StatusManager(self.robot_info, self.sub_controller)
 
     def disconnect(self):
         self.sub_controller.disconnect()

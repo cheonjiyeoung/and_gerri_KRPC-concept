@@ -34,7 +34,7 @@ from gerri.operator.examples.construction_operator.construction_base_pointcloud_
 # gerri_operator.connect()
 
 # If the model is not predefined in SampleBaseCommander,
-# we explicitly assign a sub-commander implementation.
+# we explicitly assign a sub-function implementation.
 gerri_operator_pointcloud = ConstructionBasePointcloudReceiver(ROBOT_INFO, sub_commander=None)
 gerri_operator_pointcloud.connect()
 

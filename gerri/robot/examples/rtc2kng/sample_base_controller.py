@@ -1,9 +1,6 @@
-import asyncio
 from pubsub import pub
 
 import os, sys
-
-from pubsub.pub import sendMessage
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 

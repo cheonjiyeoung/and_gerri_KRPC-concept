@@ -1,9 +1,12 @@
-import time
+from PySide6.QtCore import Qt
+import pickle
 from pubsub import pub
 
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
-
+from _and_.keti_rtc.operator.webrtc_operator_media_receiver import OperatorMediaReceiever
+from gerri.operator.interface.sample_ui.sample_operator_ui import SampleOperatorUI
+from gerri.operator.interface.main_ui import MainUI
 
 class SampleSubCommander:
     def __init__(self, **kwargs):
@@ -11,50 +14,43 @@ class SampleSubCommander:
         self.use_master_arm = False
         self.master_control = False
         self.base_commander = None
+        self.app = kwargs.get('app')
 
         pub.subscribe(self.key_mouse_control, 'key_mouse_control')
-        pub.subscribe(self.ui_control,'ui')
-
-    def ui_control(self,signel):
-        vx=0
-        vy=0
-        vth=0
-        if signel == "clicked_W":
-            vx=1
-        if signel == "clicked_A":
-            vy=-1
-        if signel == "clicked_S":
-            vx=-1
-        if signel == "clicked_D":
-            vy=1
-        if signel == "clicked_Q":
-            vth=-1
-        if signel == "clicked_E":
-            vth=1
-        value = {"vx":vx,"vy":vy,"vth":vth}
-        self.base_commander.move(value)
-
+        pub.subscribe(self.ui_signal, 'ui_signal')
     """
-    Initializes the connection for the sub-commander (e.g., hardware setup, activation).
+    Initializes the connection for the sub-function (e.g., hardware setup, activation).
     """
     def connect(self):
         print('Connecting to Gerri...')
-
-
     """
-    Handles cleanup and shutdown for the sub-commander (if applicable).
+    Handles cleanup and shutdown for the sub-function (if applicable).
     """
     def disconnect(self):
         pass
         ### TODO : ADD DISCONNECT FUNCTION
 
-    """
-    Sets the reference to the base commander instance.
-    This allows the sub commander to call base-level methods.
-    """
-    def init_base_commander(self, base_commander):
-        self.base_commander = base_commander
+    def get_status(self, value):
+        pass
 
+    def ui_signal(self,signal):
+        vx=0
+        vy=0
+        vth=0
+        if signal == "clicked_W":
+            vx=1
+        if signal == "clicked_A":
+            vy=-1
+        if signal == "clicked_S":
+            vx=-1
+        if signal == "clicked_D":
+            vy=1
+        if signal == "clicked_Q":
+            vth=-1
+        if signal == "clicked_E":
+            vth=1
+        value = {"vx":vx,"vy":vy,"vth":vth}
+        self.base_commander.hello_universe("hello")
 
     """
     Clamp a given value to a specified min-max range.

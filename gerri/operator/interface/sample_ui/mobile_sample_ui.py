@@ -1,21 +1,18 @@
 from PySide6.QtWidgets import QPushButton, QGridLayout,QWidget,QLabel,QApplication
 from pubsub import pub
+import os, sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
+from gerri.operator.interface.utils.QPushButtonWithPub import QPushButtonWithPub
 
 class MobileOperationSampleUi(QWidget):
     def __init__(self):
         super().__init__()
-        btn_w = QPushButton("W")
-        btn_w.clicked.connect(lambda:pub.sendMessage("ui",signel="clicked_W"))
-        btn_a = QPushButton("A")
-        btn_a.clicked.connect(lambda:pub.sendMessage("ui",signel="clicked_A"))
-        btn_s = QPushButton("S")
-        btn_s.clicked.connect(lambda:pub.sendMessage("ui",signel="clicked_S"))
-        btn_d = QPushButton("D")
-        btn_d.clicked.connect(lambda:pub.sendMessage("ui",signel="clicked_D"))
-        btn_q = QPushButton("Q")
-        btn_q.clicked.connect(lambda:pub.sendMessage("ui",signel="clicked_Q"))
-        btn_e = QPushButton("E")
-        btn_e.clicked.connect(lambda:pub.sendMessage("ui",signel="clicked_E"))
+        btn_w = QPushButtonWithPub("W")
+        btn_a = QPushButtonWithPub("A")
+        btn_s = QPushButtonWithPub("S")
+        btn_d = QPushButtonWithPub("D")
+        btn_q = QPushButtonWithPub("Q")
+        btn_e = QPushButtonWithPub("E")
 
         layout_main = QGridLayout(self)
         layout_main.addWidget(QLabel("[Mobile Controll]"),0,0,1,3)

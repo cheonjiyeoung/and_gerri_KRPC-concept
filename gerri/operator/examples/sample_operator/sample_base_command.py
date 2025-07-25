@@ -5,7 +5,6 @@
 - 모든 함수는 목적에 맞게 변경 가능
 - `option`에 추가된 파라미터는 로봇 쪽에서도 대응 동작을 설정해야 함
 """
-import gerri.operator.commander.manipulator_command
 
 def hello_universe(message, target=None, **option):
     """

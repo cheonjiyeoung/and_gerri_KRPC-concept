@@ -1,34 +1,35 @@
+# interface/main_ui.py
 import sys
 from PySide6.QtCore import Qt, QTimer, QUrl
 from PySide6.QtGui import QCursor
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PySide6.QtWebEngineWidgets import QWebEngineView
-from dns.name import empty
 from pubsub import pub
 
-class KeyboardMouseController(QMainWindow):
-    def __init__(self, robot_id=None, polling_rate_ms=100, custom_ui=None):
+
+class MainUI(QMainWindow):
+    def __init__(self, robot_id=None, polling_rate_ms=100, ui=None):
         super().__init__()
         self.setWindowTitle("avatar web update")
-        self.showMaximized()  # 창을 최대화합니다
-        layout = QVBoxLayout()
-        if custom_ui is None:
+
+        if ui is None:
             self.browser = QWebEngineView()
-            # self.browser_url = "http://175.126.123.199"
-            self.browser_url = "https://rubberneck.kr/remote-monitor/{robot_id}?hide-menu-bar=true&show-delay=true".format(robot_id=robot_id)
+            self.browser_url = "https://rubberneck.kr/remote-monitor/{robot_id}?hide-menu-bar=true&show-delay=true".format(
+                robot_id=robot_id)
             self.browser.load("https://rubberneck.kr")
-            layout.addWidget(self.browser)
         else:
-            layout.addWidget(custom_ui)
+            self.browser = ui
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.browser)
 
         container = QWidget()
         container.setLayout(layout)
 
         self.setCentralWidget(container)
 
-
         self.command_dict = {}
-        
+
         self.key_set = set()
         self.toggle_set = set()
 
@@ -62,7 +63,6 @@ class KeyboardMouseController(QMainWindow):
 
         self.last_command_dict = None
 
-
     def start(self):
         self.KMC_app = QApplication(sys.argv)
         self.show()
@@ -77,7 +77,6 @@ class KeyboardMouseController(QMainWindow):
             self.login = True
         print("LOGIN")
 
-
     def toggle_control(self):
         self.control_status = not self.control_status
         pub.sendMessage('toggle_control', flag=self.control_status)
@@ -91,7 +90,6 @@ class KeyboardMouseController(QMainWindow):
     def disable_control(self):
         self.control_status = False
         pub.sendMessage('toggle_control', flag=self.control_status)
-
 
     def centerMouseCursor(self):
         screen_center = self.rect().center()
@@ -111,7 +109,6 @@ class KeyboardMouseController(QMainWindow):
 
             self.centerMouseCursor()
 
-
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self.mouse_click[0] = 1
@@ -127,6 +124,7 @@ class KeyboardMouseController(QMainWindow):
             self.mouse_click[1] = 0
         if event.button() == Qt.MouseButton.RightButton:
             self.mouse_click[2] = 0
+
     def wheelEvent(self, event):
         x_delta = event.angleDelta().x()
         y_delta = event.angleDelta().y()
@@ -206,7 +204,6 @@ class KeyboardMouseController(QMainWindow):
             self.enable_control()
             print('KEYBOARD AND MOUSE CONTROL ON')
 
-
         if key == Qt.Key.Key_Up:
             if self.speed < 150:
                 self.speed += 10
@@ -231,11 +228,9 @@ class KeyboardMouseController(QMainWindow):
             print(f"{key_name} ON")
         print(self.toggle_set)
 
-
     def update_robot_control(self):
         self.mx = self.mx + self.m_dx * self.d_scale / 50
         self.my = self.my + self.m_dy * self.d_scale / 50
-
 
         # x, y 값 리미터
         if self.mx < -1:
@@ -247,7 +242,6 @@ class KeyboardMouseController(QMainWindow):
             self.my = -1
         elif self.my > 1:
             self.my = 1
-
 
         # print(self.mz)
 
@@ -276,9 +270,10 @@ class KeyboardMouseController(QMainWindow):
         self.wheel_dx = 0
         self.wheel_dy = 0
 
+
 # 실행 코드
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = KeyboardMouseController()
+    window = MainUI()
     window.show()
     sys.exit(app.exec())

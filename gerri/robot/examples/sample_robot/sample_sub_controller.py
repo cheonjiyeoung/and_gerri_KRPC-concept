@@ -1,29 +1,23 @@
+import os, sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 from robot_status import RobotStatus
-from hello_universe_robot_config import ROBOT_INFO
+from gerri.robot.examples.sample_robot.sampl_robot_controller import SampleRobotController
 import threading
 import random
 import time
 
 class SampleSubController:
     def __init__(self):
-        robot_id = ROBOT_INFO["id"]
-        robot_model= ROBOT_INFO["model"]
-        robot_category=ROBOT_INFO["category"]
-        self.status = RobotStatus(robot_id=robot_id,
-                                  model=robot_model,
-                                  category=robot_category)
-
-        self._status_thread = threading.Thread(target=self._update_loop, daemon=True)
+        self.robot_controller = None
+        self.base_controller = None
+        self.status = None
         self._lock = threading.Lock()
-        self._status_thread.start()
 
-    def init_base_controller(self, base_controller):
-        self.base_controller = base_controller
-
-    def get_joint_angles(self):
-        """
-        GET ROBOT JOINT ANGLES
-        """
+    def connect(self):
+        self.status = RobotStatus(robot_id=self.base_controller.robot_id,
+                                  model=self.base_controller.robot_model,
+                                  category=self.base_controller.robot_category)
+        threading.Thread(target=self._update_loop,daemon=True).start()
 
     def _update_loop(self):
         while True:
@@ -32,51 +26,55 @@ class SampleSubController:
             self.status.pose["2d"]["x"] = random.randint(0,15)
             self.status.pose["2d"]["y"] = random.randint(0,15)
             self.status.pose["2d"]["th"] = random.randint(0,15)
+            ###
             self._lock.release()
             time.sleep(0.1)
-
-    def connect(self):
-        """
-        CONNECT TO ROBOT
-        """
 
     def disconnect(self):
         """
         DISCONNECT FROM ROBOT
         """
 
-    def joint_ctrl(self, joint_angles: list):
+    def joint_ctrl(self, value, option):
         """
         ROBOT JOINT CONTROL BY DEGREE
         """
+        print("Joint Ctrl in Sub", value, option)
 
-    def joint_ctrl_step(self, joint_angles: list):
+    def joint_ctrl_step(self, value, option):
         """
         ROBOT JOINT CONTROL BY DEGREE
         변화량 만큼 이동하는 코드 예 (0,0,0,0,30,0) 5번축만 +30도 회전
         """
+        print("joint_ctrl_step in Sub")
 
-    def joint_ctrl_puppet(self, master_joint_angles):
+    def joint_ctrl_puppet(self, value, option):
         """
         마스터 컨트롤러가 있을 떄 조인트정보를받고 움직이는 코드
 
         """
+        print("joint_ctrl_puppet in Sub", value, option)
 
-    def gripper_ctrl(self, gripper_angle):
+
+    def gripper_ctrl(self, value, option):
         """
         페러럴 그리퍼 컨트롤
         """
+        print("gripper_ctrl in Sub", value, option)
 
-    def update_status(self):
-        print('update status')
-        return 'hi'
+    def gripper_ctrl_puppet(self, value, option):
+        """
+        페러럴 그리퍼 컨트롤
+        """
+        print("gripper_ctrl in Sub", value, option)
+
+    def move(self, value, option):
+        print("move", value, option)
 
     def hello_universe(self, value):
         print('hello_universe')
+        self.send_message(value)
         return 'hello_universe_by_robot'
-
-    def custom_command(self, command):
-        return command
 
     def send_message(self, message):
         self.base_controller.send_message(message)

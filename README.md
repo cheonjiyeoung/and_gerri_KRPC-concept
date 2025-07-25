@@ -123,8 +123,9 @@ source venv/bin/activate
 
 ```python
 if robot_model == 'gerri':
-    from gerri.robot.examples.sample_robot.sample_sub_controller import SampleSubController
-    return SampleSubController()
+  from gerri.robot.examples.sample_robot.sample_sub_controller import SampleSubController
+
+  return SampleSubController()
 ```
 
 ### Option 2: Inject sub-controller manually

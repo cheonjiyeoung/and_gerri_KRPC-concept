@@ -6,6 +6,7 @@
 - `option`에 추가된 파라미터는 로봇 쪽에서도 대응 동작을 설정해야 함
 """
 
+
 def move_waypoint(waypoint, target=None, **option):
     """
     move to waypoint
@@ -28,6 +29,7 @@ def move_waypoint(waypoint, target=None, **option):
         command['option'] = option
     return command
 
+
 def move_coord(coord, target=None, **option):
     """
     move to coord
@@ -49,6 +51,7 @@ def move_coord(coord, target=None, **option):
     if option:
         command['option'] = option
     return command
+
 
 def dock(docking_station, target=None, **option):
     """
@@ -74,12 +77,13 @@ def dock(docking_station, target=None, **option):
         command['option'] = option
     return command
 
-def move(value, target=None, **option):
+
+def joy(joy, target=None, **option):
     """
     move to joy(cmd_vel).
-    
+
     Parameters:
-    - joy (list): joy params ex: vx,vth
+    - joy (list): joy params ex)vx,vth
     - target (str, optional): 특정 로봇을 지정 (기본값: None)
     - option (dict, optional): 추가 설정값 (예: speed, acceleration 등)
 
@@ -87,8 +91,8 @@ def move(value, target=None, **option):
     - dict: 로봇 명령을 포함한 command 객체
     """
     command = {
-        'topic': 'move',
-        'value': value
+        'topic': 'joy',
+        'value': joy
     }
     if target:
         command['target'] = target
@@ -100,7 +104,7 @@ def move(value, target=None, **option):
 def change_mode(mode, target=None, **option):
     """
     move to joy(cmd_vel).
-    
+
     Parameters:
     - joy (list): joy params ex)vx,vth
     - target (str, optional): 특정 로봇을 지정 (기본값: None)
@@ -119,6 +123,7 @@ def change_mode(mode, target=None, **option):
         command['option'] = option
     return command
 
+
 def change_map(name, target=None, **option):
     command = {
         'topic': 'map_change',
@@ -129,6 +134,7 @@ def change_map(name, target=None, **option):
     if option:
         command['option'] = option
     return command
+
 
 def relocate(waypoint, target=None, **option):
     """
@@ -150,4 +156,3 @@ def relocate(waypoint, target=None, **option):
     if option:
         command['option'] = option
     return command
-

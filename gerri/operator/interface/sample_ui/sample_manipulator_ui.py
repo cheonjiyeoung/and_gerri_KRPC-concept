@@ -80,24 +80,6 @@ class sample_manipulator_ui(QWidget):
         target_movej_vel = QLabel("vel")
         target_movej_acc = QLabel("acc")
 
-        target_joint_1.setFixedWidth(10)
-        target_joint_2.setFixedWidth(10)
-        target_joint_3.setFixedWidth(10)
-        target_joint_4.setFixedWidth(10)
-        target_joint_5.setFixedWidth(10)
-        target_joint_6.setFixedWidth(10)
-        target_movej_vel.setFixedWidth(20)
-        target_movej_acc.setFixedWidth(20)
-
-        self.target_j1.setFixedWidth(60)
-        self.target_j2.setFixedWidth(60)
-        self.target_j3.setFixedWidth(60)
-        self.target_j4.setFixedWidth(60)
-        self.target_j5.setFixedWidth(60)
-        self.target_j6.setFixedWidth(60)
-        self.movejVel.setFixedWidth(60)
-        self.movejAcc.setFixedWidth(60)
-
         self.MoveJ.setFixedWidth(target_joint_1.width() + self.target_j1.width() + 20)
 
         joint_target_layout = QGridLayout(self)
@@ -119,7 +101,7 @@ class sample_manipulator_ui(QWidget):
         joint_target_layout.addWidget(self.movejAcc, 8, 1)
         joint_target_layout.addWidget(self.MoveJ, 9, 0, 1, 2)
         joint_target_layout.setContentsMargins(0, 0, 0, 0)
-        joint_target_layout.setSpacing(10)
+        joint_target_layout.setSpacing(0)
 
         joint_target_box = QGroupBox("Left MoveJ")
         joint_target_box.setLayout(joint_target_layout)
@@ -135,7 +117,9 @@ class sample_manipulator_ui(QWidget):
                     """)
         basic_command_widget = QWidget()
         layout_basic_command_widget = QHBoxLayout(basic_command_widget)
+        layout_basic_command_widget.addStretch(0)
         layout_basic_command_widget.addWidget(joint_target_box)
+        layout_basic_command_widget.addStretch(0)
 
         main_layout = QHBoxLayout(self)
         main_layout.addWidget(basic_command_widget)

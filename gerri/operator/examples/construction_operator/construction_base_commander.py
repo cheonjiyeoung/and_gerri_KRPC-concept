@@ -5,7 +5,7 @@ import time
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-from gerri.operator.commander import manipulator_command
+from gerri.operator.function import manipulator_command
 from gerri.operator.examples.construction_operator import construction_command
 from utils.time_sync_manager import time_sync
 

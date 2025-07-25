@@ -40,7 +40,7 @@ rclpy.init()
 from gerri.operator.examples.construction_operator.construction_base_commander import ConstructionBaseCommander
 from gerri.operator.examples.construction_operator.construction_sub_commander import ConstructionSubCommander
 # If the model is not predefined in SampleBaseCommander,
-# we explicitly assign a sub-commander implementation.
+# we explicitly assign a sub-function implementation.
 gerri_operator = ConstructionBaseCommander(ROBOT_INFO, sub_commander=ConstructionSubCommander(app=app))
 gerri_operator.connect()
 sys.exit(app.exec())
