@@ -8,7 +8,7 @@ from gerri.operator.interface.master_arm import dx_conf
 
 
 class Dynamixel:   # This cl]ass handles a bundle of DXs through U2D2. Each class should be assigned to each U2D2.
-    def __init__(self, baudrate=115200, device_name='/dev/ttyUSB0', protocol_version=2.0):
+    def __init__(self, device_name='/dev/ttyUSB0', baudrate=115200,  protocol_version=2.0):
         self.portHandler = PortHandler(device_name)
         self.packetHandler = PacketHandler(protocol_version)
         self.baudrate = baudrate

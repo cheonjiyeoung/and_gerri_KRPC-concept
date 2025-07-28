@@ -1,28 +1,11 @@
 ROBOT_INFO = {
-    "id": "gerri_piper_01",
-    "model": "piper",
-    "category": "manipulator",
-    "api_key": "***NEED API KEY***"
-}
-
-PUPPET_ARM_LEFT = {
-    "id": "puppet_left",
-    "model": "piper",
-    "category": "manipulator",
-}
-
-PUPPET_ARM_RIGHT = {
-    "id": "puppet_right",
-    "model": "piper",
-    "category": "manipulator",
-}
-
-PAN_TILT = {
     "id": "pan_tilt",
     "model": "pan_tilt",
     "category": "pan_tilt",
-    "usb": "/dev/ttyUSB0"
+    "port": "/dev/ttyUSB0",
+    "api_key": "***NEED API KEY***"
 }
+
 
 VIDEO_INFO = {
     "front_cam": {"index": 0, "width": 1920, "height": 1080},

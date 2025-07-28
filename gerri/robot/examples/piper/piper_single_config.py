@@ -2,6 +2,7 @@ ROBOT_INFO = {
     "id": "gerri_piper_01",
     "model": "piper",
     "category": "manipulator",
+    "api_key": "***NEED API KEY***"
 }
 
 

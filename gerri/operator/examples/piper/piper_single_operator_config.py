@@ -27,16 +27,9 @@ OPERATOR_INFO = {
     'password': 'sunfish',
 }
 
-MASTER_ARM_LEFT_INFO = {
-    'target': 'puppet_left',
+MASTER_ARM_INFO = {
+    'target': 'all',
     'port':'/dev/ttyUSB0',
-    'baudrate':1000000,
-    'n_dxl': 7,
-    'joint_limit': [[-90, 90], [None, None], [None, None], [None, None], [None, None], [None, None], [None, None]],
-}
-MASTER_ARM_RIGHT_INFO = {
-    'target': 'puppet_right',
-    'port':'/dev/ttyUSB1',
     'baudrate':1000000,
     'n_dxl': 7,
     'joint_limit': [[-90, 90], [None, None], [None, None], [None, None], [None, None], [None, None], [None, None]],

@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable),
 
 # from gerri_spot import spot_base_command
 from gerri.operator.function.manipulator_function import ManipulatorFunction
+from gerri.operator.function.pan_tilt_zoom_function import PTZFunction
 from utils.time_sync_manager import time_sync
 
 print(time_sync.timestamp())
@@ -15,7 +16,7 @@ def timestamp():
     return time_sync.timestamp()
 
 
-class PiperBaseCommander(ManipulatorFunction):
+class PiperBaseCommander(ManipulatorFunction, PTZFunction):
     def __init__(self, robot_info, operator_info, **params):
         self.robot_info = robot_info
         self.robot_id = robot_info['id']

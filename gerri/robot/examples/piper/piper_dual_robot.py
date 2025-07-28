@@ -1,6 +1,7 @@
 import time
 import os, sys
 
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
 from _and_.and_robot import AdaptiveNetworkDaemon
@@ -23,13 +24,16 @@ daemon.connect()
 ### Robot system setting
 
 from gerri.robot.examples.piper.piper_base_controller import PiperBaseController
-from gerri.robot.examples.pantilt_2kng.pantilt_controller import PanTiltController
+from gerri.robot.examples.piper.piper_sub_controller import PiperSubController
+from gerri.robot.examples.pantilt_2kng.pan_tilt_controller import PanTiltController
 from gerri.robot.examples.piper.piper_dual_config import PUPPET_ARM_LEFT, PUPPET_ARM_RIGHT
 
 left_piper = PiperBaseController(PUPPET_ARM_LEFT)
+left_piper.sub_controller = PiperSubController(PUPPET_ARM_LEFT['id'])
 left_piper.connect()
 
 right_piper = PiperBaseController(PUPPET_ARM_RIGHT)
+right_piper.sub_controller = PiperSubController(PUPPET_ARM_RIGHT['id'])
 right_piper.connect()
 
 pan_tilt = PanTiltController()

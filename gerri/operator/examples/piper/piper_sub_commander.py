@@ -1,29 +1,31 @@
-from PySide6.QtCore import Qt
-import pickle
+
 from pubsub import pub
 
 import time
 
 from gerri.operator.interface.master_arm.master_arm import MasterArm
-from gerri.operator.examples.piper.piper_dual_operator_config import (
-    MASTER_ARM_USB_LEFT, MASTER_ARM_USB_RIGHT,
-    PUPPET_ARM_NAME_LEFT, PUPPET_ARM_NAME_RIGHT,
-    JOINT_LIMIT_LEFT, JOINT_LIMIT_RIGHT)
-
-MASTER_ARM_PORT_L = MASTER_ARM_USB_LEFT
-MASTER_ARM_PORT_R = MASTER_ARM_USB_RIGHT
 
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
 class PiperSubCommander:
-    def __init__(self, **kwargs):
-        self.control_target = 'all'
-        self.use_master_arm = False
-        self.master_control = False
+    def __init__(self, master_arm = None, **kwargs):
         self.base_commander = None
-        self.puppet = [PUPPET_ARM_NAME_LEFT, PUPPET_ARM_NAME_RIGHT]
-        self.app = kwargs.get('app')
+
+        if master_arm:
+            self.use_master_arm = True
+            self.master_arm_info  = master_arm
+            self.control_target = self.master_arm_info['target']
+            self.joint_limit = self.master_arm_info['joint_limit']
+        else:
+            self.use_master_arm = False
+            self.master_arm_info  = None
+            self.control_target = None
+            self.joint_limit = None
+
+        self.control_target = 'all'
+        self.master_control = False
+        self.master_arm = None
 
         pub.subscribe(self.key_mouse_control, 'key_mouse_control')
         pub.subscribe(self.ui_signal, 'ui_signal')
@@ -32,9 +34,11 @@ class PiperSubCommander:
     Initializes the connection for the sub-function (e.g., hardware setup, activation).
     """
     def connect(self):
-        self.master_arm_left = MasterArm(7, MASTER_ARM_PORT_L)
-        self.master_arm_right = MasterArm(7, MASTER_ARM_PORT_R)
-        self.initialize()
+        if self.use_master_arm:
+            self.master_arm = MasterArm(n_dxls=self.master_arm_info['n_dxl'],
+                                        port=self.master_arm_info['port'],
+                                        baudrate=self.master_arm_info['baudrate'])
+            self.initialize()
 
 
     """
@@ -46,18 +50,15 @@ class PiperSubCommander:
 
 
     def initialize(self):
-        if self.master_arm_left is not None:
-            self.master_arm_left.updateDefaultPosCnt()
-
-        if self.master_arm_right is not None:
-            self.master_arm_right.updateDefaultPosCnt()
+        self.master_arm.updateDefaultPosCnt()
 
     def enable_master_arm(self):
         self.initialize()
-
         time.sleep(1)
-
         self.master_control = True
+
+    def disable_master_arm(self):
+        self.master_control = False
 
 
     def get_status(self, value):
@@ -134,12 +135,8 @@ class PiperSubCommander:
         if "RETURN" in key:
             self.base_commander.get_robot_status(target=self.control_target)
 
-
         if "TAB" in key:
-            current_index = self.puppet.index(self.control_target)
-            next_index = (current_index + 1) % len(self.puppet)
-            self.control_target = self.puppet[next_index]
-            print(f"Switched control target to: {self.control_target}")
+            pass
 
         if "SHIFT" in key:
             if mouse_d_move[0] or mouse_d_move[1] or mouse_d_wheel[0]:
@@ -156,10 +153,12 @@ class PiperSubCommander:
             self.base_commander.set_master_joint(target=self.control_target)
 
         if "F5" in key:
-            self.enable_master_arm()
+            if self.use_master_arm:
+                self.enable_master_arm()
 
         if "F6" in key:
-            self.disable_master_arm()
+            if self.use_master_arm:
+                self.disable_master_arm()
 
         if "F1" in key:
             self.base_commander.joint_preset(preset_name='home', target=self.control_target)
@@ -168,54 +167,45 @@ class PiperSubCommander:
 
         if 'CONTROL' in key:
             if '1' in key:
-                joint_command = self.base_commander.joint_preset(preset_name='1', target='puppet_right')
+                self.base_commander.joint_preset(preset_name='1', target=self.control_target)
 
             if '2' in key:
-                joint_command = self.base_commander.joint_preset(preset_name='2', target='puppet_right')
+                self.base_commander.joint_preset(preset_name='2', target=self.control_target)
 
             if '3' in key:
-                self.base_commander.joint_preset(preset_name='3', target='puppet_right')
+                self.base_commander.joint_preset(preset_name='3', target=self.control_target)
+
             if '4' in key:
-                self.base_commander.joint_preset(preset_name='4', target='puppet_right')
+                self.base_commander.joint_preset(preset_name='4', target=self.control_target)
 
             if '5' in key:
-                self.base_commander.joint_preset(preset_name='5', target='puppet_left')
-
+                self.base_commander.joint_preset(preset_name='5', target=self.control_target)
 
             if '6' in key:
-                self.base_commander.joint_preset(preset_name='6', target='puppet_left')
+                self.base_commander.joint_preset(preset_name='6', target=self.control_target)
 
-
+        if "ALT" in key:
+            self.base_commander.pan_tilt_step(pan_tilt_angle_step=mouse_d_move)
 
         if self.master_control:
-            joint_value_left = self.master_arm_left.get_position_deg()
-            if self.limit_e_stop(joint_value_left, JOINT_LIMIT_LEFT) is False:
-                self.base_commander.joint_ctrl_master(joint_value_left[:6], target=PUPPET_ARM_NAME_LEFT)
-                self.base_commander.gripper_ctrl_master(master_gripper_width=joint_value_left[6], target=PUPPET_ARM_NAME_LEFT)
+            joint_value = self.master_arm.get_position_deg()
+            if self.check_joint_safety_limits(joint_value):
+                self.base_commander.joint_ctrl_master(joint_value[:6], target=self.control_target)
+                self.base_commander.gripper_ctrl_master(master_gripper_width=joint_value[6], target=self.control_target)
 
-
-            joint_value_right = self.master_arm_right.get_position_deg()
-            if self.limit_e_stop(joint_value_right, JOINT_LIMIT_RIGHT) is False:
-                self.base_commander.joint_ctrl_master(joint_value_right[:6], target=PUPPET_ARM_NAME_RIGHT)
-                self.base_commander.gripper_ctrl_master(master_gripper_width=joint_value_right[6], target=PUPPET_ARM_NAME_RIGHT)
-
-
-    def limit_e_stop(self, joint_value, joint_limit):
+    def check_joint_safety_limits(self, joint_value):
         """
-        조인트 값이 리미트를 초과하면 긴급 정지.
+        Check if each joint value is within its safety limit.
 
-        :param joint_value: 조인트 값 리스트
-        :param joint_limit: 리미트 범위 리스트
-        :return: True (긴급 정지 필요), False (정상 범위)
+        :param joint_value: List of joint values (deg or rad)
+        :return: True if all values are within limits, False otherwise
         """
-        # for idx, value in enumerate(joint_value):
-        #     min_limit, max_limit = joint_limit[idx]
-        #     if value < min_limit:
-        #         value = min_limit
-        #     elif value > max_limit:
-        #         value = max_limit
-        #         # self.disable_master_arm()
-        #         print(
-        #             f"JOINT LIMIT EXCEEDED: Joint {idx + 1} | Value: {value} | Limits: [{min_limit}, {max_limit}]")
-        #         # return True
-        return False
+        if self.joint_limit:
+            for idx, value in enumerate(joint_value):
+                min_limit, max_limit = self.master_arm_info['joint_limit'][idx]
+                if value < min_limit or value > max_limit:
+                    print(
+                        f"[SAFETY] Joint {idx + 1} limit exceeded: Value={value:.2f}, Limit=[{min_limit}, {max_limit}]"
+                    )
+                    return False
+        return True

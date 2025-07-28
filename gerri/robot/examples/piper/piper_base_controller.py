@@ -1,11 +1,14 @@
 from pubsub import pub
 
 import os, sys
+
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 from gerri.robot.function.manipulator_function import ManipulatorFunction
 from gerri.robot.status_manager import StatusManager
+from gerri.robot.examples.piper.piper_sub_controller import PiperSubController
 
-class PiperBaseController(ManipulatorController):
+class PiperBaseController(ManipulatorFunction):
     def __init__(self, robot_info, **params):
         self.robot_info = robot_info
         self.robot_id = robot_info['id']
@@ -14,7 +17,7 @@ class PiperBaseController(ManipulatorController):
         self.sub_controller = None
 
     def receive_message(self, message):
-        ManipulatorController.receive_message(self,message=message)
+        ManipulatorFunction.receive_message(self,message=message)
         if 'topic' in message:
             topic = message['topic']
             value = message['value']

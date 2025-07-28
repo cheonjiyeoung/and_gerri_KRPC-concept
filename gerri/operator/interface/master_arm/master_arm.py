@@ -13,7 +13,7 @@ import copy
 import threading
 
 class MasterArm:
-    def __init__(self, n_dxls, baudrate=115200, port='/dev/ttyUSB0'):
+    def __init__(self, n_dxls, port='/dev/ttyUSB0', baudrate=115200):
         """
         Initialize the MasterArm class.
         :param n_dxls: Number of joints (axes) in the arm.
@@ -21,7 +21,7 @@ class MasterArm:
         """
         self.control_mode = 0  # Control mode for the robot arm (default: 0)
         self.n_dxls = n_dxls  # Number of joints (axes) in the robot arm
-        self.armDynamixel = Dynamixel(baudrate = baudrate, device_name=port)  # Dynamixel device object initialization
+        self.armDynamixel = Dynamixel(device_name=port, baudrate = baudrate)  # Dynamixel device object initialization
         self.armDynamixel_id = list(range(self.n_dxls))  # Dynamixel IDs for each joint
 
         # Initialize each Dynamixel motor

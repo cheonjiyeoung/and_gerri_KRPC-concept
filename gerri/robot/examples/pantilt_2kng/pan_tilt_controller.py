@@ -35,12 +35,10 @@ DEFAULT_TILT_POSITION_VALUE = 2048
 
 # Open port
 class PanTiltController:           # 2개의 다이나믹셀을 목처럼 컨트롤하기위해 개발된 코드임
-    def __init__(self, robot_name="pan_tilt", use_port=DEVICENAME, pan_motor_id=PAN_DXL_ID, tilt_motor_id=TILT_DXL_ID):
+    def __init__(self, port=DEVICENAME, pan_motor_id=PAN_DXL_ID, tilt_motor_id=TILT_DXL_ID):
         super().__init__()
-        self.robot_name = robot_name
-        self.robot_type = "pan_tilt"
 
-        self.portHandler = PortHandler(use_port)
+        self.portHandler = PortHandler(port)
         self.packetHandler = PacketHandler(PROTOCOL_VERSION)
 
         self.pan_motor_id = pan_motor_id
@@ -51,8 +49,6 @@ class PanTiltController:           # 2개의 다이나믹셀을 목처럼 컨트
 
         self.last_pan_value = 0
         self.last_tilt_value = 0
-
-        pub.subscribe(self.message_handler, 'receive_message')
 
     @staticmethod
     def clamp(value, min_value, max_value, absolute_limit=None):
@@ -99,16 +95,6 @@ class PanTiltController:           # 2개의 다이나믹셀을 목처럼 컨트
         self.pan_tilt_control(self.default_pan_value, self.default_tilt_angle)
 
 
-    def message_handler(self, message):
-        if 'topic' in message:
-            topic = message['topic']
-            value = message['value']
-            if topic == "pan_tilt":
-                self.angle_control(pan_angle=-value[0], tilt_angle=value[1])
-            elif topic == "pan_tilt_step":
-                self.step_control(pan_step=int(value[0] * 100), tilt_step=int(value[1] * 100))
-
-
     def pan_tilt_control(self, pan_value, tilt_value):
         pan_value = int(self.clamp(pan_value, PAN_MINIMUM_POSITION_VALUE, PAN_MAXIMUM_POSITION_VALUE))
         tilt_value = int(self.clamp(tilt_value, TILT_MINIMUM_POSITION_VALUE, TILT_MAXIMUM_POSITION_VALUE))
@@ -121,23 +107,7 @@ class PanTiltController:           # 2개의 다이나믹셀을 목처럼 컨트
         # else:
         self.last_pan_value = pan_value
         self.last_tilt_value = tilt_value
-        print(self.last_pan_value, self.last_tilt_value)
-
-
-    def angle_control(self, pan_angle, tilt_angle):
-        pan_value = int(self.map_value(pan_angle, -180, 180, 0, 4096))
-        tilt_value = int(self.map_value(tilt_angle, -180, 180, 0, 4096))
-        if self.last_pan_value != pan_value or self.last_tilt_value != tilt_value:
-            self.pan_tilt_control(pan_value, tilt_value)
-
-
-    def step_control(self, pan_step = 0, tilt_step = 0):
-        if pan_step != 0 or tilt_step != 0:
-            self.pan_tilt_control(self.last_pan_value - pan_step, self.last_tilt_value - tilt_step)
-
-
-    def home_position(self):
-        self.pan_tilt_control(self.default_pan_value, self.default_tilt_angle)
+        # print(self.last_pan_value, self.last_tilt_value)
 
 
     def disconnect(self):
@@ -151,10 +121,10 @@ if __name__ == '__main__':
     neck = PanTiltController()
     neck.connect()
 
-    for i in range(-90, 90):
-        neck.angle_control(i, i)
-        time.sleep(0.1)
+    for i in range(2048-500, 2048+500):
+        neck.pan_tilt_control(i, i)
+        time.sleep(0.01)
 
-    time.sleep(100)
+    time.sleep(10)
     neck.disconnect()
 

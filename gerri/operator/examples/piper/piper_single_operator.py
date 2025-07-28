@@ -22,25 +22,19 @@ app = QApplication(sys.argv)
 
 from gerri.operator.examples.piper.piper_base_commander import PiperBaseCommander
 from gerri.operator.examples.piper.piper_sub_commander import PiperSubCommander
-from gerri.operator.examples.piper.piper_dual_operator_config import MASTER_ARM_LEFT_INFO, MASTER_ARM_RIGHT_INFO
 
-# LEFT ARM SETUP
+# ARM SETUP
 
-piper_left_base_commander = PiperBaseCommander(ROBOT_INFO, OPERATOR_INFO)
-piper_left_sub_commander = PiperSubCommander(master_arm=MASTER_ARM_LEFT_INFO)
+piper_base_commander = PiperBaseCommander(ROBOT_INFO, OPERATOR_INFO)
+piper_sub_commander = PiperSubCommander()
 
-piper_left_base_commander.sub_commander = piper_left_sub_commander
-piper_left_sub_commander.base_commander = piper_left_base_commander
-piper_left_base_commander.connect()
+# WITH MASTER
+# from gerri.operator.examples.piper.piper_single_operator_config import MASTER_ARM_INFO
+# piper_sub_commander = PiperSubCommander(master_arm=MASTER_ARM_INFO)
 
-# RIGHT ARM SETUP
-
-piper_right_base_commander = PiperBaseCommander(ROBOT_INFO, OPERATOR_INFO)
-piper_right_sub_commander = PiperSubCommander(master_arm=MASTER_ARM_RIGHT_INFO)
-
-piper_right_base_commander.sub_commander = piper_right_sub_commander
-piper_right_sub_commander.base_commander = piper_right_base_commander
-piper_right_base_commander.connect()
+piper_base_commander.sub_commander = piper_sub_commander
+piper_sub_commander.base_commander = piper_base_commander
+piper_base_commander.connect()
 
 from gerri.operator.interface.main_ui import MainUI
 from gerri.operator.interface.sample_ui.sample_operator_ui import SampleOperatorUI
