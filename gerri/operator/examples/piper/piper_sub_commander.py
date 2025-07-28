@@ -1,8 +1,8 @@
-import time
+from PySide6.QtCore import Qt
+import pickle
 from pubsub import pub
 
-import os, sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
+import time
 
 from gerri.operator.interface.master_arm.master_arm import MasterArm
 from gerri.operator.examples.piper.piper_dual_operator_config import (
@@ -13,19 +13,37 @@ from gerri.operator.examples.piper.piper_dual_operator_config import (
 MASTER_ARM_PORT_L = MASTER_ARM_USB_LEFT
 MASTER_ARM_PORT_R = MASTER_ARM_USB_RIGHT
 
+import os, sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-class PiperCommander:
+class PiperSubCommander:
     def __init__(self, **kwargs):
-        self.base_commander = None
-        self.puppet = [PUPPET_ARM_NAME_LEFT, PUPPET_ARM_NAME_RIGHT]
         self.control_target = 'all'
         self.use_master_arm = False
         self.master_control = False
+        self.base_commander = None
+        self.puppet = [PUPPET_ARM_NAME_LEFT, PUPPET_ARM_NAME_RIGHT]
+        self.app = kwargs.get('app')
 
         pub.subscribe(self.key_mouse_control, 'key_mouse_control')
+        pub.subscribe(self.ui_signal, 'ui_signal')
 
-    def init_base_commander(self, base_commander):
-        self.base_commander = base_commander
+    """
+    Initializes the connection for the sub-function (e.g., hardware setup, activation).
+    """
+    def connect(self):
+        self.master_arm_left = MasterArm(7, MASTER_ARM_PORT_L)
+        self.master_arm_right = MasterArm(7, MASTER_ARM_PORT_R)
+        self.initialize()
+
+
+    """
+    Handles cleanup and shutdown for the sub-function (if applicable).
+    """
+    def disconnect(self):
+        pass
+        ### TODO : ADD DISCONNECT FUNCTION
+
 
     def initialize(self):
         if self.master_arm_left is not None:
@@ -33,17 +51,6 @@ class PiperCommander:
 
         if self.master_arm_right is not None:
             self.master_arm_right.updateDefaultPosCnt()
-
-    def connect(self):
-        self.master_arm_left = MasterArm(7, MASTER_ARM_PORT_L)
-        self.master_arm_right = MasterArm(7, MASTER_ARM_PORT_R)
-        self.initialize()
-
-
-    def disconnect(self):
-        pass
-        ### TODO : ADD DISCONNECT FUNCTION
-
 
     def enable_master_arm(self):
         self.initialize()
@@ -53,10 +60,32 @@ class PiperCommander:
         self.master_control = True
 
 
-    def disable_master_arm(self):
-        self.master_control = False
+    def get_status(self, value):
+        pass
 
+    def ui_signal(self,signal):
+        vx=0
+        vy=0
+        vth=0
+        if signal == "clicked_W":
+            vx=1
+        if signal == "clicked_A":
+            vy=-1
+        if signal == "clicked_S":
+            vx=-1
+        if signal == "clicked_D":
+            vy=1
+        if signal == "clicked_Q":
+            vth=-1
+        if signal == "clicked_E":
+            vth=1
+        value = {"vx":vx,"vy":vy,"vth":vth}
+        self.base_commander.hello_universe("hello")
 
+    """
+    Clamp a given value to a specified min-max range.
+    Optionally constrain further with an absolute limit.
+    """
     def clamp(self, value, min_value, max_value, absolute_limit=None):
         """
         값을 주어진 범위로 제한 (클램핑).
@@ -72,6 +101,9 @@ class PiperCommander:
             max_value = min(max_value, absolute_limit[1])
         return max(min_value, min(value, max_value))
 
+    """
+    Maps a value from one range into another using linear scaling.
+    """
     def map_value(self, value, in_min, in_max, out_min, out_max):
         """
         특정 값을 주어진 범위 내에서 다른 범위로 매핑하는 함수.
@@ -87,8 +119,9 @@ class PiperCommander:
 
         return map_value
 
-    def master_arm_control(self, command):
-        pass
+    """
+    Handles key and mouse input events and maps them to robot commands.
+    """
 
     def key_mouse_control(self, command):
         # print(command)
@@ -165,7 +198,6 @@ class PiperCommander:
             if self.limit_e_stop(joint_value_right, JOINT_LIMIT_RIGHT) is False:
                 self.base_commander.joint_ctrl_master(joint_value_right[:6], target=PUPPET_ARM_NAME_RIGHT)
                 self.base_commander.gripper_ctrl_master(master_gripper_width=joint_value_right[6], target=PUPPET_ARM_NAME_RIGHT)
-
 
 
     def limit_e_stop(self, joint_value, joint_limit):

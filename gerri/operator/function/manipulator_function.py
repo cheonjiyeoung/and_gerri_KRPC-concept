@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable),
 from gerri.operator.function import manipulator_command
 
 
-class ManipulatorCommander:
+class ManipulatorFunction:
     def send_message(self, message):
         pub.sendMessage('send_message', message=message)
 

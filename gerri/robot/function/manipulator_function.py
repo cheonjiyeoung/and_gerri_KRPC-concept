@@ -3,7 +3,7 @@ from pubsub import pub
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-class ManipulatorController:
+class ManipulatorFunction:
     def receive_message(self, message):
         if 'topic' in message:
             topic = message['topic']

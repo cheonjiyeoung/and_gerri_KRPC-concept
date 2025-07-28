@@ -1,18 +1,28 @@
 import threading
 import ntplib
-import time
+import datetime
 import uuid
 from pubsub import pub
 
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
-from utils.time_sync_manager import time_sync
+# from utils.time_sync_manager import time_sync
+import time
 
-print(time_sync.timestamp())
+#
+# def timestamp():
+#     return time_sync.timestamp()
 
-def timestamp():
-    return time_sync.timestamp()
+
+def timestamp(fmt: str = "%Y-%m-%d %H:%M:%S.%f", trim_micro=True) -> str:
+    """서버 시간 기준의 포맷된 문자열 반환"""
+    now = datetime.datetime.now()
+    text = now.strftime(fmt)
+    return text[:-3] if trim_micro else text
+
+print(timestamp())
+
 
 class StatusManager:
     def __init__(self, robot_info, controller, interval=1):
@@ -23,7 +33,6 @@ class StatusManager:
         self.interval = interval
         self.status = vars(self.controller)
 
-        # ✅ 서버 시간 & 로컬 기준 시간 저장 (보정 포함)
         self.robot_info = self.get_robot_status()
 
         self.start_status_loop()

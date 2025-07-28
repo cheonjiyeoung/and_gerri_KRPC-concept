@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable),
 
 from gerri.operator.function import mobile_command
 
-class MobileCommander:
+class MobileFunction:
     def send_message(self, message):
         pub.sendMessage('send_message', message=message)
 

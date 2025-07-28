@@ -1,0 +1,10 @@
+websockets
+pypubsub
+pyaudio
+--trusted-host 175.126.123.199
+--index-url http://keti:dev123@175.126.123.199:7070
+ketirtc
+piper_sdk
+python-can
+ntplib
+zmq

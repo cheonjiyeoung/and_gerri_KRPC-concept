@@ -13,7 +13,7 @@ import copy
 import threading
 
 class MasterArm:
-    def __init__(self, n_dxls, baurate=115200, port='/dev/ttyUSB0'):
+    def __init__(self, n_dxls, baudrate=115200, port='/dev/ttyUSB0'):
         """
         Initialize the MasterArm class.
         :param n_dxls: Number of joints (axes) in the arm.
@@ -68,10 +68,10 @@ class MasterArm:
         print("Dynamixel port closed successfully.")
 
 
-    def updateDefaultPosCnt(self, default_pos_cnt = [0] * self.n_dxls):
-        # Update the default position counts for all joints
+    def updateDefaultPosCnt(self, default_pos_cnt = None):
         positions_cnt = self.readPosition_cnt()
-        self.arm_offsets_deg = default_pos_cnt
+        if default_pos_cnt:
+            self.arm_offsets_deg = default_pos_cnt
         for i in range(self.n_dxls):
             self.arm_default_pos_cnt[i] = positions_cnt[i]
         print("Reset complete:", self.arm_offsets_deg)
