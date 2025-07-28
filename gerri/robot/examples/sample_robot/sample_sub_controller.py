@@ -1,7 +1,7 @@
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 from robot_status import RobotStatus
-from gerri.robot.examples.sample_robot.sampl_robot_controller import SampleRobotController
+from gerri.robot.examples.sample_robot.sample_robot_controller import SampleRobotController
 import threading
 import random
 import time

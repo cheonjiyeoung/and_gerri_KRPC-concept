@@ -19,28 +19,38 @@ Together, TOM, AND, and GERRI provide a scalable and flexible architecture for r
 
 Below is a high-level architecture of the Hello Universe robot framework:
 
-![System Architecture](./and_gerri_diagram.svg)
+![System Architecture](./tom_and_gerri_2025_diagram.svg)
 
 ## 🗂 Project Structure Overview
 ```
 and_gerri/
-├── gerri/                       # Core GERRI Framework
-│   ├── operator/                # Operator-side modules
-│   │   ├── commander/           # Command generation logic (base/sub)
-│   │   ├── interface/           # Input devices (keyboard, VR, etc.)
-│   │   ├── examples/            # Per-robot operator implementations
-│   │   └── ...                  
-│   ├── robot/                   # Robot-side modules
-│   │   ├── controller/          # Base/sub controller logic
-│   │   ├── interface/           # Robot-side I/O (sensors, estop)
-│   │   ├── examples/            # Per-robot controller implementations
+├── gerri/                  # GERRI 프레임워크 코어
+│   ├── operator/           # Operator 측 모듈
+│   │   ├── function/       # BaseCommander가 상속받는 기본 메시지 포맷
+│   │   ├── interface/      # 키보드, VR 등 입력 장치 인터페이스
+│   │   ├── examples/       # 로봇별 Operator 구현 예시
+│   │   │   └── [someoperator]/ # 특정 로봇의 Operator 구현부 (예: piper_operator)
+│   │   │       ├── base_commander.py   # 메시지 포맷팅 및 전송 (BaseCommander)
+│   │   │       ├── sub_commander.py    # 입력 값 기반 로직 처리 (SubCommander)
+│   │   │       └── robot_config.py     # 로봇 관련 설정 파일
 │   │   └── ...
-├── _and_/                       # Adaptive Network Daemon core
-├── utils/                       # Utility scripts
-├── hello_universe_*             # Entry scripts for robot/operator
-├── requirements.txt             # Python dependencies
-├── install.sh                   # Setup script
-└── README.md                    # This file
+│   ├── robot/              # Robot 측 모듈
+│   │   ├── function/       # BaseController가 상속받는 기본 메시지 포맷
+│   │   ├── interface/      # 로봇 측 센서, E-Stop 등 I/O
+│   │   ├── examples/       # 로봇별 Controller 구현 예시
+│   │   │   └── [somerobot]/      # 특정 로봇의 Robot 구현부 (예: doosan_robot)
+│   │   │       ├── base_controller.py  # 메시지 라우팅 (BaseController)
+│   │   │       ├── sub_controller.py   # 값 변환, 함수 매핑 등 어댑터 (SubController)
+│   │   │       ├── robot_controller.py # 로봇 SDK 또는 직접 제어 로직 (RobotController)
+│   │   │       └── robot_config.py     # 로봇 관련 설정 파일
+│   │   └── ...
+│   └── ...
+├── _and_/                  # Adaptive Network Daemon (AND) 코어
+├── utils/                  # 유틸리티 스크립트
+├── [robot_name]_*          # 로봇/오퍼레이터 실행 스크립트
+├── requirements.txt        # Python 의존성 파일
+├── install.sh              # 설치 스크립트
+└── README.md               # README 파일
 ```
 
 
