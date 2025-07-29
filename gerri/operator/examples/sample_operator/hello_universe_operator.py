@@ -31,6 +31,29 @@ gerri_base_commander.sub_commander = gerri_sub_commander
 gerri_sub_commander.base_commander = gerri_base_commander
 gerri_base_commander.connect()
 
+from gerri.operator.examples.sample_operator.sample_base_commander import SampleBaseCommander
+from gerri.operator.examples.sample_operator.sample_sub_commander import SampleSubCommander
+# If the model is not predefined in SampleBaseCommander,
+# we explicitly assign a sub-function implementation.
+gerri_base_commander = SampleBaseCommander(ROBOT_INFO, OPERATOR_INFO)
+gerri_sub_commander = SampleSubCommander()
+
+gerri_base_commander.sub_commander = gerri_sub_commander
+gerri_sub_commander.base_commander = gerri_base_commander
+gerri_base_commander.connect()
+
+
+from gerri.operator.examples.sample_operator.sample_base_commander import SampleBaseCommander
+from gerri.operator.examples.sample_operator.sample_sub_commander import SampleSubCommander
+# If the model is not predefined in SampleBaseCommander,
+# we explicitly assign a sub-function implementation.
+gerri_base_commander = SampleBaseCommander(ROBOT_INFO, OPERATOR_INFO)
+gerri_sub_commander = SampleSubCommander()
+
+gerri_base_commander.sub_commander = gerri_sub_commander
+gerri_sub_commander.base_commander = gerri_base_commander
+gerri_base_commander.connect()
+
 from gerri.operator.interface.main_ui import MainUI
 from gerri.operator.interface.sample_ui.sample_operator_ui import SampleOperatorUI
 from _and_.keti_rtc.operator.webrtc_operator_media_receiver import OperatorMediaReceiever

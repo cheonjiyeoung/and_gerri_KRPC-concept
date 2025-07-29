@@ -6,7 +6,7 @@ from gerri.robot.function.manipulator_function import ManipulatorFunction
 from gerri.robot.function.mobile_function import MobileFunction
 from gerri.robot.status_manager import StatusManager
 
-class SampleBaseController(MobileController,ManipulatorController):
+class SampleBaseController(ManipulatorFunction,MobileFunction):
     def __init__(self, robot_info, **params):
         self.robot_info = robot_info
         self.robot_id = robot_info['id']
