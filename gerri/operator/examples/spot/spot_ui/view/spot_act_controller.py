@@ -19,6 +19,9 @@ class SpotActController(QWidget):
         btn_stop = PubSubButton("Stop")
         btn_docking = PubSubButton("Docking")
         btn_undocking = PubSubButton("UnDocking")
+        btn_auto_return = PubSubButton("Auto Return")
+        btn_get_lease = PubSubButton("Get Lease")
+        btn_release_lease = PubSubButton("Release Lease")
         
         spot_stance = QWidget()
         layout_spot_stance = QGridLayout(spot_stance)
@@ -88,6 +91,11 @@ class SpotActController(QWidget):
         layout_main.addWidget(set_velocity)
         if spot_info["using_ptz"]:
             layout_main.addWidget(ijkl_mode)
+        layout_main.addWidget(QLabel("[Auto Return]"))
+        layout_main.addWidget(btn_auto_return)
+        layout_main.addWidget(QLabel("[Lease]"))
+        layout_main.addWidget(btn_get_lease)
+        layout_main.addWidget(btn_release_lease)
         layout_main.addStretch(0)
         layout_main.setContentsMargins(0, 0, 0, 0)
         

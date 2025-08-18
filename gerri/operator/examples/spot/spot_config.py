@@ -9,7 +9,17 @@ ROBOT_INFO = {
 
 # Camera settings: device index and resolution
 VIDEO_INFO = {
-    "ptz_cam": {"source": None, "width": 1920, "height": 1080},
+    "front_cam": {"source": None, "width": 640, "height": 1080},
+    "rest_cam": {"source": None, "width": 1280, "height": 720},
+}
+
+GERRI_ROBOT_INFO = {
+    "id": "gerri_spot_01",
+    "model": "spot",
+    "category": "sample",
+}
+GERRI_VIDEO_INFO = {
+    "ptz_cam": {"source": None, "width": 640, "height": 1080},
     "rest_cam": {"source": None, "width": 1280, "height": 720},
 }
 
@@ -35,5 +45,5 @@ SPOT_INFO = {"using_arm":False,
              "default_linear_low_speed":0.3,
              "default_angular_speed":0.7,
              "default_angular_low_speed":0.3,
-             "missions": ["keti_2f-3f_round","keti_3f-2f_round"]
+             "missions": ["KOSPO_TestRoute3","keti_2f-3f_round","keti_3f-2f_round","callbacktest2","callbacktest","iii","test0813-1"]
              }

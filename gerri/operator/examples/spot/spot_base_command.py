@@ -200,6 +200,42 @@ def dock(value=None, target=None, **option):
         command['option'] = option
     return command    
 
+def auto_return(value=None, target=None, **option):
+    """
+    Sends a command to the robot to return to its docking station automatically.
+    """
+    command = {
+        'topic': 'auto_return',
+        'value': value
+    }
+    if target:
+        command['target'] = target
+    if option:
+        command['option'] = option
+    return command
+
+def get_lease(value=None, target=None, **option):
+    command = {
+        'topic': 'get_lease',
+        'value': value
+    }
+    if target:
+        command['target'] = target
+    if option:
+        command['option'] = option
+    return command
+
+def release_lease(value=None, target=None, **option):
+    command = {
+        'topic': 'release_lease',
+        'value': value
+    }
+    if target:
+        command['target'] = target
+    if option:
+        command['option'] = option
+    return command
+
 
 
 ##########################################################################

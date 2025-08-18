@@ -89,6 +89,21 @@ class SpotBaseCommander(ManipulatorFunction, MobileFunction):
     def undock(self,value=None,option=None):
         command = spot_base_command.dock(value=True,target=self.robot_id, option=option)
         self.send_message(command)
+
+    def auto_return(self, value=None, option=None):
+        """
+        Sends a command to the robot to return to its docking station automatically.
+        """
+        command = spot_base_command.auto_return(value=value, target=self.robot_id, option=option)
+        self.send_message(command)
+
+    def get_lease(self,value=None,option=None):
+        command = spot_base_command.get_lease(value=True,target=self.robot_id, option=option)
+        self.send_message(command)
+
+    def release_lease(self,value=None,option=None):
+        command = spot_base_command.release_lease(value=True,target=self.robot_id, option=option)
+        self.send_message(command)
     """
     Receives and handles messages from the robot.
     Specifically tracks robot status messages to calculate latency.
@@ -98,6 +113,8 @@ class SpotBaseCommander(ManipulatorFunction, MobileFunction):
         if 'topic' in message:
             topic = message['topic']
             value = message['value']
+            if topic == "spot_question":
+                pub.sendMessage('spot_question', value=value)
             if topic == 'robot_status':
                 ts = value['metadata'].get('timestamp')
                 time_sync.record_latency(ts)

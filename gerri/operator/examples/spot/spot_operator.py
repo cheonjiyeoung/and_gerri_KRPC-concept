@@ -11,9 +11,12 @@ import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
 from _and_.keti_rtc.operator.webrtc_operator_command import WebRtcOperatorCommand
-from gerri.operator.examples.spot.spot_config import ROBOT_INFO, OPERATOR_INFO, VIDEO_INFO, SPOT_INFO
+from gerri.operator.examples.spot.spot_config import ROBOT_INFO, OPERATOR_INFO, VIDEO_INFO, SPOT_INFO, GERRI_ROBOT_INFO
 from PySide6.QtWidgets import QApplication
+import logging
 
+# 로그 레벨을 ERROR로 설정하여 WARNING 이하의 로그를 표시하지 않음
+logging.basicConfig(level=logging.ERROR)
 webrtc_daemon = WebRtcOperatorCommand(ROBOT_INFO,OPERATOR_INFO)
 webrtc_daemon.connect()
 
@@ -23,9 +26,13 @@ from gerri.operator.interface.main_ui import MainUI
 from gerri.operator.examples.spot.spot_ui.main_ui import SpotOperationUI
 from _and_.keti_rtc.operator.webrtc_operator_media_receiver import OperatorMediaReceiever
 
-ptz_cam_receiver = OperatorMediaReceiever(robot_info=ROBOT_INFO, operator_info=OPERATOR_INFO,
+
+# ptz_cam_receiver = OperatorMediaReceiever(robot_info=ROBOT_INFO, operator_info=OPERATOR_INFO,
+#                                                  channel_info="front_cam",gerri=False)
+
+ptz_cam_receiver = OperatorMediaReceiever(robot_info=GERRI_ROBOT_INFO, operator_info=OPERATOR_INFO,
                                                  channel_info="ptz_cam")
-rest_cam_receiver = OperatorMediaReceiever(robot_info=ROBOT_INFO, operator_info=OPERATOR_INFO,
+rest_cam_receiver = OperatorMediaReceiever(robot_info=GERRI_ROBOT_INFO, operator_info=OPERATOR_INFO,
                                                  channel_info="rest_cam")
 
 

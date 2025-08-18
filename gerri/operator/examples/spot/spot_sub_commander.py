@@ -57,7 +57,6 @@ class SpotSubCommander:
     def init_base_commander(self, base_commander):
         self.base_commander = base_commander
 
-
     """
     Clamp a given value to a specified min-max range.
     Optionally constrain further with an absolute limit.
@@ -96,6 +95,7 @@ class SpotSubCommander:
         return map_value
 
     def ui_signal(self, signal, value=None):
+        print(f"ui_signal: {signal}, value: {value}")
         if signal == "cb_mission_list":
             self.current_mission = value
         if signal == "Mission Start":
@@ -176,6 +176,12 @@ class SpotSubCommander:
             self.pt_relative_step = value
         if signal == "spin_zoom_step":
             self.zoom_relative_step = value
+        if signal == "Auto Return":
+            self.base_commander.auto_return()
+        if signal == "Get Lease":
+            self.base_commander.get_lease()
+        if signal == "Release Lease":
+            self.base_commander.release_lease()
         if "_connect" in signal:
             channel_name = signal.removesuffix("_connect")
             print(f"channel_name:{channel_name}")
