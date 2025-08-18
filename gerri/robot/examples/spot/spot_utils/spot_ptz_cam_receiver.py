@@ -21,6 +21,10 @@ import threading
 import time
 DEFAULT_WEB_REQUEST_TIMEOUT = 10.0
 import datetime
+import cv2
+import os
+from pubsub import pub
+from PIL import Image
 
 class SpotCAMMediaStreamTrack(MediaStreamTrack):
     def __init__(self, track, parent_client):  # ✅ client 객체를 직접 받음
@@ -28,12 +32,28 @@ class SpotCAMMediaStreamTrack(MediaStreamTrack):
         self.track = track
         self.client = parent_client
         self._lock = threading.Lock()
+        os.makedirs("/home/keti/KOSPO_RAW",exist_ok=True)
+        pub.subscribe(self.acuire_frame,"acuire_frame")
+
+
+    def acuire_frame(self,file_name):
+        file_path = f"/home/keti/KOSPO_RAW/{file_name}"
+        img = self.client.last_frame.to_ndarray(format="bgr24")  # BGR 포맷으로 변환 (OpenCV 호환)
+        # PIL Image로 변환
+        image = Image.fromarray(img[:, :, ::-1])  # BGR -> RGB 변환
+        image.save(file_path, format='JPEG')
 
     async def recv(self):
         frame = await self.track.recv()
-        with self._lock:
-            self.client.last_frame = frame  # ✅ 실제 client 객체에 직접 저장
-        return frame
+        try:
+            with self._lock:
+                # cv_frame = frame.to_ndarray(format="bgr24")
+                # cv_resize_frame = cv2.resize(cv_frame,(640,480))
+                # self.client.last_frame = cv_resize_frame  # ✅ 실제 client 객체에 직접 저장
+                self.client.last_frame = frame
+            return self.client.last_frame
+        except:
+            pass
 
 
 
@@ -42,7 +62,6 @@ class SpotWebRTCClient:
     def __init__(self, hostname, sdp_port, sdp_filename, cam_ssl_cert, token, rtc_config,
                  media_recorder=None, recorder_type=None, auto_start=True):
         self.pc = RTCPeerConnection(configuration=rtc_config)
-
         # self.video_frame_queue = asyncio.Queue()
         # self.frame_queue = queue.Queue()
         self.last_frame=None

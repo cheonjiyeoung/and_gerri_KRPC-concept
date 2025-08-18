@@ -145,7 +145,7 @@ class SpotAct:
             blocking_undock(self.robot_client.robot)
             print('Undocking Success')
         else:
-            dock_id = self.robot_client.spot_camera.get_fiducial_objects(dock=True)
+            dock_id, _ = self.robot_client.spot_camera.get_fiducial_objects(dock=True)
             if dock_id is not None:
                 # Stand before trying to dock.
                 robot_command.blocking_stand(self.command_client)

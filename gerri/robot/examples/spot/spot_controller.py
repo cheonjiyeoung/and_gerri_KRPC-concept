@@ -2,9 +2,12 @@ from bosdyn.client import create_standard_sdk
 from bosdyn.client.async_tasks import AsyncPeriodicQuery
 from bosdyn.client.lease import LeaseClient, LeaseKeepAlive
 from bosdyn.client.robot_state import RobotStateClient
+from bosdyn.client.auto_return import AutoReturnClient
+from bosdyn.api.auto_return import auto_return_pb2
 from threading import Thread
 import bosdyn.mission.client
 from bosdyn.client.exceptions import ResponseError
+from bosdyn.util import seconds_to_duration
 # import graph_nav_util
 import time
 import os,sys
@@ -59,6 +62,7 @@ class SpotController:
 
         self.lease_client =             self.robot.ensure_client(LeaseClient.default_service_name)
         self.robot_state_client =       self.robot.ensure_client(RobotStateClient.default_service_name)
+        self.auto_return_client =       self.robot.ensure_client(AutoReturnClient.default_service_name)
         self._robot_state_task = AsyncRobotState(self.robot_state_client)
         self._running = True
         
@@ -72,7 +76,8 @@ class SpotController:
         # self.upload_graph_and_snapshots()
 
     def connect(self):
-        self.initialize()
+        # self.initialize()
+        pass
 
     def initialize(self):
         self.toggle_lease()
@@ -81,7 +86,6 @@ class SpotController:
         power = self.spot_act.request_power_on_ensure()
         if not power:
             print("can not on motor power")
-            sys.exit()
 
     def get_latest_state(self):
         return self._robot_state_task.proto  # or .response, depending on your need
@@ -118,6 +122,16 @@ class SpotController:
         if self.spot_act.estop_client is not None:
             self.spot_act.estop_endpoint.force_simple_setup(
             )  # Set this endpoint as the robot's sole estop.
+
+    def auto_return_force(self):
+
+        print("okokok")
+        params = auto_return_pb2.Params(max_displacement=600)
+
+        params.max_duration.CopyFrom(seconds_to_duration(600))
+
+        self.auto_return_client.configure(params, [self.lease_client.lease_wallet.get_lease().create_newer()])
+        self.auto_return_client.start()
 
     @property
     def robot_state(self):

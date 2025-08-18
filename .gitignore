@@ -172,3 +172,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Spot mission files
+./gerri/robot/examples/spot/spot_utils/mission_files/*

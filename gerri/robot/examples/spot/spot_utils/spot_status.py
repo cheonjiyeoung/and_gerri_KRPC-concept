@@ -85,9 +85,11 @@ class RobotStatus:
                           "distance":None}
         
         self.mode = "SIT"
+        self.controll_mode = 'auto'
 
 
     def common_status_parser(self,status):
+        print(status)
         try:
             battery = status.battery_states[0]  # Protobuf 객체
             self.battery_state["percentage"] = battery.charge_percentage.value
@@ -166,6 +168,11 @@ class RobotStatus:
             self.pose["orientation"]["w"] = pose_tform.rotation.w
         except Exception as e:
             print(f"err in common_status_parser / pose : {e}")
+
+        # try:
+        #     hardware_state = status.hardware_state
+        # except:
+        #     pass
         
     def arm_status_parser(self,status):
         pass
@@ -201,14 +208,19 @@ class RobotStatus:
                 pass
 
     def fiducial_info_parser(self,objects):
+        print(f"objects = {objects}")
         try:
             for obj in objects:
+                print(f"obj = {obj}")
                 camera = obj.apriltag_properties.frame_name_camera
                 fiducial_idx = int(obj.apriltag_properties.tag_id) # upper 499 = docking station
+                print(f"fiducial_idx = {fiducial_idx}")
                 if camera == "frontleft_fisheye" or camera == "frontright_fisheye" and fiducial_idx < 500:
                     self.fiducial_info = fiducial_idx
+                    print(f"222 fiducial_idx = {fiducial_idx}")
                     break
                 else:
+                    print(f"else fiducial_idx = {fiducial_idx}")
                     self.fiducial_info = None
                     continue
         except Exception as e:

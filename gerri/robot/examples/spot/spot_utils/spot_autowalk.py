@@ -18,7 +18,12 @@ from bosdyn.api.autowalk import walks_pb2
 from bosdyn.api.graph_nav import graph_nav_pb2, map_pb2, nav_pb2
 from bosdyn.api.mission import mission_pb2, nodes_pb2
 from bosdyn.client.autowalk import AutowalkResponseError
+from bosdyn.client.autowalk import AutowalkClient
+from pubsub import pub
+import logging
 
+logging.basicConfig(level=logging.WARNING)
+_LOGGER = logging.getLogger(__name__)
 class SpotAutowalk:
     def __init__(self,robot,lease_client):
         self.robot = robot
@@ -102,6 +107,8 @@ class SpotAutowalk:
     def handle_mission(self,value):
         threading.Thread(target=lambda:self._handle_mission(value),daemon=True).start()
 
+    def stop_mission(self):
+        self.mission_client.stop_mission()
 
     def _handle_mission(self, value):
         print(f"mission_run. value = {value}")
@@ -151,6 +158,7 @@ class SpotAutowalk:
             #     self.repeat_mission(self.robot, mission_client, lease_client, args.duration, fail_on_question,
             #                     args.mission_timeout, args.disable_directed_exploration,
             #                     path_following_mode)
+        pub.sendMessage("end_episode")
         self.mission_running_state = False
 
     def init_mission_clients(self, robot, mission_file, walk_directory, do_map_load, disable_alternate_route_finding,
@@ -292,8 +300,10 @@ class SpotAutowalk:
         autowalk_proto = walks_pb2.Walk()
         with open(filename, 'rb') as walk_file:
             data = walk_file.read()
+            print(f"\n\ndata : {data}\n\n")
             try:
                 autowalk_proto.ParseFromString(data)
+                print(f"\n\nautowalk_proto : {autowalk_proto}\n\n")
             except google.protobuf.message.DecodeError as exc:
                 raise exc
 

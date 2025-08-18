@@ -5,7 +5,7 @@ ROBOT_INFO = {
     "id": "spot_01",
     "model": "spot",
     "category": "spot",
-    "api_key": "cdbbe30562edc879dff2f036a9f54d20"
+    "api_key": "cdbbe30562edc879dff2f036a9f54d20",
 }
 
 SPOT_INFO = {
@@ -18,8 +18,8 @@ SPOT_INFO = {
 
 # Camera settings: device index and resolution
 VIDEO_INFO = {
-    "ptz_cam": {"source": None, "width": 1920, "height": 1080},
-    "rest_cam": {"source": None, "width": 1280, "height": 720},
+    "front_cam": {"source": 0, "width": 640, "height": 480},
+    "rear_cam": {"source": 2, "width": 640, "height": 480},
 }
 
 # Audio I/O devices
@@ -28,3 +28,14 @@ AUDIO_INFO = {
     "audio": {"input": "default", "output": "default"},
 }
 
+GERRI_ROBOT_INFO = {
+    "id": "gerri_spot_01",
+    "model": "spot",
+    "category": "spot",
+    "api_key": "48ddac9b6e0616849a844a257ca7468c"
+}
+
+GERRI_VIDEO_INFO = {
+    "ptz_cam": {"source": None, "width": 1920, "height": 1080},
+    "rest_cam": {"source": None, "width": 1280, "height": 720},
+}

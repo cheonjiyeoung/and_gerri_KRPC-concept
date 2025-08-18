@@ -21,6 +21,7 @@ from bosdyn.client.command_line import Command, Subcommands
 
 from bosdyn.api.spot_cam import ptz_pb2
 from bosdyn.client.spot_cam.ptz import PtzClient
+from bosdyn.client.spot_cam.lighting import LightingClient
 from bosdyn.client.spot_cam.compositor import CompositorClient
 from gerri.robot.examples.spot.spot_controller import SpotController
 from threading import Thread
@@ -33,12 +34,15 @@ class SpotPTZ(SpotController):
         # ptz name = mech
         self.ptz = self.robot.ensure_client(PtzClient.default_service_name)
         self.compositor_client = self.robot.ensure_client(CompositorClient.default_service_name)
+        self.lightning_client = self.robot.ensure_client(LightingClient.default_service_name)
         result = self.compositor_client.set_screen("mech_full")
         # self.spot_ptz_absolute(ptz={"pan":145,"tilt":0,"zoom":1})
         self.ptz_focus_dist = 0.0
 
     def spot_set_compositor(self,name):
+        print(222)
         result = self.compositor_client.set_screen(name)
+        print(f"\n\n{result}\n\n")
         return result
 
     def spot_ptz_get_position(self):
@@ -93,3 +97,12 @@ class SpotPTZ(SpotController):
         ptz_focus = self.ptz.set_ptz_focus_state(
                     ptz_pb2.PtzFocusState.PTZ_FOCUS_MANUAL, self.ptz_focus_dist+step, None)
         return ptz_focus
+    
+    def spot_light(self,level:list):
+        result = self.lightning_client.set_led_brightness_async(level)
+        return result
+    
+    def get_spot_light_level(self):
+        result = self.lightning_client.get_led_brightness()
+        print(f"\n\n current robot_light_level. level : {result}")
+        return result

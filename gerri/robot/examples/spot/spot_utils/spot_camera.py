@@ -96,13 +96,15 @@ class SpotCamera():
             object_type=request_fiducials).world_objects
         if len(fiducial_objects) > 0:
             # Return the first detected fiducial.
-            if dock:
-                for fiducial_object in fiducial_objects:
-                    if fiducial_object.apriltag_properties.tag_id > 499:
-                        return fiducial_object.apriltag_properties.tag_id
-                    else:
-                        continue
-            else:
-                return fiducial_objects[0].apriltag_properties.tag_id
+            # if dock:
+            #     for fiducial_object in fiducial_objects:
+            #         # if fiducial_object.apriltag_properties.tag_id > 499:
+            #         if True:
+            #             return fiducial_object.apriltag_properties.tag_id
+            #         else:
+            #             continue
+            # else:
+            #     return fiducial_objects[0].apriltag_properties.tag_id
+            return fiducial_objects[0].apriltag_properties.tag_id, fiducial_objects
         # Return none if no fiducials are found.
-        return None
+        return None, None
