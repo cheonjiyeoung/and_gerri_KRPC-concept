@@ -1,5 +1,5 @@
 class RobotStatus:
-    def __init__(self,robot_id=None,model=None,category=None):
+    def __init__(self, robot_id=None, model=None, category=None):
         self.robot_id = robot_id
         self.robot_type = {
             "category": category,
@@ -12,6 +12,7 @@ class RobotStatus:
             }
         }
 
+        # ZYX
         self.pose = {
             "position": {
                 "x": None,
@@ -19,14 +20,15 @@ class RobotStatus:
                 "z": None
             },
             "orientation": {
-                "x":None,
-                "y":None,
-                "z":None,
-                "w":None
+                "yaw": None,
+                "pitch": None,
+                "roll": None,
             },
-            "2d":{"x":None,
-                  "y":None,
-                  "th":None}
+            "2d": {
+                "x": None,
+                "y": None,
+                "th": None
+            }
         }
         self.velocity = {
             "linear": {
@@ -39,21 +41,29 @@ class RobotStatus:
                 "y": None,
                 "z": None
             },
+            "2d": {
+                "vx": None,
+                "vy": None,
+                "vth": None,
+            }
         }
         self.battery_state = {
-            "voltage": None, # ok
+            "voltage": None,
             "current": None,
             "capacity": None,
-            "percentage": None, # ok
-            "temperature": None, 
-            "power_supply_status": None,
-            "now_charging": None # ok
+            "percentage": None,
+            "temperature": None,
+            "now_charging": None
         }
         self.joint_state = {
             "name": None,
             "position": None,
             "velocity": None,
             "effort": None
+        }
+        self.path_plan = {
+            "global": None,
+            "local": None,
         }
         self.sensor = {
             "ultrasonic": None,
@@ -63,5 +73,5 @@ class RobotStatus:
             "name": None,
             "origin": None,
             "size": None,
-            "scale": None
+            "resolution": None
         }
