@@ -1,13 +1,13 @@
 ROBOT_INFO = {
-    "id": "hello_universe",
-    "model": "gerri",
-    "category": "sample",
+    "id": "gerri_piper_01",
+    "model": "piper",
+    "category": "manipulator",
 }
 
 # Camera settings: device index and resolution
 VIDEO_INFO = {
-    "front_cam": {"index": 0, "width": 1920, "height": 1080},
-    # "rear": {"index": 2, "width": 1280, "height": 720},
+    "front_cam": {"source": 0, "width": 1920, "height": 1080},
+    # "rear": {"source": 2, "width": 1280, "height": 720},
 }
 VIDEO_CHANNEL = "front_cam"
 
@@ -31,7 +31,7 @@ MASTER_ARM_LEFT_INFO = {
     'id': 'master_left',
     'target': 'puppet_left',
     'master_model': 'piper',
-    'joint_limit': [[-90, 90], [None, None], [None, None], [None, None], [None, None], [None, None], [None, None]],
+    'joint_limit': [[-105, 105], [None, None], [None, None], [None, None], [None, None], [None, None], [None, None]],
 }
 
 
@@ -39,7 +39,7 @@ MASTER_ARM_RIGHT_INFO = {
     'id': 'master_right',
     'target': 'puppet_right',
     'master_model': 'piper',
-    'joint_limit': [[-90, 90], [None, None], [None, None], [None, None], [None, None], [None, None], [None, None]],
+    'joint_limit': [[-105, 105], [None, None], [None, None], [None, None], [None, None], [None, None], [None, None]],
 }
 
 # MASTER_ARM_LEFT_INFO = {

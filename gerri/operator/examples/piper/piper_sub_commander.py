@@ -19,10 +19,9 @@ class PiperSubCommander:
         else:
             self.use_master_arm = False
             self.master_arm_info  = None
-            self.control_target = None
+            self.control_target = "all"
             self.joint_limit = None
 
-        self.control_target = 'all'
         self.master_control = False
         self.master_arm = None
 
@@ -37,13 +36,16 @@ class PiperSubCommander:
             if self.master_arm_info['master_model'] == 'piper':
                 from gerri.robot.examples.piper.piper_sub_controller import PiperSubController
                 self.master_arm = PiperSubController(self.master_arm_info['id'])
+                print('[Python] Connecting to piper_master', self.master_arm)
 
             elif self.master_arm_info['master_model'] == 'dynamixel':
                 from gerri.operator.interface.master_arm.master_arm import MasterArm
                 self.master_arm = MasterArm(n_dxls=self.master_arm_info['n_dxl'],
                                             port=self.master_arm_info['port'],
                                             baudrate=self.master_arm_info['baudrate'])
+            self.master_arm.connect()
             self.master_arm.initialize()
+            print('[Python] Connected to master')
 
 
     """
@@ -193,10 +195,10 @@ class PiperSubCommander:
             if self.check_joint_safety_limits(joint_value):
                 if self.master_arm_info['master_model'] == 'dynamixel':
                     self.base_commander.joint_ctrl_master(joint_value[:6], target=self.control_target)
-                    self.base_commander.gripper_ctrl_master(master_gripper_width=joint_value[6], target=self.control_target)
+                    # self.base_commander.gripper_ctrl_master(master_gripper_width=joint_value[6], target=self.control_target)
                 elif self.master_arm_info['master_model'] == 'piper':
                     self.base_commander.joint_ctrl(joint_value[:6], target=self.control_target)
-                    self.base_commander.gripper_ctrl(gripper_width=joint_value[6], target=self.control_target)
+                    self.base_commander.gripper_ctrl(gripper_angle=joint_value[6], target=self.control_target)
 
     def check_joint_safety_limits(self, joint_value):
         """
@@ -208,9 +210,10 @@ class PiperSubCommander:
         if self.joint_limit:
             for idx, value in enumerate(joint_value):
                 min_limit, max_limit = self.master_arm_info['joint_limit'][idx]
-                if value < min_limit or value > max_limit:
-                    print(
-                        f"[SAFETY] Joint {idx + 1} limit exceeded: Value={value:.2f}, Limit=[{min_limit}, {max_limit}]"
-                    )
-                    return False
+                if min_limit or max_limit:
+                    if value < min_limit or value > max_limit:
+                        print(
+                            f"[SAFETY] Joint {idx + 1} limit exceeded: Value={value:.2f}, Limit=[{min_limit}, {max_limit}]"
+                        )
+                        return False
         return True
