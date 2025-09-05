@@ -67,6 +67,8 @@ class MasterArm:
         self.armDynamixel.close_port()
         print("Dynamixel port closed successfully.")
 
+    def initialize(self):
+        self.updateDefaultPosCnt()
 
     def updateDefaultPosCnt(self, default_pos_cnt = None):
         positions_cnt = self.readPosition_cnt()
@@ -126,6 +128,11 @@ class MasterArm:
         return self.position_rad
 
     def get_position_deg(self):
+        # Get the current positions of all joints in degrees
+        self.readPosition()
+        return self.position_deg
+
+    def get_joint_angles(self):
         # Get the current positions of all joints in degrees
         self.readPosition()
         return self.position_deg

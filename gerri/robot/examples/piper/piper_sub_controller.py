@@ -44,6 +44,9 @@ class PiperSubController:
             self._lock.release()
             time.sleep(0.1)
 
+    def initialize(self):
+        self.joint_preset['master'] = self.last_joint_angle
+
     def get_joint_angles(self):
         # ArmJoint 객체에서 직접 joint_state 속성에 접근
         joint_msg = self.robot.GetArmJointMsgs()
@@ -104,7 +107,7 @@ class PiperSubController:
             round((self.joint_preset['master'][1] + master_joint_angles[1]) * self.factor_degree),
             round((self.joint_preset['master'][2] + master_joint_angles[2]) * self.factor_degree),
             round((self.joint_preset['master'][3] + master_joint_angles[3]) * self.factor_degree),
-            round((self.joint_preset['master'][4] - master_joint_angles[4]) * self.factor_degree),
+            round((self.joint_preset['master'][4] + master_joint_angles[4]) * self.factor_degree),
             round((self.joint_preset['master'][5] + master_joint_angles[5]) * self.factor_degree),
         ]
 
@@ -166,3 +169,8 @@ class PiperSubController:
 
     def custom_command(self, command):
         print("CUSTOM COMMAND")
+
+
+if __name__ == '__main__':
+    piper = PiperSubController()
+    piper.initialize()
