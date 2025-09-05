@@ -7,18 +7,18 @@ from _and_.rtc2kng.camera_manager import CameraManager
 from _and_.rtc2kng.audio_track import AudioSendTrack
 from _and_.rtc2kng.pyaudio_manager import AudioRecorder, AudioPlayer
 
-def create_channels(robot_info, command, video_info, audio_info):
+def create_channels(robot_info, server_info, video_info, audio_info, command = None):
     """
     AdaptiveNetworkDaemon의 'rtc2kng' 백엔드를 위한 채널을 생성합니다.
 
     Args:
         robot_info (dict): 로봇 기본 정보.
-            예: {'id': 'test_robot', 'room_id': 'test_room',
-                 'server_ip': '125.131.105.165', 'server_port': 25000}
-        command (any): 명령 채널 관련 정보 (현재 RobotClient 초기화에 직접 사용되지 않음).
+            예: {'id': 'test_robot'}
+        server_info (any): 서버 관련 정보
+            예: {'room_id': 'test_room','server_ip': '125.131.105.165', 'server_port': 25000}
         video_info (dict): 비디오 스트림 정보.
-            예: {'front_cam': {'index': 0, 'width': 1920, 'height': 1080, 'debug': False},
-                 'rear_cam': {'index': 1, 'width': 1280, 'height': 720, 'debug': False}}
+            예: {'front_cam': {'source': 0, 'width': 1920, 'height': 1080, 'debug': False},
+                 'rear_cam': {'source': 1, 'width': 1280, 'height': 720, 'debug': False}}
         audio_info (dict): 오디오 스트림 정보.
             예: {'enabled': True, 'player_volume': 0.0, 'silence_threshold': 50,
                  'recorder_params': {'rate': 16000, 'channels': 1}}
@@ -30,16 +30,16 @@ def create_channels(robot_info, command, video_info, audio_info):
     """
     print(f"RTC2KNG 백엔드: create_channels 호출됨")
     print(f"  ROBOT_INFO: {robot_info}")
-    print(f"  COMMAND: {command}") # 현재 로깅만 수행
+    print(f"  SERVER_INFO: {server_info}")
     print(f"  VIDEO_INFO: {video_info}")
     print(f"  AUDIO_INFO: {audio_info}")
 
     # 1. RobotClient 초기화에 필요한 파라미터 추출
     # robot_client.py의 __main__ 및 클래스 기본값 참고
-    room_id = robot_info.get('room_id', 'test_room')
     robot_id = robot_info.get('id', robot_info.get('name', 'test_robot')) # 'id' 또는 'name' 사용
-    server_ip = robot_info.get('server_ip', '125.131.105.165') # robot_client.py의 외부 IP 기본값
-    server_port = robot_info.get('server_port', 25000) # robot_client.py의 포트 기본값
+    room_id = robot_info.get('room_id', 'test_room')
+    server_ip = server_info.get('server_ip', '125.131.105.165') # robot_client.py의 외부 IP 기본값
+    server_port = server_info.get('server_port', 25000) # robot_client.py의 포트 기본값
 
     # 2. 비디오 트랙 설정 (VIDEO_INFO 기반)
     # robot_client.py의 __main__에서는 video_track={"front_cam": CameraManager(...)} 형태로 전달
@@ -49,7 +49,7 @@ def create_channels(robot_info, command, video_info, audio_info):
             if isinstance(cam_config, dict):
                 try:
                     video_tracks_dict[cam_label] = CameraManager(
-                        index=cam_config.get('index', 0),
+                        source=cam_config.get('source', 0),
                         width=cam_config.get('width', 1920), # 기본 해상도 설정
                         height=cam_config.get('height', 1080),
                         debug=cam_config.get('debug', False)

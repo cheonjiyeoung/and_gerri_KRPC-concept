@@ -1,0 +1,255 @@
+HOME = posj(-90.00, 0.00, 90.00, 0.00, -45.00, -60.00)
+RELOADER = posj(90.00, 10.00, -80.00, 0.00, -90.00, 0.00)
+RELOADER_SLOT = [130.00, 90.00, 50.00, 10.00, -30.00, -70.00, -110.00, -150.00]
+
+def convert_value(value):
+	convert_val = []
+	for val in value:
+		if val > 0x8000:
+			val = val - 0x10000
+			convert_val.append(val / 10)
+		else:
+			convert_val.append(val / 10)
+	return convert_val
+
+def from_modbus_register(value):
+	if value > 0x8000:
+		value = value - 0x10000
+	converted_value = value / 10
+	return converted_value
+
+def to_modbus_register(value):
+    scaled_int = int(round(value * 10))
+    register_value = scaled_int & 0xFFFF
+    return register_value
+
+
+def reload(reloader_slot_num = -1):
+	if reloader_slot_num > -1:
+		movej(HOME, radius=0.00, ra=DR_MV_RA_DUPLICATE)
+		movej(RELOADER, radius=0.00, ra=DR_MV_RA_DUPLICATE)
+		y = RELOADER_SLOT[reloader_slot_num]
+		reloading_pose = posx(-220.00, y, 366.00, 180.00, 115.00, -180.00)
+		movel(reloading_pose, vel=[50.00, 20.00], acc=[250.00, 100.00], radius=0.00, ref=DR_WORLD, mod=DR_MV_MOD_ABS, ra=DR_MV_RA_DUPLICATE, app_type=DR_MV_APP_NONE)
+		set_ref_coord(DR_TOOL)
+		# WaitNode
+		wait(1.00)
+		# ComplianceNode
+		set_external_force_reset()
+		task_compliance_ctrl()
+		set_stiffnessx([10000.00, 10000.00, 10000.00, 1000.00, 1000.00, 1000.00],time=0.0)
+		# 힘제어 전진
+		set_desired_force([0.00, 0.00, 25.00, 0.00, 0.00, 0.00],[0,0,1,0,0,0],time=0.0,mod=DR_FC_MOD_REL)
+		# WaitNode
+		wait(2.00)
+		# 힘제어 종료
+		release_force(time=1.0)
+		# 힘제어 전진하며 시계방향 회전
+		set_desired_force([0.00, 0.00, 10.00, 0.00, 0.00, 35.00],[0,0,1,0,0,1],time=0.0,mod=DR_FC_MOD_REL)
+		# WaitNode
+		wait(5.00)
+		# 힘제어 종료
+		release_force(time=0.0)
+		release_compliance_ctrl()
+		# WaitNode
+		wait(1.00)
+		reload_end_pose = posx(-240.00, y, 366.00, 180.00, 115.00, -180.00)
+		movel(reload_end_pose, vel=[100.00, 50.00], acc=[250.00, 100.00], radius=0.00, ref=DR_WORLD, mod=DR_MV_MOD_ABS, ra=DR_MV_RA_DUPLICATE, app_type=DR_MV_APP_NONE)
+		reload_end_up_pose = posx(-240.00, y, 400.00, 180.00, 115.00, -180.00)
+		movel(reload_end_up_pose, vel=[100.00, 50.00], acc=[250.00, 100.00], radius=0.00, ref=DR_WORLD, mod=DR_MV_MOD_ABS, ra=DR_MV_RA_DUPLICATE, app_type=DR_MV_APP_NONE)
+
+
+		# # 힘제어 후퇴하며 반시계방향 회전
+		# set_desired_force([0.00, 0.00, 10.00, 0.00, 0.00, -40.00],[0,0,1,0,0,1],time=0.0,mod=DR_FC_MOD_REL)
+		# # WaitNode
+		# wait(5.00)
+		# # 힘제어 종료
+		# release_force(time=0.0)
+		# set_desired_force([0.00, 0.00, -10.00, 0.00, 0.00, -10.00],[0,0,1,0,0,1],time=0.0,mod=DR_FC_MOD_REL)
+		# # WaitNode
+		# wait(3.00)
+		# # 힘제어 종료
+		# release_force(time=0.0)
+		# # MoveLNode
+		# movel(posx(0.00, 0.00, -75.00, 0.00, 0.00, 0.00), vel=[100.00, 50.00], acc=[500.00, 250.00], radius=0.00, ref=1, mod=DR_MV_MOD_REL, ra=DR_MV_RA_DUPLICATE, app_type=DR_MV_APP_NONE)
+		# # ComplianceNode
+		movej(HOME, radius=0.00, ra=DR_MV_RA_DUPLICATE)
+		set_ref_coord(DR_WORLD)
+
+
+set_modbus_slave(129, 0)
+set_modbus_slave(200, 2)
+set_modbus_slave(211, 0)
+# movej(HOME, radius=0.00, ra=DR_MV_RA_DUPLICATE)
+
+
+# current_pose, sol_space = get_current_posx(ref=DR_WORLD)
+# z_align_vector = [0, 0, 1]
+# align_axis(vect = z_align_vector, pos = current_pose, axis=DR_AXIS_Z, ref=DR_WORLD)
+# z_align_pose = [current_pose[0], current_pose[1], current_pose[2], 0, 0, 60]
+# movel(z_align_pose, time=5, ref=DR_WORLD)
+# set_modbus_slave(129, 21)
+# set_modbus_slave(211, 10)
+
+
+while True:
+	mode = get_modbus_slave(129)
+	if mode == 0: # Stop
+		stop(DR_SSTOP)
+
+	if mode == 1: # movej
+		j1 = get_modbus_slave(130)
+		j2 = get_modbus_slave(131)
+		j3 = get_modbus_slave(132)
+		j4 = get_modbus_slave(133)
+		j5 = get_modbus_slave(134)
+		j6 = get_modbus_slave(135)
+		vel = get_modbus_slave(136)
+		acc = get_modbus_slave(137)
+		value = [j1, j2, j3, j4, j5, j6, vel, acc]
+		target_value = convert_value(value)
+		target_pose = posj(target_value[0], target_value[1], target_value[2], target_value[3], target_value[4], target_value[5])
+		amovej(target_pose, target_value[6], target_value[7])
+
+	if mode == 2:
+		x = get_modbus_slave(138)
+		y = get_modbus_slave(139)
+		z = get_modbus_slave(140)
+		rx = get_modbus_slave(141)
+		ry = get_modbus_slave(142)
+		rz = get_modbus_slave(143)
+		vel = get_modbus_slave(144)
+		acc = get_modbus_slave(145)
+		rel = get_modbus_slave(146)
+		value = [x, y, z, rx, ry, rz, vel, acc]
+		target_val = convert_value(value)
+		# tp_popup(message="{}".format(value), pm_type=DR_PM_MESSAGE, button_type=0)
+
+		target_pose = posx(target_val[0], target_val[1], target_val[2], target_val[3], target_val[4], target_val[5])
+		# tp_popup(message="{}".format(target_pose), pm_type=DR_PM_MESSAGE, button_type=0)
+
+		if rel == 0:
+			amovel(target_pose, target_val[6], target_val[7], ref=DR_BASE)
+		elif rel == 1:
+			amovel(target_pose, target_val[6], target_val[7], ref=DR_TOOL, mod=DR_MV_MOD_REL)
+		set_modbus_slave(129, 100)
+
+	if mode == 3: # master
+		j1 = get_modbus_slave(130)
+		j2 = get_modbus_slave(131)
+		j3 = get_modbus_slave(132)
+		j4 = get_modbus_slave(133)
+		j5 = get_modbus_slave(134)
+		j6 = get_modbus_slave(135)
+		vel = get_modbus_slave(136)
+		acc = get_modbus_slave(137)
+		value = [j1, j2, j3, j4, j5, j6, vel, acc]
+		target_value = convert_value(value)
+		target_pose = posj(target_value[0], target_value[1], target_value[2], target_value[3], target_value[4], target_value[5])
+		# tp_popup(message="{}".format(target_value), pm_type=DR_PM_MESSAGE, button_type=0)
+		# servoj(target_pose, target_value[6], target_value[7])
+		servoj(target_pose, 120, 120)
+
+	if mode == 4:
+		j1 = get_modbus_slave(147)
+		j2 = get_modbus_slave(148)
+		j3 = get_modbus_slave(149)
+		j4 = get_modbus_slave(150)
+		j5 = get_modbus_slave(151)
+		j6 = get_modbus_slave(152)
+		vel = get_modbus_slave(153)
+		acc = get_modbus_slave(154)
+		value = [j1, j2, j3, j4, j5, j6, vel, acc]
+		target_value = convert_value(value)
+		target_pose = posj(target_value[0], target_value[1], target_value[2], target_value[3], target_value[4], target_value[5])
+		speedj(vel, acc, time)(target_pose, vel, acc)
+
+		
+
+	if mode == 21:
+		# Z AXIS ALIGN 
+		current_pose, sol_space = get_current_posx(ref=DR_WORLD)
+		z_align_vector = [0, 0, 1]
+		align_axis(vect = z_align_vector, pos = current_pose, axis=DR_AXIS_Z, ref=DR_WORLD)
+		# z_align_pose = [current_pose[0], current_pose[1], current_pose[2], 0, 0, 60]
+		# movel(z_align_pose, time=5, ref=DR_WORLD)
+		set_modbus_slave(129, 22)
+
+
+	if mode == 22:
+		# INIT FORCE MODE
+		set_ref_coord(DR_WORLD)
+		wait(2.00)
+		# ComplianceNode
+		task_compliance_ctrl()
+		set_external_force_reset()
+		set_stiffnessx([10000.00, 10000.00, 10000.00, 1000.00, 1000.00, 1000.00],time=0.0)
+		set_modbus_slave(129, 23)
+
+	if mode == 23:
+		# FORCE MODE CONTROL
+		x_value = get_modbus_slave(211)
+		y_value = get_modbus_slave(212)
+		z_value = get_modbus_slave(213)
+
+		target_x_force = from_modbus_register(x_value)
+		target_y_force = from_modbus_register(y_value)
+		target_z_force = from_modbus_register(z_value)
+
+		if target_x_force == 0:
+			x_vector = 0
+		else: 
+			x_vector = 1
+
+		if target_y_force == 0:
+			y_vector = 0
+		else:
+			y_vector = 1
+
+		# if target_z_force == 0:
+		# 	z_vector = 0
+		# else:
+		# z_vector = 1
+		z_vector = 1
+
+		target_force = [target_x_force, target_y_force, target_z_force, 0.00, 0.00, 0.00]
+		target_vector = [x_vector, y_vector, z_vector, 0, 0, 0]
+
+		
+		# tp_popup(message="force = {} vertor ={}".format(target_force, target_vector), pm_type=DR_PM_MESSAGE, button_type=0)
+
+		# WaitNode
+		# wait(1.00)
+		# ComplianceNode
+		set_desired_force(target_force, target_vector, time=0.0)
+		set_modbus_slave(210, to_modbus_register(get_tool_force(ref=DR_TOOL)[2]))
+
+	if mode == 24:
+		# END FORCE MODE
+		release_force(time=0.0)
+		release_compliance_ctrl()
+		# WaitNode
+		wait(1.00)
+
+	# if 11 <= mode and mode < 20:
+	# 	reload(mode-11)
+	# 	set_modbus_slave(129, 0)
+
+
+	pose_mode = get_modbus_slave(200)
+	if pose_mode > 0:
+		if pose_mode == 1:
+			current_pose, sol_space = get_current_posx(ref=DR_BASE)
+		
+		if pose_mode == 2:
+			current_pose, sol_space = get_current_posx(ref=DR_WORLD)
+		
+		set_modbus_slave(201, to_modbus_register(current_pose[0]))
+		set_modbus_slave(202, to_modbus_register(current_pose[1]))
+		set_modbus_slave(203, to_modbus_register(current_pose[2]))
+		set_modbus_slave(204, to_modbus_register(current_pose[3]))
+		set_modbus_slave(205, to_modbus_register(current_pose[4]))
+		set_modbus_slave(206, to_modbus_register(current_pose[5]))
+		set_modbus_slave(207, sol_space)
+		
+

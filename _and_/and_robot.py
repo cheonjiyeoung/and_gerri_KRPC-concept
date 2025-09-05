@@ -4,29 +4,36 @@ import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
 class AdaptiveNetworkDaemon:
-    def __init__(self, robot_info, network="ketirtc", command=None, video=None, audio=None):
+    def __init__(self, robot_info, network="ketirtc", command=None, video_info=None, audio_info=None, server_info=None):
         self.robot_info = robot_info
         self.network = network
         self.command = command
-        self.video = video
-        self.audio = audio
+        self.video_info = video_info
+        self.audio_info = audio_info
+        self.server_info = server_info
 
         self.channels = self._setup_channels()
 
     def _setup_channels(self):
         if self.network == "ketirtc":
             from _and_.keti_rtc.robot import webrtc_robot as backend
+            backend.create_channels(
+                robot_info=self.robot_info,
+                command=self.command,
+                video_info=self.video_info,
+                audio_info=self.audio_info
+            )
         elif self.network == "rtc2kng":
             from _and_.rtc2kng import rtc2kng_robot as backend
+            return backend.create_channels(
+                robot_info=self.robot_info,
+                server_info=self.server_info,
+                video_info=self.video_info,
+                audio_info=self.audio_info
+            )
         else:
             raise ValueError(f"Unsupported network backend: {self.network}")
 
-        return backend.create_channels(
-            robot_info=self.robot_info,
-            command=self.command,
-            video_info=self.video,
-            audio_info=self.audio
-        )
 
     def connect(self):
         for ch in self.channels.values():
@@ -50,8 +57,8 @@ if __name__ == "__main__":
         robot_info=ROBOT_INFO,
         network='ketirtc',
         command="command",
-        video=VIDEO_INFO,
-        audio=AUDIO_INFO
+        video_info=VIDEO_INFO,
+        audio_info=AUDIO_INFO
     )
 
     daemon.connect()
