@@ -13,7 +13,8 @@ from _and_.rtc2kng.robot_peer_connection import RobotPeerConnectionHandler
 ### 마이스터 센터 내부 '172.20.1.250'
 ### 외부 WAN           '125.131.105.165'
 
-SERVER_IP = '125.131.105.165'
+# SERVER_IP = '125.131.105.165'
+SERVER_IP = '172.20.1.250'
 # SERVER_IP = 'localhost'
 SERVER_PORT = 25000
 

@@ -49,7 +49,7 @@ def create_channels(robot_info, server_info, video_info, audio_info, command = N
             if isinstance(cam_config, dict):
                 try:
                     video_tracks_dict[cam_label] = CameraManager(
-                        source=cam_config.get('source', 0),
+                        index=cam_config.get('source', 0),
                         width=cam_config.get('width', 1920), # 기본 해상도 설정
                         height=cam_config.get('height', 1080),
                         debug=cam_config.get('debug', False)

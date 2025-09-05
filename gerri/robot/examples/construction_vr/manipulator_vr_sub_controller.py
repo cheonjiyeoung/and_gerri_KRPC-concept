@@ -16,6 +16,7 @@ class DoosanSubController:
         self.status = None
 
     def connect(self):
+        self.robot_controller.connect()
         self.status = RobotStatus(robot_id=self.base_controller.robot_id,
                                   model=self.base_controller.robot_model,
                                   category=self.base_controller.robot_category)
@@ -25,6 +26,7 @@ class DoosanSubController:
         while True:
             self._lock.acquire()
             # For examples #
+            self.robot_controller.update_status()
             self.status.joint_state =self.robot_controller.joint_state
             self.status.pose = self.robot_controller.pose
             ###

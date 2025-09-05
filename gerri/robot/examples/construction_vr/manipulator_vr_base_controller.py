@@ -35,7 +35,7 @@ class ManipulatorVRBaseController:
         pub.sendMessage('send_message', message=message)
 
     def receive_message(self, message):
-        ManipulatorFunction.receive_message(self,message=message)
+        ManipulatorFunction.receive_message(self, message=message)
         if 'topic' in message:
             topic = message['topic']
             value = message['value']

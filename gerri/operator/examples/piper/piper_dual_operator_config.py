@@ -29,6 +29,14 @@ OPERATOR_INFO = {
 
 MASTER_ARM_LEFT_INFO = {
     'target': 'puppet_left',
+    'master_model': 'piper',
+    'port':'/dev/ttyUSB0',
+    'joint_limit': [[-90, 90], [None, None], [None, None], [None, None], [None, None], [None, None], [None, None]],
+}
+
+MASTER_ARM_LEFT_INFO = {
+    'target': 'puppet_left',
+    'master_model': 'dynamixel',
     'port':'/dev/ttyUSB0',
     'baudrate':1000000,
     'n_dxl': 7,
@@ -36,6 +44,7 @@ MASTER_ARM_LEFT_INFO = {
 }
 MASTER_ARM_RIGHT_INFO = {
     'target': 'puppet_right',
+    'master_model': 'dynamixel',
     'port':'/dev/ttyUSB1',
     'baudrate':1000000,
     'n_dxl': 7,

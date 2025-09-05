@@ -28,8 +28,8 @@ sample_base_controller = ManipulatorVRBaseController(ROBOT_INFO)
 sample_sub_controller = DoosanSubController(ROBOT_INFO['ip'], ROBOT_INFO['port'])
 sample_base_controller.sub_controller = sample_sub_controller
 sample_sub_controller.base_controller = sample_base_controller
-
 sample_base_controller.connect()
+
 
 # Keep process alive
 while True:
