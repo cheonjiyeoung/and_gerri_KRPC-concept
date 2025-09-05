@@ -11,6 +11,8 @@ FACTOR_DEGREE = 1000 # 1도는 1000펄스임
 class PiperSubController:
     def __init__(self, can_port):
         self.robot = C_PiperInterface(can_port)
+        self.base_controller = None
+
         self.factor_degree = FACTOR_DEGREE
         self.status = None
         self.joint_preset = {'home': [0, 80, -160, 0, 0, 0],
@@ -21,16 +23,14 @@ class PiperSubController:
         self.default_joint_angle = self.joint_preset['ready']
         self.last_joint_angle = self.default_joint_angle
 
-        self.status.joint_state = {
-            'name': ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6'],
-            'position': self.deg2rad(self.get_joint_angles())
-        }
-
     def init_base_controller(self, base_controller):
         self.status = RobotStatus(robot_id=base_controller.robot_info["id"],
                                   model=base_controller.robot_info["model"],
                                   category=base_controller.robot_info["category"],)
-
+        self.status.joint_state = {
+            'name': ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6'],
+            'position': self.deg2rad(self.get_joint_angles())
+        }
         self._status_thread = threading.Thread(target=self._update_loop, daemon=True)
         self._lock = threading.Lock()
         self._status_thread.start()
@@ -65,7 +65,16 @@ class PiperSubController:
 
 
     def connect(self):
-        self.robot.connect()
+        if self.base_controller:
+            self.init_base_controller(self.base_controller)
+        self.robot.ConnectPort()
+        time.sleep(1)
+        self.robot.EnableArm(7)
+        time.sleep(1)
+        # self.robot.MotionCtrl_1(0x02, 0, 0)
+        self.robot.MotionCtrl_2(0x01, 0x01, 100, 0x00)
+        time.sleep(1)
+        self.robot.status = 'connect'
         self.get_joint_angles()
         time.sleep(1)
         self.joint_ctrl(self.joint_preset['ready'])
@@ -75,8 +84,9 @@ class PiperSubController:
         self.get_joint_angles()
 
     def disconnect(self):
-        self.robot.disconnect()
-
+        self.robot.MotionCtrl_1(0x02, 0, 0)
+        self.robot.MotionCtrl_2(0, 0, 0, 0x00)
+        self.robot.status = 'disconnect'
 
     def joint_ctrl(self, joint_angles: list):
         scaled_value = [round(joint_angle * self.factor_degree) for joint_angle in joint_angles]
@@ -172,5 +182,7 @@ class PiperSubController:
 
 
 if __name__ == '__main__':
-    piper = PiperSubController()
+    piper = PiperSubController('piper_gyd')
+    piper.connect()
     piper.initialize()
+    piper.get_joint_angles()

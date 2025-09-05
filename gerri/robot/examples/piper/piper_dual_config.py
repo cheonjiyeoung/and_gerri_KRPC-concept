@@ -2,7 +2,7 @@ ROBOT_INFO = {
     "id": "gerri_piper_01",
     "model": "piper",
     "category": "manipulator",
-    "api_key": "***NEED API KEY***"
+    "api_key": "1ca720194d3d52acb8230e28668b9546"
 }
 
 PUPPET_ARM_LEFT = {
