@@ -25,8 +25,8 @@ PAN_TILT = {
 }
 
 VIDEO_INFO = {
-    "front_cam": {"index": 0, "width": 1920, "height": 1080},
-    # "rear": {"index": 2, "width": 1280, "height": 720},
+    "front_cam": {"source": 0, "width": 1920, "height": 1080},
+    # "rear": {"source": 2, "width": 1280, "height": 720},
 }
 
 AUDIO_INFO = {

@@ -14,8 +14,8 @@ daemon = AdaptiveNetworkDaemon(
     robot_info=ROBOT_INFO,
     network='ketirtc',
     command="command",
-    video_info=VIDEO_INFO,
-    audio_info=AUDIO_INFO
+    # video_info=VIDEO_INFO,
+    # audio_info=AUDIO_INFO
 )
 
 daemon.connect()
@@ -25,7 +25,6 @@ daemon.connect()
 
 from gerri.robot.examples.piper.piper_base_controller import PiperBaseController
 from gerri.robot.examples.piper.piper_sub_controller import PiperSubController
-from gerri.robot.examples.pantilt_2kng.pan_tilt_controller import PanTiltController
 from gerri.robot.examples.piper.piper_dual_config import PUPPET_ARM_LEFT, PUPPET_ARM_RIGHT
 
 left_piper_base = PiperBaseController(PUPPET_ARM_LEFT)
@@ -39,6 +38,9 @@ right_piper_sub = PiperSubController(PUPPET_ARM_RIGHT['id'])
 right_piper_base.sub_controller = right_piper_sub
 right_piper_sub.base_controller = right_piper_base
 right_piper_base.connect()
+
+
+# from gerri.robot.examples.pantilt_2kng.pan_tilt_controller import PanTiltController
 
 # pan_tilt = PanTiltController()
 # pan_tilt.connect()

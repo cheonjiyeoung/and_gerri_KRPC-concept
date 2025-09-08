@@ -17,7 +17,7 @@ class AdaptiveNetworkDaemon:
     def _setup_channels(self):
         if self.network == "ketirtc":
             from _and_.keti_rtc.robot import webrtc_robot as backend
-            backend.create_channels(
+            return backend.create_channels(
                 robot_info=self.robot_info,
                 command=self.command,
                 video_info=self.video_info,

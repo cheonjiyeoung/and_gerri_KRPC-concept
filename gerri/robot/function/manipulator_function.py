@@ -13,15 +13,15 @@ class ManipulatorFunction:
                 if message['target'] in self.robot_id or message['target'] == 'all':
                     try:
                         if topic == 'joint_ctrl':
-                            self.sub_controller.joint_ctrl(value,option)
+                            self.sub_controller.joint_ctrl(value)
                         elif topic == 'joint_ctrl_step':
-                            self.sub_controller.joint_ctrl_step(value,option)
+                            self.sub_controller.joint_ctrl_step(value)
                         elif topic == 'gripper_ctrl':
-                            self.sub_controller.gripper_ctrl(value,option)
+                            self.sub_controller.gripper_ctrl(value)
                         elif topic == 'joint_ctrl_master':
-                            self.sub_controller.joint_ctrl_puppet(value,option)
+                            self.sub_controller.joint_ctrl_puppet(value)
                         elif topic == 'gripper_ctrl_master':
-                            self.sub_controller.gripper_ctrl_puppet(value,option)
+                            self.sub_controller.gripper_ctrl_puppet(value)
                         elif topic == 'joint_preset':
                             if value in self.sub_controller.joint_preset:
                                 self.sub_controller.joint_ctrl(self.sub_controller.joint_preset[value])

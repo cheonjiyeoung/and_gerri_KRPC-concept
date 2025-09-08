@@ -28,8 +28,8 @@ class ManipulatorFunction:
         command = manipulator_command.joint_ctrl_master(master_joint_angle, target=target)
         self.send_message(command)
 
-    def gripper_ctrl(self, gripper_value, target='all'):
-        command = manipulator_command.gripper_ctrl(gripper_value, target=target)
+    def gripper_ctrl(self, gripper_angle, target='all'):
+        command = manipulator_command.gripper_ctrl(gripper_angle, target=target)
         self.send_message(command)
 
     def get_robot_status(self, target='all'):

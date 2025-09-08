@@ -15,6 +15,8 @@ class PiperBaseController(ManipulatorFunction):
         self.robot_category = robot_info['category']
         self.robot_model = robot_info['model']
         self.sub_controller = None
+        pub.subscribe(self.receive_message, "receive_message")
+
 
     def receive_message(self, message):
         ManipulatorFunction.receive_message(self,message=message)

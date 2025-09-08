@@ -49,6 +49,9 @@ class MasterArm:
 
         print(f"[Python] Dynamixel ready for {self.n_dxls} axes")
 
+    def connect(self):
+        pass
+
     def disconnect(self):
         """
         Safely disconnect all Dynamixel motors by disabling torque _and_ closing the port.
