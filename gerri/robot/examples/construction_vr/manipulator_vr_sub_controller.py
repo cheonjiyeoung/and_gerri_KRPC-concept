@@ -1,22 +1,30 @@
 import os, sys
+
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 from gerri.robot.examples.construction_vr.robot_status import RobotStatus
-from gerri.robot.examples.sample_robot.sample_robot_controller import SampleRobotController
+from gerri.robot.examples.sample_robot.sample_robot import SampleRobotController
 from gerri.robot.examples.construction_vr.doosan_controller import DoosanController
+from gerri.robot.examples.construction_vr.manipulator_ik_solver import ManipulatorIKSolver
 import threading
 import random
 import time
+import pinocchio as pin
+
+urdf_path = '/home/orin2kng01/dev/and_gerri/gerri/robot/examples/construction_vr/m1509.urdf'
 
 class DoosanSubController:
     def __init__(self, ip, port):
-        self.robot_controller = DoosanController(ip, port)
+        self.robot = DoosanController(ip, port)
         self.base_controller = None
         self._lock = threading.Lock()
 
+        self.ik_solver = ManipulatorIKSolver(urdf_path, 'joint_6')
         self.status = None
 
     def connect(self):
-        self.robot_controller.connect()
+        self.robot.connect()
         self.status = RobotStatus(robot_id=self.base_controller.robot_id,
                                   model=self.base_controller.robot_model,
                                   category=self.base_controller.robot_category)
@@ -26,9 +34,9 @@ class DoosanSubController:
         while True:
             self._lock.acquire()
             # For examples #
-            self.robot_controller.update_status()
-            self.status.joint_state =self.robot_controller.joint_state
-            self.status.pose = self.robot_controller.pose
+            self.robot.update_status()
+            self.status.joint_state =self.robot.joint_state
+            self.status.pose = self.robot.pose
             ###
             self._lock.release()
             time.sleep(0.1)
@@ -63,6 +71,24 @@ class DoosanSubController:
 
     def end_pose_ctrl_step(self, end_pose_step):
         print("end_pose_step_ctrl")
+
+    def clik_ctrl(self, delta_pose):
+        current_joint_rad = np.deg2rad(self.status.joint_state['position'])
+        # current_end_position_mm = self.status.pose['position']
+        # current_end_rotation_deg = self.status.pose['orientation']
+        # current_end_position_m = np.array(current_end_position_mm) / 1000.0
+        # current_end_rotation_rad = np.deg2rad(current_end_rotation_deg)
+        #
+        # # 회전 행렬 생성
+        # current_R = pin.rpy.rpyToMatrix(current_end_rotation_rad[0],
+        #                                 current_end_rotation_rad[1],
+        #                                 current_end_rotation_rad[2])
+        # # SE3 객체 생성
+        # current_robot_pose = pin.SE3(current_R, current_end_position_m)
+
+        joint_vel = self.ik_solver.clik_delta(current_joint_rad, delta_pose)
+        print(joint_vel)
+        self.robot.joint_ctrl_velocity(joint_vel)
 
 
     def gripper_ctrl(self, value, option):

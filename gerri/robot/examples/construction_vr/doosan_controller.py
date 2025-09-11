@@ -258,23 +258,23 @@ class DoosanController:
         self.client.write_register(self.write_register_address_jacc, self.convert_to_hex_joint(value['joint_acceleration']))
 
 
-    def joint_ctrl_speed(self, value):
+    def joint_ctrl_velocity(self, value):
         self.set_robot_mode = 4
-        j1 = self.clamp(value[0], min_value = -360, max_value = 360)
-        j2 = self.clamp(value[1], min_value = -95, max_value = 95)
-        j3 = self.clamp(value[2], min_value = -135, max_value = 135)
-        j4 = self.clamp(value[3], min_value = -360, max_value = 360)
-        j5 = self.clamp(value[4], min_value = -135, max_value = 135)
-        j6 = self.clamp(value[5], min_value = -360, max_value = 360)
+        v1 = self.clamp(value[0], min_value = -1, max_value = 1)
+        v2 = self.clamp(value[1], min_value = -1, max_value = 1)
+        v3 = self.clamp(value[2], min_value = -1, max_value = 1)
+        v4 = self.clamp(value[3], min_value = -1, max_value = 1)
+        v5 = self.clamp(value[4], min_value = -1, max_value = 1)
+        v6 = self.clamp(value[5], min_value = -1, max_value = 1)
 
         self.client.write_register(self.write_register_address_0, self.set_robot_mode)
-        self.client.write_register(self.write_register_address_j1, self.convert_to_hex_joint(j1))
-        self.client.write_register(self.write_register_address_j2, self.convert_to_hex_joint(j2))
-        self.client.write_register(self.write_register_address_j3, self.convert_to_hex_joint(j3))
-        self.client.write_register(self.write_register_address_j4, self.convert_to_hex_joint(j4))
-        self.client.write_register(self.write_register_address_j5, self.convert_to_hex_joint(j5))
-        self.client.write_register(self.write_register_address_j6, self.convert_to_hex_joint(j6))
-        self.client.write_register(self.write_register_address_jacc, self.convert_to_hex_joint(value['joint_acceleration']))
+        self.client.write_register(self.write_register_address_j1, self.convert_to_hex_joint(v1))
+        self.client.write_register(self.write_register_address_j2, self.convert_to_hex_joint(v2))
+        self.client.write_register(self.write_register_address_j3, self.convert_to_hex_joint(v3))
+        self.client.write_register(self.write_register_address_j4, self.convert_to_hex_joint(v4))
+        self.client.write_register(self.write_register_address_j5, self.convert_to_hex_joint(v5))
+        self.client.write_register(self.write_register_address_j6, self.convert_to_hex_joint(v6))
+        # self.client.write_register(self.write_register_address_jacc, self.convert_to_hex_joint(value['joint_acceleration']))
 
     def gripper_ctrl(self, value):
         print("Moving Gripper")

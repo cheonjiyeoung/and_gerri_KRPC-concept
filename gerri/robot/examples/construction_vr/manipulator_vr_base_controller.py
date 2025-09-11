@@ -55,7 +55,8 @@ class ManipulatorVRBaseController:
                                 self.interface.reset_initial_pose('right')
 
                             if self.interface.button_right_grip:
-                                print(self.interface.right_current_pose, self.interface.right_delta_pose)
+                                # print(self.interface.right_current_pose, self.interface.right_delta_pose)
+                                self.sub_controller.clik_ctrl(self.interface.right_delta_pose)
 
                                 # 그리퍼 제어 (오른쪽 트리거)
                                 # gripper_value = round(1 - self.interface.right_trigger, 1)

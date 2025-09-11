@@ -8,8 +8,8 @@ class ManipulatorIKSolver:
     관절 속도를 계산하는 범용 솔버.
     """
 
-    def __init__(self, robot_model, end_effector_frame_name):
-        self.model = robot_model
+    def __init__(self, urdf_path, end_effector_frame_name):
+        self.model = pin.buildModelFromUrdf(urdf_path)
         self.data = self.model.createData()
 
         if not self.model.existFrame(end_effector_frame_name):
@@ -20,24 +20,42 @@ class ManipulatorIKSolver:
         self.Kp = 5.0
         self.damping = 1e-4
 
-    def compute_joint_velocities(self, q: np.ndarray, target_pose: pin.SE3) -> np.ndarray:
+    def clik(self, q: np.ndarray, target_pose: pin.SE3) -> np.ndarray:
         """
-        현재 관절 각도(q)와 목표 자세(target_pose)로부터
+        [기본 함수] 현재 관절 각도(q)와 '절대적인 목표 자세(target_pose)'로부터
         필요한 관절 속도(dq)를 계산합니다.
         """
+        # 1. 순기구학으로 현재 자세 계산
         pin.forwardKinematics(self.model, self.data, q)
         pin.updateFramePlacement(self.model, self.data, self.frame_id)
-
         current_pose = self.data.oMf[self.frame_id]
+
+        # 2. 오차 계산
         error = pin.log6(current_pose.inverse() * target_pose).vector
 
+        # 3. 자코비안 계산
         J = pin.computeFrameJacobian(self.model, self.data, q, self.frame_id)
 
-        # 감쇠 최소 자승법 (Damped Least-Squares)
+        # 4. 감쇠 최소 자승법으로 dq 계산
         J_T = J.T
         lambda_sq = self.damping * self.damping
         inv_term = np.linalg.inv(J @ J_T + lambda_sq * np.identity(6))
-
         dq = J_T @ inv_term @ (self.Kp * error)
 
         return dq
+
+    def clik_delta(self, q: np.ndarray, delta_pose: pin.SE3) -> np.ndarray:
+        """
+        [헬퍼 함수] 현재 관절 각도(q)를 기준으로 '상대적인 움직임(delta_pose)'만큼
+        이동하기 위한 관절 속도(dq)를 계산합니다.
+        """
+        # 1. 순기구학으로 현재 자세 계산
+        pin.forwardKinematics(self.model, self.data, q)
+        pin.updateFramePlacement(self.model, self.data, self.frame_id)
+        current_pose = self.data.oMf[self.frame_id]
+
+        # 2. 다음 목표 자세 계산
+        next_target_pose = current_pose * delta_pose
+
+        # 3. 계산된 절대 목표 자세를 이용해 기본 clik 함수 호출
+        return self.clik(q, next_target_pose)
