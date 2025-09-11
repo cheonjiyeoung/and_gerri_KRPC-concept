@@ -58,6 +58,12 @@ class DoosanSubController:
         """
         print("joint_ctrl_puppet in Sub", value, option)
 
+    def end_pose_ctrl(self, end_pose):
+        print("end_pose_ctrl")
+
+    def end_pose_ctrl_step(self, end_pose_step):
+        print("end_pose_step_ctrl")
+
 
     def gripper_ctrl(self, value, option):
         """

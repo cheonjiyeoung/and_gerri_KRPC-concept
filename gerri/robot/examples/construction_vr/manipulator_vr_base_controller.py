@@ -3,10 +3,13 @@ from pubsub import pub
 
 import os, sys
 
-from gerri.robot.function.manipulator_function import ManipulatorFunction
+import copy
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
 from gerri.robot.status_manager import StatusManager
+from gerri.robot.function.manipulator_function import ManipulatorFunction
+from gerri.robot.function.pan_tilt_zoom_function import PTZFunction
 
 
 class ManipulatorVRBaseController:
@@ -19,8 +22,10 @@ class ManipulatorVRBaseController:
 
         if 'interface' in params:
             self.interface = params['interface']
+            self.last_interface_value = copy.deepcopy(self.interface)
         else:
             self.interface = None
+            self.last_interface_value = None
 
         pub.subscribe(self.receive_message,"receive_message")
 
@@ -36,6 +41,7 @@ class ManipulatorVRBaseController:
 
     def receive_message(self, message):
         ManipulatorFunction.receive_message(self, message=message)
+        PTZFunction.receive_message(self, message)
         if 'topic' in message:
             topic = message['topic']
             value = message['value']
@@ -45,13 +51,16 @@ class ManipulatorVRBaseController:
                         if topic == self.interface.name:
                             self.interface.update(value)
                             # --- 팔 제어 로직 (오른쪽 그립) ---
+                            if self.interface.button_right_grip != self.last_interface_value.button_right_grip:
+                                self.interface.reset_initial_pose('right')
+
                             if self.interface.button_right_grip:
                                 print(self.interface.right_current_pose, self.interface.right_delta_pose)
-                                # self.sub_controller.joint_ctrl_vel()
 
                                 # 그리퍼 제어 (오른쪽 트리거)
-                                gripper_value = round(1 - self.interface.right_trigger, 1)
-                                self.sub_controller.gripper_ctrl(gripper_value)
+                                # gripper_value = round(1 - self.interface.right_trigger, 1)
+                                # self.sub_controller.gripper_ctrl(gripper_value)
+                                self.last_interface_value = copy.deepcopy(self.interface)
                         elif topic == 'connect_robot':
                             self.connect()
                         elif topic == 'get_robot_status':
