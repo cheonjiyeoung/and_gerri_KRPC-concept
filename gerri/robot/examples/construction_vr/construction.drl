@@ -2,24 +2,24 @@ HOME = posj(-90.00, 0.00, 90.00, 0.00, -45.00, -60.00)
 RELOADER = posj(90.00, 10.00, -80.00, 0.00, -90.00, 0.00)
 RELOADER_SLOT = [130.00, 90.00, 50.00, 10.00, -30.00, -70.00, -110.00, -150.00]
 
-def convert_value(value):
+def convert_value(value, scale=10):
 	convert_val = []
 	for val in value:
 		if val > 0x8000:
 			val = val - 0x10000
-			convert_val.append(val / 10)
+			convert_val.append(val / scale)
 		else:
-			convert_val.append(val / 10)
+			convert_val.append(val / scale)
 	return convert_val
 
-def from_modbus_register(value):
+def from_modbus_register(value, scale=10):
 	if value > 0x8000:
 		value = value - 0x10000
-	converted_value = value / 10
+	converted_value = value / scale
 	return converted_value
 
-def to_modbus_register(value):
-    scaled_int = int(round(value * 10))
+def to_modbus_register(value, scale=10):
+    scaled_int = int(round(value * scale))
     register_value = scaled_int & 0xFFFF
     return register_value
 
@@ -151,18 +151,26 @@ while True:
 		servoj(target_pose, 120, 120)
 
 	if mode == 4:
-		j1 = get_modbus_slave(147)
-		j2 = get_modbus_slave(148)
-		j3 = get_modbus_slave(149)
-		j4 = get_modbus_slave(150)
-		j5 = get_modbus_slave(151)
-		j6 = get_modbus_slave(152)
-		vel = get_modbus_slave(153)
-		acc = get_modbus_slave(154)
-		value = [j1, j2, j3, j4, j5, j6, vel, acc]
-		target_value = convert_value(value)
-		target_pose = posj(target_value[0], target_value[1], target_value[2], target_value[3], target_value[4], target_value[5])
-		speedj(vel, acc, time)(target_pose, vel, acc)
+		v1 = get_modbus_slave(147)
+		v2 = get_modbus_slave(148)
+		v3 = get_modbus_slave(149)
+		v4 = get_modbus_slave(150)
+		v5 = get_modbus_slave(151)
+		v6 = get_modbus_slave(152)
+		acc = get_modbus_slave(153)
+		dt = get_modbus_slave(154)
+		value = [v1, v2, v3, v4, v5, v6]
+		target_value = convert_value(value, 100)
+		speedj(target_value, acc, dt)
+
+		set_modbus_slave(129, 0)
+		set_modbus_slave(147, to_modbus_register(0))
+		set_modbus_slave(148, to_modbus_register(0))
+		set_modbus_slave(149, to_modbus_register(0))
+		set_modbus_slave(150, to_modbus_register(0))
+		set_modbus_slave(151, to_modbus_register(0))
+		set_modbus_slave(152, to_modbus_register(0))
+		set_modbus_slave(153, to_modbus_register(0))
 
 		
 
