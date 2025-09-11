@@ -202,5 +202,13 @@ class VRController:
             # 라디안 값으로 회전 행렬을 생성
             R = pin.rpy.rpyToMatrix(rpy_rad[0], rpy_rad[1], rpy_rad[2])
 
+        else:
+            axis_map = ['-y', '-x', 'z']
+            axis_map_dict = {'x': [1,0,0], 'y': [0,1,0], 'z': [0,0,1],
+                             '-x': [-1,0,0], '-y': [0,-1,0], '-z': [0,0,-1]}
+            new_x_axis = np.array(axis_map_dict[axis_map[0]])
+            new_y_axis = np.array(axis_map_dict[axis_map[1]])
+            new_z_axis = np.array(axis_map_dict[axis_map[2]])
+            R = np.array([new_x_axis, new_y_axis, new_z_axis]).T
 
         return pin.SE3(R, t)

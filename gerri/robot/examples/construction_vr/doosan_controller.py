@@ -24,6 +24,7 @@ class DoosanController:
             'effort': [0, 0, 0, 0],
         }
 
+
         self.ip = ip
         self.port = port
 

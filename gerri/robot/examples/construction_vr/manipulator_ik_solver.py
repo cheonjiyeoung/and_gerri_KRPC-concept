@@ -27,11 +27,8 @@ class ManipulatorIKSolver:
         """
         # 1. 순기구학으로 현재 자세 계산
         current_pose = self.fk(q)
-
-        print(target_pose)
         # 2. 오차 계산
         error = pin.log6(current_pose.inverse() * target_pose).vector
-        print(error)
 
         # 3. 자코비안 계산
         J = pin.computeFrameJacobian(self.model, self.data, q, self.frame_id)

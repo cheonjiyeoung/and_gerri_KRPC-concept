@@ -24,6 +24,9 @@ class DoosanSubController:
 
         self.last_robot_SE3_pose = None
 
+        self.joint_preset = {'home': [-90.00, 0.00, 90.00, 0.00, -45.00, -60.00]}
+
+
     def connect(self):
         self.robot.connect()
         self.status = RobotStatus(robot_id=self.base_controller.robot_id,
