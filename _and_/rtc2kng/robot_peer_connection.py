@@ -353,7 +353,7 @@ class RobotPeerConnectionHandler:
 
         @self.data_channel.on("message")
         def _on_data_channel_message(msg):
-            print(f"[{timestamp()}] 📥 {self.operator_id}: {msg}")
+            # print(f"[{timestamp()}] 📥 {self.operator_id}: {msg}")
             # self.data_channel.send(f"echo: {msg}")
             try:
                 msg_data = json.loads(msg)

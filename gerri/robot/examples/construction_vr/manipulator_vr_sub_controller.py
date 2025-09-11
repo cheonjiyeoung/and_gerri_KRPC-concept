@@ -4,7 +4,6 @@ import numpy as np
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 from gerri.robot.examples.construction_vr.robot_status import RobotStatus
-from gerri.robot.examples.sample_robot.sample_robot import SampleRobotController
 from gerri.robot.examples.construction_vr.doosan_controller import DoosanController
 from gerri.robot.examples.construction_vr.manipulator_ik_solver import ManipulatorIKSolver
 import threading
@@ -22,6 +21,8 @@ class DoosanSubController:
 
         self.ik_solver = ManipulatorIKSolver(urdf_path, 'joint_6')
         self.status = None
+
+        self.last_robot_SE3_pose = None
 
     def connect(self):
         self.robot.connect()
@@ -72,23 +73,33 @@ class DoosanSubController:
     def end_pose_ctrl_step(self, end_pose_step):
         print("end_pose_step_ctrl")
 
-    def clik_ctrl(self, delta_pose):
-        current_joint_rad = np.deg2rad(self.status.joint_state['position'])
-        # current_end_position_mm = self.status.pose['position']
-        # current_end_rotation_deg = self.status.pose['orientation']
-        # current_end_position_m = np.array(current_end_position_mm) / 1000.0
-        # current_end_rotation_rad = np.deg2rad(current_end_rotation_deg)
-        #
-        # # 회전 행렬 생성
-        # current_R = pin.rpy.rpyToMatrix(current_end_rotation_rad[0],
-        #                                 current_end_rotation_rad[1],
-        #                                 current_end_rotation_rad[2])
-        # # SE3 객체 생성
-        # current_robot_pose = pin.SE3(current_R, current_end_position_m)
+    def joint_ctrl_vel_stop(self):
+        self.robot.joint_ctrl_vel_stop()
 
-        joint_vel = self.ik_solver.clik_delta(current_joint_rad, delta_pose)
-        print(joint_vel)
-        self.robot.joint_ctrl_velocity(joint_vel)
+
+    def joint_ctrl_vel_delta(self, start_pose: pin.SE3, delta_pose: pin.SE3, acc=250, dt=0.01):
+        """
+        BaseController로부터 받은 명령을 수행하는 핵심 함수.
+        기준 자세(start_pose)에 변화량(delta_pose)을 적용해 목표 지점으로 이동.
+        """
+        # 1. 최종 목표 지점 계산
+        target_pose = start_pose * delta_pose
+
+        # 2. 현재 관절 각도 가져오기
+        current_q_rad = np.deg2rad(self.status.joint_state['position'])
+
+        # 3. IK 솔버를 이용해 관절 속도(dq) 계산
+        #    이때는 절대 목표를 추종하는 clik 함수를 사용
+        dq = self.ik_solver.clik(current_q_rad, target_pose)
+
+        self.robot.joint_ctrl_vel(dq, acc, dt)
+
+        # 4. 실제 로봇에 속도 명령 전달
+        self.robot.joint_ctrl_vel(dq)
+
+    def get_current_SE3_pose(self):
+        current_joint_rad = np.deg2rad(self.status.joint_state['position'])
+        return self.ik_solver.fk(current_joint_rad)
 
 
     def gripper_ctrl(self, value, option):
