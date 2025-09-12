@@ -56,7 +56,7 @@ class DoosanSubController:
         DISCONNECT FROM ROBOT
         """
 
-    def joint_ctrl(self, value, option):
+    def joint_ctrl(self, value):
         """
         ROBOT JOINT CONTROL BY DEGREE
         """

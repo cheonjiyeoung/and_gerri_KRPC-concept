@@ -35,7 +35,7 @@ class ManipulatorVRBaseController:
 
         # 최종 마스터 변환 행렬: T_base_vr (베이스에서 본 VR컨트롤러의 자세)
         # VR -> World -> Base 순서로 변환을 합성
-        self.T_base_from_vr = tf_compose([T_world_vr, T_base_world])
+        self.T_world_vr = T_world_vr
 
         if 'interface' in params:
             self.interface = params['interface']
@@ -86,7 +86,7 @@ class ManipulatorVRBaseController:
                                 raw_delta_pose_vr = self.interface.right_delta_pose
 
                                 # 2. 마스터 변환 행렬을 이용해 'VR 기준 delta'를 '로봇 베이스 기준 delta'로 변환
-                                delta_pose_base = self.T_base_from_vr * raw_delta_pose_vr * self.T_base_from_vr.inverse()
+                                delta_pose_base = self.T_world_vr * raw_delta_pose_vr * self.T_world_vr.inverse()
 
                                 # 3. SubController에는 '베이스 기준'의 start_pose와 '베이스 기준'의 delta_pose를 전달
                                 self.sub_controller.joint_ctrl_vel_delta(self.start_pose, delta_pose_base)
