@@ -23,10 +23,19 @@ class ManipulatorVRBaseController:
         self.start_pose = None
         self.target_pose = None
 
-        self.T_vr_world = tf_preset['vr_world']
-        self.T_world_base = tf_from_rpy_deg([0, 45, -90])
-        self.T_vr_base = tf_compose([self.T_vr_world, self.T_world_base])
-        self.T_base_world = self.T_world_base.inverse()
+        # T_A_B: A에서 본 B의 자세
+        # T_world_vr: 월드에서 본 VR컨트롤러의 자세 (VR -> 월드 변환)
+        T_world_vr = tf_from_axis_map(['z', 'x', '-y'])
+
+        # T_world_base: 월드에서 본 로봇 베이스의 자세 (로봇의 물리적 설치 상태)
+        T_world_base = tf_from_rpy_deg([0, 45, -90])
+
+        # T_base_world: 베이스에서 본 월드의 자세 (역행렬)
+        T_base_world = T_world_base.inverse()
+
+        # 최종 마스터 변환 행렬: T_base_vr (베이스에서 본 VR컨트롤러의 자세)
+        # VR -> World -> Base 순서로 변환을 합성
+        self.T_base_from_vr = tf_compose([T_world_vr, T_base_world])
 
         if 'interface' in params:
             self.interface = params['interface']
@@ -73,8 +82,14 @@ class ManipulatorVRBaseController:
 
                             if self.interface.button_right_grip and self.start_pose:
                                 # print(self.interface.right_current_pose, self.interface.right_delta_pose)
-                                world_right_delta_pose = self.T_vr_base * self.interface.right_delta_pose * self.T_vr_base.inverse()
-                                self.sub_controller.joint_ctrl_vel_delta(self.start_pose, world_right_delta_pose)
+                                # 1. VR의 원본 delta (VR 좌표계 기준)
+                                raw_delta_pose_vr = self.interface.right_delta_pose
+
+                                # 2. 마스터 변환 행렬을 이용해 'VR 기준 delta'를 '로봇 베이스 기준 delta'로 변환
+                                delta_pose_base = self.T_base_from_vr * raw_delta_pose_vr * self.T_base_from_vr.inverse()
+
+                                # 3. SubController에는 '베이스 기준'의 start_pose와 '베이스 기준'의 delta_pose를 전달
+                                self.sub_controller.joint_ctrl_vel_delta(self.start_pose, delta_pose_base)
 
                                 # 그리퍼 제어 (오른쪽 트리거)
                                 # gripper_value = round(1 - self.interface.right_trigger, 1)
