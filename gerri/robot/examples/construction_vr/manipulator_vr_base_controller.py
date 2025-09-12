@@ -1,8 +1,6 @@
 import asyncio
 from pubsub import pub
-
 import os, sys
-
 import copy
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
@@ -10,6 +8,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable),
 from gerri.robot.status_manager import StatusManager
 from gerri.robot.function.manipulator_function import ManipulatorFunction
 from gerri.robot.function.pan_tilt_zoom_function import PTZFunction
+
+from gerri.robot.function.tf_helper import *
+from gerri.robot.function.ik_solver import IKSolver
 
 
 class ManipulatorVRBaseController:
@@ -21,6 +22,10 @@ class ManipulatorVRBaseController:
         self.sub_controller = None
         self.start_pose = None
         self.target_pose = None
+
+        self.T_vr_world = tf_preset['vr_world']
+        self.T_world_base = tf_from_rpy_deg([0, 45, -90])
+        self.T_base_world = self.T_world_base.inverse()
 
         if 'interface' in params:
             self.interface = params['interface']
@@ -57,13 +62,15 @@ class ManipulatorVRBaseController:
                                 self.interface.reset_initial_pose('right')
                                 if self.interface.button_right_grip:
                                     self.start_pose = self.sub_controller.get_current_SE3_pose()
+
                                 else:
                                     self.start_pose = None
                                     self.sub_controller.joint_ctrl_vel_stop()
 
                             if self.interface.button_right_grip and self.start_pose:
                                 # print(self.interface.right_current_pose, self.interface.right_delta_pose)
-                                self.sub_controller.joint_ctrl_vel_delta(self.start_pose, self.interface.right_delta_pose)
+                                world_right_delta_pose = self.T_vr_world * self.interface.right_delta_pose * self.T_vr_world.inverse()
+                                self.sub_controller.joint_ctrl_vel_delta(self.start_pose, world_right_delta_pose)
 
                                 # 그리퍼 제어 (오른쪽 트리거)
                                 # gripper_value = round(1 - self.interface.right_trigger, 1)

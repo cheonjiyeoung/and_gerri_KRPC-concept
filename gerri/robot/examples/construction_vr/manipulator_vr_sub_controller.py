@@ -2,14 +2,18 @@ import os, sys
 
 import numpy as np
 
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 from gerri.robot.examples.construction_vr.robot_status import RobotStatus
 from gerri.robot.examples.construction_vr.doosan_controller import DoosanController
-from gerri.robot.examples.construction_vr.manipulator_ik_solver import ManipulatorIKSolver
 import threading
 import random
 import time
 import pinocchio as pin
+
+
+from gerri.robot.function.tf_helper import *
+from gerri.robot.function.ik_solver import IKSolver
 
 urdf_path = '/home/orin2kng01/dev/and_gerri/gerri/robot/examples/construction_vr/m1509.urdf'
 
@@ -19,10 +23,12 @@ class DoosanSubController:
         self.base_controller = None
         self._lock = threading.Lock()
 
-        self.ik_solver = ManipulatorIKSolver(urdf_path, 'joint_6')
+        self.ik_solver = IKSolver(urdf_path, 'joint_6')
+
         self.status = None
 
         self.last_robot_SE3_pose = None
+
 
         self.joint_preset = {'home': [-90.00, 0.00, 90.00, 0.00, -45.00, -60.00]}
 

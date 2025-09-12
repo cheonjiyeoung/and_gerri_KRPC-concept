@@ -2,7 +2,7 @@ import pinocchio as pin
 import numpy as np
 
 
-class ManipulatorIKSolver:
+class IKSolver:
     """
     Pinocchio를 이용해 CLIK(Closed-loop Inverse Kinematics) 기반의
     관절 속도를 계산하는 범용 솔버.
