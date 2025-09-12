@@ -22,12 +22,12 @@ daemon.connect()
 # - Otherwise, manually specify a sub-controller as shown below.
 
 from gerri.robot.examples.construction_vr.manipulator_vr_base_controller import ManipulatorVRBaseController
-from gerri.robot.examples.construction_vr.manipulator_vr_sub_controller import DoosanSubController
+from gerri.robot.examples.construction_vr.doosan_vr_sub_controller import DoosanSubController
 from gerri.robot.interface.vr_controller import VRController
 
 
 # vr_ctrl_interface = VRController()
-vr_ctrl_interface = VRController(axis_map=['-y', '-x', 'z'])
+vr_ctrl_interface = VRController()
 sample_base_controller = ManipulatorVRBaseController(ROBOT_INFO, interface=vr_ctrl_interface)
 sample_sub_controller = DoosanSubController(ROBOT_INFO['ip'], ROBOT_INFO['port'])
 sample_base_controller.sub_controller = sample_sub_controller

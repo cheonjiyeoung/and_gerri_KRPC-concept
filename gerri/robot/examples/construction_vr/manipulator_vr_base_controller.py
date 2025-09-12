@@ -25,6 +25,7 @@ class ManipulatorVRBaseController:
 
         self.T_vr_world = tf_preset['vr_world']
         self.T_world_base = tf_from_rpy_deg([0, 45, -90])
+        self.T_vr_base = tf_compose([self.T_vr_world, self.T_world_base])
         self.T_base_world = self.T_world_base.inverse()
 
         if 'interface' in params:
@@ -58,6 +59,9 @@ class ManipulatorVRBaseController:
                         if topic == self.interface.name:
                             self.interface.update(value)
                             # --- 팔 제어 로직 (오른쪽 그립) ---
+                            if self.interface.button_A:
+                                self.sub_controller.joint_ctrl(self.sub_controller.joint_preset['home'])
+
                             if self.interface.button_right_grip != self.last_interface_value.button_right_grip:
                                 self.interface.reset_initial_pose('right')
                                 if self.interface.button_right_grip:
@@ -69,7 +73,7 @@ class ManipulatorVRBaseController:
 
                             if self.interface.button_right_grip and self.start_pose:
                                 # print(self.interface.right_current_pose, self.interface.right_delta_pose)
-                                world_right_delta_pose = self.T_vr_world * self.interface.right_delta_pose * self.T_vr_world.inverse()
+                                world_right_delta_pose = self.T_vr_base * self.interface.right_delta_pose * self.T_vr_base.inverse()
                                 self.sub_controller.joint_ctrl_vel_delta(self.start_pose, world_right_delta_pose)
 
                                 # 그리퍼 제어 (오른쪽 트리거)

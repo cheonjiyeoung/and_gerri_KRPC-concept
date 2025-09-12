@@ -60,7 +60,7 @@ class DoosanSubController:
         """
         ROBOT JOINT CONTROL BY DEGREE
         """
-        print("Joint Ctrl in Sub", value, option)
+        self.robot.joint_ctrl(value)
 
     def joint_ctrl_step(self, value, option):
         """

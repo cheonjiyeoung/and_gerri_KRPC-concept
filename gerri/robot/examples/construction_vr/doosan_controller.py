@@ -200,21 +200,16 @@ class DoosanController:
         self.client.write_register(self.write_register_address_0, self.set_robot_mode)
             # drl_script_pause()
 
-    def joint_ctrl(self, value):
+    def joint_ctrl(self, value, vel=120, acc=120):
         print('joint_ctrl')
         self.set_robot_mode = 1
-        j1 = value['joint_angle'][0]
-        j1 = max(-360., min(360., j1))
-        j2 = value['joint_angle'][1]
-        j2 = max(-150., min(150., j2))
-        j3 = value['joint_angle'][2]
-        j3 = max(-135., min(135., j3))
-        j4 = value['joint_angle'][3]
-        j4 = max(-360., min(360., j4))
-        j5 = value['joint_angle'][4]
-        j5 = max(-135., min(135., j5))
-        j6 = value['joint_angle'][5]
-        j6 = max(-360., min(360., j6))
+
+        j1 = self.clamp(value[0], min_value = -360, max_value = 360)
+        j2 = self.clamp(value[1], min_value = -150, max_value = 150)
+        j3 = self.clamp(value[2], min_value = -135, max_value = 135)
+        j4 = self.clamp(value[3], min_value = -360, max_value = 360)
+        j5 = self.clamp(value[4], min_value = -135, max_value = 135)
+        j6 = self.clamp(value[5], min_value = -360, max_value = 360)
 
         self.client.write_register(self.write_register_address_0, self.set_robot_mode)
         self.client.write_register(self.write_register_address_j1, self.modbus_encode(j1))
@@ -223,8 +218,8 @@ class DoosanController:
         self.client.write_register(self.write_register_address_j4, self.modbus_encode(j4))
         self.client.write_register(self.write_register_address_j5, self.modbus_encode(j5))
         self.client.write_register(self.write_register_address_j6, self.modbus_encode(j6))
-        self.client.write_register(self.write_register_address_jvel, self.modbus_encode(value['joint_velocity']))
-        self.client.write_register(self.write_register_address_jacc, self.modbus_encode(value['joint_acceleration']))
+        self.client.write_register(self.write_register_address_jvel, self.modbus_encode(vel))
+        self.client.write_register(self.write_register_address_jacc, self.modbus_encode(acc))
 
     def movel(self, value):
         print("Movel")
