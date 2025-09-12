@@ -79,8 +79,15 @@ class DoosanSubController:
     def end_pose_ctrl(self, end_pose):
         print("end_pose_ctrl")
 
-    def end_pose_ctrl_step(self, end_pose_step):
-        print("end_pose_step_ctrl")
+    def end_pose_ctrl_delta(self, start_pose, delta_pose, vel=100, acc=100, dt=0.1):
+        target_pose = start_pose * delta_pose
+        # 변환 함수를 호출하여 [x,y,z,rx,ry,rz] 리스트를 얻음
+        # 로봇이 mm 단위를 쓴다면 pos_unit='mm' 추가
+        pose_list = se3_to_pose(target_pose, pos_unit='mm', rot_unit='deg')
+        print(f"Current pose: {self.status.pose}")
+        print(f"Target Pose List: {pose_list}")
+
+
 
     def joint_ctrl_vel_stop(self):
         self.robot.joint_ctrl_vel_stop()

@@ -151,6 +151,23 @@ while True:
 		servoj(target_pose, 120, 120)
 
 	if mode == 4:
+		x = get_modbus_slave(138)
+		y = get_modbus_slave(139)
+		z = get_modbus_slave(140)
+		rx = get_modbus_slave(141)
+		ry = get_modbus_slave(142)
+		rz = get_modbus_slave(143)
+		vel = get_modbus_slave(144)
+		acc = get_modbus_slave(145)
+		time = get_modbus_slave(146)
+		value = [x, y, z, rx, ry, rz, vel, acc, time]
+		target_val = convert_value(value)
+		target_pose = posx(target_val[0], target_val[1], target_val[2], target_val[3], target_val[4], target_val[5])
+
+		servol(target_pose, vel, acc, time)
+
+
+	if mode == 5:
 		v1 = get_modbus_slave(147)
 		v2 = get_modbus_slave(148)
 		v3 = get_modbus_slave(149)

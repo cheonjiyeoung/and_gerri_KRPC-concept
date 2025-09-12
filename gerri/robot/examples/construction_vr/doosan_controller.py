@@ -261,9 +261,25 @@ class DoosanController:
         self.client.write_register(self.write_register_address_jvel, self.modbus_encode(value['joint_velocity']))
         self.client.write_register(self.write_register_address_jacc, self.modbus_encode(value['joint_acceleration']))
 
+    def end_pose_ctrl(self, pose, vel=100, acc=100, dt=0.1):
+        self.set_robot_mode = 4
+
+        x, y, z, rx, ry, rz = pose
+
+        self.client.write_register(self.write_register_address_0, self.set_robot_mode)
+        self.client.write_register(self.write_register_address_x, self.modbus_encode(x))
+        self.client.write_register(self.write_register_address_y, self.modbus_encode(y))
+        self.client.write_register(self.write_register_address_z, self.modbus_encode(z))
+        self.client.write_register(self.write_register_address_rx, self.modbus_encode(rx))
+        self.client.write_register(self.write_register_address_ry, self.modbus_encode(ry))
+        self.client.write_register(self.write_register_address_rz, self.modbus_encode(rz))
+        self.client.write_register(self.write_register_address_lvel, self.modbus_encode(vel))
+        self.client.write_register(self.write_register_address_lacc, self.modbus_encode(acc))
+        self.client.write_register(self.write_register_address_rel, self.modbus_encode(dt))
+
 
     def joint_ctrl_vel(self, value, acc=250, dt=0.1):
-        self.set_robot_mode = 4
+        self.set_robot_mode = 5
         v1, v2, v3, v4, v5, v6 = value
 
         # v1 = self.clamp(value[0], min_value = -1, max_value = 1)

@@ -27,6 +27,24 @@ def tf_from_offset_rpy_deg(params):
     R = pin.rpy.rpyToMatrix(rpy_rad[0], rpy_rad[1], rpy_rad[2])
     return pin.SE3(R, offset)
 
+
+def se3_to_pose(pose: pin.SE3, pos_unit='m', rot_unit='deg'):
+    """pin.SE3 객체를 [x, y, z, rx, ry, rz] 리스트로 변환합니다."""
+
+    # 1. 위치 추출 및 단위 변환
+    position = pose.translation
+    if pos_unit == 'mm':
+        position = position * 1000.0
+
+    # 2. 회전 추출 및 단위 변환
+    rotation_matrix = pose.rotation
+    rpy = pin.rpy.matrixToRpy(rotation_matrix)  # 기본 단위는 라디안
+    if rot_unit == 'deg':
+        rpy = np.rad2deg(rpy)
+
+    # 3. 두 리스트를 합쳐서 반환
+    return np.concatenate([position, rpy])
+
 def tf_compose(se3_list: list) -> pin.SE3:
     """SE3 리스트를 순서대로 곱하여 최종 변환 행렬을 반환합니다."""
     final_transform = pin.SE3.Identity()

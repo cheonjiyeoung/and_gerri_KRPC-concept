@@ -89,7 +89,7 @@ class ManipulatorVRBaseController:
                                 delta_pose_base = self.T_world_vr * raw_delta_pose_vr * self.T_world_vr.inverse()
 
                                 # 3. SubController에는 '베이스 기준'의 start_pose와 '베이스 기준'의 delta_pose를 전달
-                                self.sub_controller.joint_ctrl_vel_delta(self.start_pose, delta_pose_base)
+                                self.sub_controller.end_pose_ctrl_delta(self.start_pose, delta_pose_base)
 
                                 # 그리퍼 제어 (오른쪽 트리거)
                                 # gripper_value = round(1 - self.interface.right_trigger, 1)
