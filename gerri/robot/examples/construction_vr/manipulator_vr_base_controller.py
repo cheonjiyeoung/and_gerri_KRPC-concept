@@ -37,6 +37,9 @@ class ManipulatorVRBaseController:
         # 제어 루프에서 계산을 단순화하기 위해 미리 곱해둡니다.
         self.T_hctrl_quest = self.T_hctrl_ros * self.T_ros_quest
 
+        np.printoptions(suppress=True)
+
+
         if 'interface' in params:
             self.interface = params['interface']
             self.last_interface_value = copy.deepcopy(self.interface)
@@ -83,22 +86,30 @@ class ManipulatorVRBaseController:
                             if self.interface.button_right_grip and self.start_pose:
                                 # 1. VR 인터페이스에서 '초기 자세 대비 변화량'을 가져옴 (Quest 좌표계 기준)
                                 delta_quest = self.interface.right_delta_pose
+                                # delta_ctrl_ros = self.T_hctrl_ros * delta_quest * self.T_hctrl_ros.inverse()
 
-                                # 2. 'Quest 기준 변화량'을 '사용자 컨트롤(월드 기준) 변화량'으로 변환
-                                # T * delta * T_inv 공식 사용
+                                # # 2. 'Quest 기준 변화량'을 '사용자 컨트롤(월드 기준) 변화량'으로 변환
+                                # # T * delta * T_inv 공식 사용
                                 delta_world = self.T_hctrl_quest * delta_quest * self.T_hctrl_quest.inverse()
+                                #
+                                # # 3. 로봇의 '시작 자세'를 월드 기준으로 변환
+                                # start_pose_world = self.T_world_base * self.start_pose
+                                #
+                                # # 4. 월드 기준 '목표 자세' 계산 = 월드 기준 '시작 자세' * 월드 기준 '변화량'
+                                # target_pose_world = start_pose_world * delta_world
+                                #
+                                #
+                                # # 5. 월드 기준 '목표 자세'를 다시 로봇 베이스 기준으로 변환
+                                # target_pose_base = self.T_world_base.inverse() * target_pose_world
 
-                                # 3. 로봇의 '시작 자세'를 월드 기준으로 변환
-                                start_pose_world = self.T_world_base * self.start_pose
-
-                                # 4. 월드 기준 '목표 자세' 계산 = 월드 기준 '시작 자세' * 월드 기준 '변화량'
-                                target_pose_world = start_pose_world * delta_world
-
-                                # 5. 월드 기준 '목표 자세'를 다시 로봇 베이스 기준으로 변환
-                                target_pose_base = self.T_world_base.inverse() * target_pose_world
+                                target_pose = self.start_pose * delta_quest
+                                print(np.round(se3_to_pose(delta_quest),2))
+                                print(np.round(se3_to_pose(target_pose),2))
+                                # target_pose = self.start_pose * delta_world
+                                # target_pose = self.start_pose * delta_ctrl_ros
 
                                 # 6. 최종 '베이스 기준 목표 자세'를 로봇에게 전송
-                                self.sub_controller.end_pose_ctrl_delta(target_pose_base)
+                                self.sub_controller.end_pose_ctrl(target_pose)
 
                             self.last_interface_value = copy.deepcopy(self.interface)
                         elif topic == 'connect_robot':
