@@ -23,9 +23,19 @@ class ManipulatorVRBaseController:
         self.start_pose = None
         self.target_pose = None
 
-        # 최종 마스터 변환 행렬: T_base_vr (베이스에서 본 VR컨트롤러의 자세)
-        # VR -> World -> Base 순서로 변환을 합성
-        self.T_quest_to_ros = tf_preset['quest_to_ros']
+        # --- 좌표계 변환 행렬 정의 ---
+        # 1. 월드 좌표계에서 본 로봇 베이스의 자세
+        self.T_world_base = tf_from_rpy_deg([0, 45, -90])
+
+        # 2. Quest 원본 -> ROS 표준 좌표계 변환 (tf_helper.py의 tf_preset 사용)
+        self.T_ros_quest = tf_from_axis_map(['x', '-y', 'z'])
+
+        # 3. ROS 표준 -> 사용자 컨트롤 좌표계 변환 ('z'가 앞, 'x'가 위, 'y'가 오른쪽)
+        self.T_hctrl_ros = tf_from_axis_map(['z', '-y', 'x'])
+
+        # 4. Quest -> 사용자 컨트롤(Human Control) 좌표계로 한 번에 변환하는 "마스터 변환 행렬"
+        # 제어 루프에서 계산을 단순화하기 위해 미리 곱해둡니다.
+        self.T_hctrl_quest = self.T_hctrl_ros * self.T_ros_quest
 
         if 'interface' in params:
             self.interface = params['interface']
@@ -71,22 +81,24 @@ class ManipulatorVRBaseController:
                                     self.sub_controller.joint_ctrl_vel_stop()
 
                             if self.interface.button_right_grip and self.start_pose:
-                                # print(self.interface.right_current_pose, self.interface.right_delta_pose)
-                                # 1. VR의 원본 delta (VR 좌표계 기준)
-                                raw_delta_pose_vr = self.interface.right_delta_pose
-                                # print(raw_delta_pose_vr)
-                                print('r : ',np.round(se3_to_pose(raw_delta_pose_vr, 'mm'), 2))
+                                # 1. VR 인터페이스에서 '초기 자세 대비 변화량'을 가져옴 (Quest 좌표계 기준)
+                                delta_quest = self.interface.right_delta_pose
 
-                                # 2. 마스터 변환 행렬을 이용해 'VR 기준 delta'를 '로봇 베이스 기준 delta'로 변환
-                                delta_pose_base = self.T_quest_to_ros * raw_delta_pose_vr * self.T_quest_to_ros.inverse()
-                                print('d : ',np.round(se3_to_pose(delta_pose_base, 'mm'),2))
+                                # 2. 'Quest 기준 변화량'을 '사용자 컨트롤(월드 기준) 변화량'으로 변환
+                                # T * delta * T_inv 공식 사용
+                                delta_world = self.T_hctrl_quest * delta_quest * self.T_hctrl_quest.inverse()
 
-                                # 3. SubController에는 '베이스 기준'의 start_pose와 '베이스 기준'의 delta_pose를 전달
-                                self.sub_controller.end_pose_ctrl_delta(self.start_pose, delta_pose_base)
+                                # 3. 로봇의 '시작 자세'를 월드 기준으로 변환
+                                start_pose_world = self.T_world_base * self.start_pose
 
-                                # 그리퍼 제어 (오른쪽 트리거)
-                                # gripper_value = round(1 - self.interface.right_trigger, 1)
-                                # self.sub_controller.gripper_ctrl(gripper_value)
+                                # 4. 월드 기준 '목표 자세' 계산 = 월드 기준 '시작 자세' * 월드 기준 '변화량'
+                                target_pose_world = start_pose_world * delta_world
+
+                                # 5. 월드 기준 '목표 자세'를 다시 로봇 베이스 기준으로 변환
+                                target_pose_base = self.T_world_base.inverse() * target_pose_world
+
+                                # 6. 최종 '베이스 기준 목표 자세'를 로봇에게 전송
+                                self.sub_controller.end_pose_ctrl_delta(target_pose_base)
 
                             self.last_interface_value = copy.deepcopy(self.interface)
                         elif topic == 'connect_robot':

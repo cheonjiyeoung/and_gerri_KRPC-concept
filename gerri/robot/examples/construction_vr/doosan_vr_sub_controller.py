@@ -76,8 +76,14 @@ class DoosanSubController:
         """
         print("joint_ctrl_puppet in Sub", value, option)
 
-    def end_pose_ctrl(self, end_pose):
-        print("end_pose_ctrl")
+    def end_pose_ctrl(self, target_pose):
+        """
+        최종 목표 자세(SE3)를 받아 로봇을 제어합니다.
+        """
+        # pin.SE3 객체를 로봇이 이해하는 [x,y,z,rx,ry,rz] 리스트로 변환
+        pose_list = se3_to_pose(target_pose, pos_unit='mm', rot_unit='deg')
+        # 로봇 드라이버에 명령 전송
+        self.robot.end_pose_ctrl(pose_list)
 
     def end_pose_ctrl_delta(self, start_pose, delta_pose, vel=100, acc=100, dt=0.1):
         target_pose = start_pose * delta_pose
