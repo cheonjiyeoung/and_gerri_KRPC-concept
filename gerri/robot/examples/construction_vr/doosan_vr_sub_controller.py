@@ -84,8 +84,9 @@ class DoosanSubController:
         # 변환 함수를 호출하여 [x,y,z,rx,ry,rz] 리스트를 얻음
         # 로봇이 mm 단위를 쓴다면 pos_unit='mm' 추가
         pose_list = se3_to_pose(target_pose, pos_unit='mm', rot_unit='deg')
-        print(f"Current pose: {self.status.pose}")
-        print(f"Target Pose List: {pose_list}")
+        # print(f"Current pose: {self.status.pose}")
+        # print(f"Target Pose List: {pose_list}")
+        self.robot.end_pose_ctrl(pose_list)
 
 
 

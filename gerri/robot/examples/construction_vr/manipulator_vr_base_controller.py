@@ -23,19 +23,9 @@ class ManipulatorVRBaseController:
         self.start_pose = None
         self.target_pose = None
 
-        # T_A_B: A에서 본 B의 자세
-        # T_world_vr: 월드에서 본 VR컨트롤러의 자세 (VR -> 월드 변환)
-        T_world_vr = tf_from_axis_map(['z', 'x', '-y'])
-
-        # T_world_base: 월드에서 본 로봇 베이스의 자세 (로봇의 물리적 설치 상태)
-        T_world_base = tf_from_rpy_deg([0, 45, -90])
-
-        # T_base_world: 베이스에서 본 월드의 자세 (역행렬)
-        T_base_world = T_world_base.inverse()
-
         # 최종 마스터 변환 행렬: T_base_vr (베이스에서 본 VR컨트롤러의 자세)
         # VR -> World -> Base 순서로 변환을 합성
-        self.T_world_vr = T_world_vr
+        self.T_quest_to_ros = tf_preset['quest_to_ros']
 
         if 'interface' in params:
             self.interface = params['interface']
@@ -84,9 +74,12 @@ class ManipulatorVRBaseController:
                                 # print(self.interface.right_current_pose, self.interface.right_delta_pose)
                                 # 1. VR의 원본 delta (VR 좌표계 기준)
                                 raw_delta_pose_vr = self.interface.right_delta_pose
+                                # print(raw_delta_pose_vr)
+                                print('r : ',np.round(se3_to_pose(raw_delta_pose_vr, 'mm'), 2))
 
                                 # 2. 마스터 변환 행렬을 이용해 'VR 기준 delta'를 '로봇 베이스 기준 delta'로 변환
-                                delta_pose_base = self.T_world_vr * raw_delta_pose_vr * self.T_world_vr.inverse()
+                                delta_pose_base = self.T_quest_to_ros * raw_delta_pose_vr * self.T_quest_to_ros.inverse()
+                                print('d : ',np.round(se3_to_pose(delta_pose_base, 'mm'),2))
 
                                 # 3. SubController에는 '베이스 기준'의 start_pose와 '베이스 기준'의 delta_pose를 전달
                                 self.sub_controller.end_pose_ctrl_delta(self.start_pose, delta_pose_base)

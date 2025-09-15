@@ -261,7 +261,7 @@ class DoosanController:
         self.client.write_register(self.write_register_address_jvel, self.modbus_encode(value['joint_velocity']))
         self.client.write_register(self.write_register_address_jacc, self.modbus_encode(value['joint_acceleration']))
 
-    def end_pose_ctrl(self, pose, vel=100, acc=100, dt=0.1):
+    def end_pose_ctrl(self, pose, vel=250, acc=250, dt=0.1):
         self.set_robot_mode = 4
 
         x, y, z, rx, ry, rz = pose

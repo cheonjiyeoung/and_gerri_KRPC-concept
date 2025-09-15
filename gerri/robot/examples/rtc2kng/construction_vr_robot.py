@@ -19,7 +19,7 @@ daemon.connect()
 
 # Initialize robot controller (GERRI)
 # - If the model in ROBOT_INFO is predefined, the base controller will auto-select it.
-# - Otherwise, manually specify a sub-controller as shown below.
+# - Otherwise,manually specify a sub-controller as shown below.
 
 from gerri.robot.examples.construction_vr.manipulator_vr_base_controller import ManipulatorVRBaseController
 from gerri.robot.examples.construction_vr.doosan_vr_sub_controller import DoosanSubController

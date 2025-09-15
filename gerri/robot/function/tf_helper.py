@@ -54,6 +54,7 @@ def tf_compose(se3_list: list) -> pin.SE3:
 
 
 tf_preset = {
-            'vr_to_robot': tf_from_axis_map(['-y', '-x', 'z']),
-            'vr_world': tf_from_axis_map(['z', 'x', '-y']),
+            'quest_to_ros': tf_from_axis_map(['x', '-y', 'z']),
+            'vr_world': tf_from_axis_map(['z', '-z', '-y']),
+            'vr_to_ee': tf_from_rpy_deg([-90,0,0])
         }
