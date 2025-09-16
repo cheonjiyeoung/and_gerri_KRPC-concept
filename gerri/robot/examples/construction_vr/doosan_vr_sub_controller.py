@@ -29,8 +29,7 @@ class DoosanSubController:
 
         self.last_robot_SE3_pose = None
 
-
-        self.joint_preset = {'home': [-90.00, 0.00, 90.00, 0.00, -45.00, -60.00]}
+        self.joint_preset = {'home': [-90.00, 0.00, 90.00, 0.00, -45.00, 0.00]}
 
 
     def connect(self):
@@ -76,14 +75,14 @@ class DoosanSubController:
         """
         print("joint_ctrl_puppet in Sub", value, option)
 
-    def end_pose_ctrl(self, target_pose):
+    def end_pose_ctrl(self, target_pose, vel=100, acc=200, dt=0.1):
         """
         최종 목표 자세(SE3)를 받아 로봇을 제어합니다.
         """
         # pin.SE3 객체를 로봇이 이해하는 [x,y,z,rx,ry,rz] 리스트로 변환
         pose_list = se3_to_pose(target_pose, pos_unit='mm', rot_unit='deg')
         # 로봇 드라이버에 명령 전송
-        self.robot.end_pose_ctrl(pose_list)
+        self.robot.end_pose_ctrl(pose_list, vel, acc, dt)
 
     def end_pose_ctrl_delta(self, start_pose, delta_pose, vel=100, acc=100, dt=0.1):
         target_pose = start_pose * delta_pose
@@ -94,6 +93,20 @@ class DoosanSubController:
         # print(f"Target Pose List: {pose_list}")
         self.robot.end_pose_ctrl(pose_list)
 
+    def joint_ctrl_vel(self, target_pose: pin.SE3, acc=250, dt=0.01):
+        """
+        최종 목표 자세(target_pose)를 받아 해당 지점으로 이동하기 위한
+        관절 속도를 계산하고 로봇을 제어합니다.
+        """
+        # 1. 현재 관절 각도 가져오기
+        current_q_rad = np.deg2rad(self.status.joint_state['position'])
+
+        # 2. IK 솔버를 이용해 관절 속도(dq) 계산
+        dq = self.ik_solver.clik(current_q_rad, target_pose)
+
+        print(dq)
+        # 3. 실제 로봇에 속도 명령 전달
+        self.robot.joint_ctrl_vel(dq, acc, dt)
 
 
     def joint_ctrl_vel_stop(self):
@@ -118,7 +131,7 @@ class DoosanSubController:
         self.robot.joint_ctrl_vel(dq, acc, dt)
 
         # 4. 실제 로봇에 속도 명령 전달
-        self.robot.joint_ctrl_vel(dq)
+        # self.robot.joint_ctrl_vel(dq)
 
     def get_current_SE3_pose(self):
         current_joint_rad = np.deg2rad(self.status.joint_state['position'])

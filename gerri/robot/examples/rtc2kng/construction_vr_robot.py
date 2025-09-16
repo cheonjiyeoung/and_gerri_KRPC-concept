@@ -4,6 +4,7 @@ import time
 # Add project root to Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 
+
 from _and_.and_robot import AdaptiveNetworkDaemon
 from gerri.robot.examples.rtc2kng.rtc2kng_gerri_config import ROBOT_INFO, VIDEO_INFO, AUDIO_INFO, SERVER_INFO
 
@@ -14,6 +15,7 @@ daemon = AdaptiveNetworkDaemon(
     network='rtc2kng',
     video_info=VIDEO_INFO,
     audio_info=AUDIO_INFO,
+
 )
 daemon.connect()
 

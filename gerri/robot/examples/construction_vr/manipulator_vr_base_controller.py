@@ -23,19 +23,26 @@ class ManipulatorVRBaseController:
         self.start_pose = None
         self.target_pose = None
 
-        # --- 좌표계 변환 행렬 정의 ---
-        # 1. 월드 좌표계에서 본 로봇 베이스의 자세
-        self.T_world_base = tf_from_rpy_deg([0, 45, -90])
+        # --- 사용자 정의 변수 (T_도착 <- 출발) ---
+        T_base_world = tf_from_rpy_deg([0, 45, -90])
+        T_ee_world = tf_from_rpy_deg([0, 0, 180])
+        T_vr_world = tf_from_axis_map(['-y', '-x', 'z'])
+        T_ctrl_world = tf_from_rpy_deg([0, 0, -90])
 
-        # 2. vr 원본 -> ROS 표준 좌표계 변환 (tf_helper.py의 tf_preset 사용)
-        self.T_ros_vr = tf_from_axis_map(['x', '-y', 'z'])
 
-        # 3. ROS 표준 -> 사용자 컨트롤 좌표계 변환 ('z'가 앞, 'x'가 위, 'y'가 오른쪽)
-        self.T_vrctrl_ros = tf_from_axis_map(['z', '-y', 'x'])
+        # self.T_ros_rh = tf_from_axis_map(['x', '-y', 'z'])
+        # self.T_ros_rh = tf_from_rpy_deg([180, 0, 90])
 
-        # 4. vr -> 사용자 컨트롤(Human Control) 좌표계로 한 번에 변환하는 "마스터 변환 행렬"
-        # 제어 루프에서 계산을 단순화하기 위해 미리 곱해둡니다.
-        self.T_vrctrl_vr = self.T_vrctrl_ros * self.T_ros_vr
+        # --- Pinocchio 표준 변수로 변환 (T_도착 <- 출발) ---
+        # 실제 계산에는 Pinocchio 표준에 맞는 변수명을 사용합니다.
+        # T_world_base는 base에서 world로 가는 변환을 의미합니다.
+        self.T_world_base = T_base_world.inverse()
+        self.T_world_ee = T_ee_world.inverse()
+        self.T_world_vr = T_vr_world.inverse()
+        self.T_world_ctrl = T_ctrl_world.inverse()
+        self.T_base_vr = self.T_world_base.inverse() * self.T_world_vr
+        # --- 마스터 VR 변환 행렬 ---
+        self.T_world_vrctrl = self.T_world_ctrl * self.T_world_vr
 
 
 
@@ -83,33 +90,64 @@ class ManipulatorVRBaseController:
                                     self.sub_controller.joint_ctrl_vel_stop()
 
                             if self.interface.button_right_grip and self.start_pose:
-                                delta_vr = self.interface.right_delta_pose
-                                # initial_pose_vrctrl = self.T_vrctrl_vr * self.interface.right_initial_pose
-                                # current_pose_vrctrl = self.T_vrctrl_vr * self.interface.right_current_pose
-                                delta_world = delta_vr * self.T_vrctrl_vr
+                                # 속도 제어
+                                delta_ros = self.interface.right_delta_pose
 
-                                # 3. 로봇의 '시작 자세'를 월드 기준으로 변환
+                                # 2. 컨트롤 좌표계 기준으로 ROS 변화량을 해석하여 월드 공간의 변화량으로 만듭니다.
+                                delta_world = self.T_world_ctrl * delta_ros
+
+                                # 3. 월드 기준 시작 자세를 계산합니다.
                                 start_pose_world = self.T_world_base * self.start_pose
 
-                                # 4. 월드 기준 '목표 자세' 계산 = 월드 기준 '시작 자세' * 월드 기준 '변화량'
+                                print(delta_ros)
+
+                                # 4. 월드 기준 시작 자세에 월드 기준 변화량을 적용하여 목표 자세를 계산합니다.
                                 target_pose_world = start_pose_world * delta_world
 
 
-                                # 5. 월드 기준 '목표 자세'를 다시 로봇 베이스 기준으로 변환
+                                # 5. 월드 기준 목표 자세를 로봇 베이스 기준으로 변환합니다.
                                 target_pose_base = self.T_world_base.inverse() * target_pose_world
 
-                                np.printoptions(suppress=True)
+                                # 6. 최종 변환된 목표 자세를 CLIK 속도 제어 함수로 전달합니다.
+                                self.sub_controller.joint_ctrl_vel(target_pose_base)
 
-                                print(np.round(se3_to_pose(delta_vr),2))
-                                print(np.round(se3_to_pose(delta_world),2))
-                                # target_pose = self.start_pose * delta_world
-                                # target_pose = self.start_pose * delta_ctrl_ros
+                                # # 1. VR 컨트롤러의 전체 6축(위치+자세) 변화량(delta)을 가져옵니다.
+                                # delta_vr = self.interface.right_delta_pose
+                                #
+                                # # 2. VR 컨트롤러의 변화량을 월드 좌표계 기준으로 변환합니다.
+                                # delta_world = self.T_vrctrl_ros * delta_vr
+                                #
+                                # # 3. 로봇의 시작 자세(월드 기준)에 월드 기준 변화량을 적용하여
+                                # #    최종 목표 자세(월드 기준)를 계산합니다.
+                                # start_pose_world = self.T_world_base * self.start_pose
+                                # target_pose_world = start_pose_world * delta_world
+                                #
+                                #
+                                # # 4. 최종 목표 자세(월드 기준)를 다시 로봇 베이스 좌표계 기준으로 변환합니다.
+                                # target_pose_base = self.T_world_base.inverse() * target_pose_world
+                                #
+                                #
+                                # # 5. 계산된 최종 목표 자세를 새로운 속도 제어 함수로 직접 전달합니다.
+                                # self.sub_controller.joint_ctrl_vel(target_pose_base)
 
-                                # 6. 최종 '베이스 기준 목표 자세'를 로봇에게 전송
-                                self.sub_controller.end_pose_ctrl(target_pose_base)
-
+                                # 위치 제어
+                                # delta_vr = self.interface.right_delta_pose
+                                # delta_world = self.T_vrctrl_ros * delta_vr
+                                #
+                                # # 3. 로봇의 '시작 자세'를 월드 기준으로 변환
+                                # start_pose_world = self.T_world_base * self.start_pose
+                                #
+                                # # 4. 월드 기준 '목표 자세' 계산 = 월드 기준 '시작 자세' * 월드 기준 '변화량'
+                                # target_pose_world = start_pose_world * delta_world
+                                #
+                                # # 5. 월드 기준 '목표 자세'를 다시 로봇 베이스 기준으로 변환
+                                # target_pose_base = self.T_world_base.inverse() * target_pose_world
+                                #
+                                # # 6. 최종 '베이스 기준 목표 자세'를 로봇에게 전송
+                                # self.sub_controller.end_pose_ctrl(target_pose_base)
 
                             self.last_interface_value = copy.deepcopy(self.interface)
+
                         elif topic == 'connect_robot':
                             self.connect()
                         elif topic == 'get_robot_status':

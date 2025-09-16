@@ -1,13 +1,20 @@
 import pinocchio as pin
 import numpy as np
+from gerri.robot.function.tf_helper import *
 
 class VRController:
-    """VR 컨트롤러의 현재 입력을 파싱하고 상태를 저장하는 데이터 클래스."""
+    """
+    VR 컨트롤러의 입력을 파싱하고, 원본(LH) 데이터를 표준 ROS(RH) 데이터로 변환하여 저장합니다.
+    이 클래스의 출력 Pose는 모두 ROS 표준 좌표계입니다.
+    """
 
     def __init__(self):
-
         self.name = 'vr_controller'
 
+        # --- 좌표계 변환 행렬 정의 ---
+        # 오른손 좌표계(RH)를 표준 ROS 좌표계로 변환하는 행렬
+        # self.T_ros_rh = tf_from_axis_map(['x', '-y', 'z'])
+        self.T_ros_rh = tf_from_rpy_deg([180, 0, 90])
         # --- Left Controller ---
         self.left_axis_X = 0.0
         self.left_axis_Y = 0.0
@@ -72,9 +79,15 @@ class VRController:
             self.left_rotation = left.get('rotation', self.left_rotation)
 
             # 왼쪽 손 현재 Pose 업데이트 및 델타 계산
-            left_pos = left.get('position', [0,0,0])
-            left_rot_xyzw = left.get('rotation', [0,0,0,1])
-            self.left_current_pose = pin.SE3(pin.Quaternion(np.array(left_rot_xyzw)), np.array(left_pos))
+            left_pos_lh = left.get('position', [0, 0, 0])
+            left_rot_lh_xyzw = left.get('rotation', [0, 0, 0, 1])
+
+            # 1. 원본 데이터(LH)로 SE3 객체 생성
+            pose_lh = pin.SE3(pin.Quaternion(np.array(left_rot_lh_xyzw)), np.array(left_pos_lh))
+            # 2. LH -> RH 변환
+            pose_rh = convert_lh_to_rh(pose_lh)
+            # 3. RH -> ROS 변환 후 최종 할당
+            self.left_current_pose = self.T_ros_rh * pose_rh
             self.left_delta_pose = self.left_initial_pose.inverse() * self.left_current_pose
 
         else:
@@ -122,9 +135,15 @@ class VRController:
             self.right_rotation = right.get('rotation', self.right_rotation)
 
             # 오른쪽 손 현재 Pose 업데이트 및 델타 계산
-            right_pos = right.get('position', [0,0,0])
-            right_rot_xyzw = right.get('rotation', [0,0,0,1])
-            self.right_current_pose = pin.SE3(pin.Quaternion(np.array(right_rot_xyzw)), np.array(right_pos))
+            right_pos_lh = right.get('position', [0, 0, 0])
+            right_rot_lh_xyzw = right.get('rotation', [0, 0, 0, 1])
+
+            # 1. 원본 데이터(LH)로 SE3 객체 생성
+            pose_lh = pin.SE3(pin.Quaternion(np.array(right_rot_lh_xyzw)), np.array(right_pos_lh))
+            # 2. LH -> RH 변환
+            pose_rh = convert_lh_to_rh(pose_lh)
+            # 3. RH -> ROS 변환 후 최종 할당
+            self.right_current_pose = self.T_ros_rh * pose_rh
             self.right_delta_pose = self.right_initial_pose.inverse() * self.right_current_pose
 
         else:

@@ -52,9 +52,20 @@ def tf_compose(se3_list: list) -> pin.SE3:
         final_transform = T_step * final_transform
     return final_transform
 
+def convert_lh_to_rh(pose_lh: pin.SE3) -> pin.SE3:
+    """
+    Z축을 뒤집어 왼손 좌표계(LH) SE3를 오른손 좌표계(RH) SE3로 변환합니다.
+    """
+    # 1. Z축을 뒤집는 반전 행렬 정의
+    S = np.diag([1, 1, -1])
 
-tf_preset = {
-            'quest_to_ros': tf_from_axis_map(['x', '-y', 'z']),
-            # 'vr_world': tf_from_axis_map(['z', '-z', '-y']),
-            # 'vr_to_ee': tf_from_rpy_deg([-90,0,0])
-        }
+    # 2. 왼손 좌표계의 위치와 회전 행렬 추출
+    p_lh = pose_lh.translation
+    R_lh = pose_lh.rotation
+
+    # 3. 오른손 좌표계의 위치와 회전 행렬 계산
+    p_rh = np.array([p_lh[0], p_lh[1], -p_lh[2]])
+    R_rh = S @ R_lh @ S
+
+    # 4. 오른손 좌표계 SE3 객체를 새로 만들어 반환
+    return pin.SE3(R_rh, p_rh)
