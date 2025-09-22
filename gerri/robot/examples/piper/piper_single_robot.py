@@ -13,8 +13,8 @@ daemon = AdaptiveNetworkDaemon(
     robot_info=ROBOT_INFO,
     network='ketirtc',
     command="command",
-    video=VIDEO_INFO,
-    audio=AUDIO_INFO
+    # video_info=VIDEO_INFO,
+    # audio_info=AUDIO_INFO
 )
 
 daemon.connect()
@@ -23,9 +23,12 @@ daemon.connect()
 ### Robot system setting
 
 from gerri.robot.examples.piper.piper_base_controller import PiperBaseController
-
-piper = PiperBaseController(ROBOT_INFO)
-piper.connect()
+from gerri.robot.examples.piper.piper_sub_controller import PiperSubController
+piper_base = PiperBaseController(ROBOT_INFO)
+piper_sub = PiperSubController('piper_gyd')
+piper_base.sub_controller = piper_sub
+piper_sub.base_controller = piper_base
+piper_base.connect()
 
 
 while True:

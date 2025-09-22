@@ -10,7 +10,10 @@ FACTOR_DEGREE = 1000 # 1도는 1000펄스임
 
 class PiperSubController:
     def __init__(self, can_port):
-        self.robot = C_PiperInterface(can_port)
+        self.robot = C_PiperInterface_V2(can_port)
+        self.base_controller = None
+        self.robot_id = can_port
+
         self.factor_degree = FACTOR_DEGREE
         self.status = None
         self.joint_preset = {'home': [0, 80, -160, 0, 0, 0],
@@ -21,20 +24,6 @@ class PiperSubController:
         self.default_joint_angle = self.joint_preset['ready']
         self.last_joint_angle = self.default_joint_angle
 
-        self.status.joint_state = {
-            'name': ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6'],
-            'position': self.deg2rad(self.get_joint_angles())
-        }
-
-    def init_base_controller(self, base_controller):
-        self.status = RobotStatus(robot_id=base_controller.robot_info["id"],
-                                  model=base_controller.robot_info["model"],
-                                  category=base_controller.robot_info["category"],)
-
-        self._status_thread = threading.Thread(target=self._update_loop, daemon=True)
-        self._lock = threading.Lock()
-        self._status_thread.start()
-
 
     def _update_loop(self):
         while True:
@@ -44,9 +33,13 @@ class PiperSubController:
             self._lock.release()
             time.sleep(0.1)
 
+    def initialize(self):
+        self.joint_preset['master'] = self.last_joint_angle
+
     def get_joint_angles(self):
         # ArmJoint 객체에서 직접 joint_state 속성에 접근
         joint_msg = self.robot.GetArmJointMsgs()
+        gripper_msg = self.robot.GetArmGripperMsgs()
 
         # ArmMsgJointFeedBack 속성에서 각도를 리스트로 저장
         self.last_joint_angle = [
@@ -56,29 +49,103 @@ class PiperSubController:
             joint_msg.joint_state.joint_4 * 0.001,
             joint_msg.joint_state.joint_5 * 0.001,
             joint_msg.joint_state.joint_6 * 0.001,
+            gripper_msg.gripper_state.grippers_angle * 0.001
         ]
         print(self.last_joint_angle)
         return self.last_joint_angle
 
 
     def connect(self):
-        self.robot.connect()
-        self.get_joint_angles()
+        if self.base_controller:
+            self.status = RobotStatus(robot_id=self.base_controller.robot_info["id"],
+                                      model=self.base_controller.robot_info["model"],
+                                      category=self.base_controller.robot_info["category"], )
+        else:
+            self.status = RobotStatus(robot_id=self.robot_id,)
+
+        self.status.joint_state = {
+            'name': ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6'],
+            'position': self.deg2rad(self.get_joint_angles())
+        }
+        self._status_thread = threading.Thread(target=self._update_loop, daemon=True)
+        self._lock = threading.Lock()
+        self._status_thread.start()
+        self.robot.ConnectPort()
         time.sleep(1)
-        self.joint_ctrl(self.joint_preset['ready'])
-        self.get_joint_angles()
+        # self.robot.MotionCtrl_2(0x01, 0x01, 100, 0xAD)
+        # self.robot.MotionCtrl_2(0x01, 0x01, 100, 0x00)
         time.sleep(1)
-        self.joint_ctrl(self.joint_preset['home'])
-        self.get_joint_angles()
+        # self.robot.MotionCtrl_2(0x01, 0x01, 100, 0x00, 0x00, 0x01)
+        if 'left' in self.robot_id:
+            installation_pos = 0x02
+        elif 'right' in self.robot_id:
+            installation_pos = 0x03
+        else:
+            installation_pos = 0x01
+        # installation_pos = 0x01
+
+        if 'puppet' in self.robot_id:
+            self.robot.EnableArm(7)
+
+            self.robot.MotionCtrl_2(0x01, 0x01, 100, 0x00, 0x00, installation_pos)
+            time.sleep(1)
+            self.robot.status = 'connect'
+            self.get_joint_angles()
+            time.sleep(1)
+            self.joint_ctrl(self.joint_preset['ready'])
+            self.get_joint_angles()
+            time.sleep(1)
+            self.joint_ctrl(self.joint_preset['home'])
+            self.get_joint_angles()
+            time.sleep(2)
+            self.robot.MotionCtrl_2(0x01, 0x01, 100, 0xAD, 0x00, installation_pos)
+
+        else:
+            self.robot.EnableArm(7)
+            # self.robot.DisconnectPort()
+            #
+            # time.sleep(1)
+            # self.robot.ConnectPort()
+            # self.robot.MasterSlaveConfig(0xFA, 0, 0, 0)
+            self.robot.MasterSlaveConfig(0xFC, 0, 0, 0)
+            # self.robot.ArmParamEnquiryAndConfig(0, 0, 0, 0xAE, 2)  # load: 0/1/2 → 무거울수록 '버티는' 느낌↑
+
+            print(self.robot_id, ':installation_pose:', installation_pos)
+            self.robot.MotionCtrl_1(0x02, 0, 0)
+            time.sleep(1)
+            self.robot.MotionCtrl_2(0x01, 0x04, 100, 0xAD, 0x00, installation_pos)
+            time.sleep(1)
+
+            # self.joint_ctrl(self.joint_preset['home'])
+
+            # self.robot.MotionCtrl_1(0x02, 0, 0)
+            # time.sleep(1)
+            # self.robot.MotionCtrl_2(0x00, 0x00, 100, 0x00, 0x00, installation_pos)
+            # time.sleep(1)
+
+            # self.robot.ModeCtrl(ctrl_mode=0x01, move_mode=0x01, is_mit_mode=0xAD)
+            # self.robot.ArmParamEnquiryAndConfig(0, 0, 0, 0xAE, 2)  # load: 0/1/2 → 무거울수록 '버티는' 느낌↑
+            # self.robot.GripperTeachingPendantParamConfig(teaching_range_per=100, max_range_config=70, teaching_friction=1)
+            # self.robot.DisableArm(7)
+            # self.robot.EnableArm(7)
+            # self.joint_ctrl(self.joint_preset['home'])
+
+
 
     def disconnect(self):
-        self.robot.disconnect()
-
+        self.robot.MotionCtrl_1(0x02, 0, 0)
+        self.robot.MotionCtrl_2(0, 0, 0, 0x00)
+        self.robot.status = 'disconnect'
+        self.robot.DisableArm(7)
 
     def joint_ctrl(self, joint_angles: list):
         scaled_value = [round(joint_angle * self.factor_degree) for joint_angle in joint_angles]
         print(scaled_value)
         self.robot.JointCtrl(*scaled_value)
+
+    def joint_ctrl_mit(self, joint_angles: list):
+        scaled_value = [round(joint_angle * self.factor_degree) for joint_angle in joint_angles]
+        print(scaled_value)
 
     def joint_ctrl_step(self, joint_angles: list):
         """
@@ -104,7 +171,7 @@ class PiperSubController:
             round((self.joint_preset['master'][1] + master_joint_angles[1]) * self.factor_degree),
             round((self.joint_preset['master'][2] + master_joint_angles[2]) * self.factor_degree),
             round((self.joint_preset['master'][3] + master_joint_angles[3]) * self.factor_degree),
-            round((self.joint_preset['master'][4] - master_joint_angles[4]) * self.factor_degree),
+            round((self.joint_preset['master'][4] + master_joint_angles[4]) * self.factor_degree),
             round((self.joint_preset['master'][5] + master_joint_angles[5]) * self.factor_degree),
         ]
 
@@ -112,7 +179,9 @@ class PiperSubController:
         self.robot.JointCtrl(*scaled_value)
 
     def gripper_ctrl(self, gripper_angle):
-        self.robot.GripperCtrl(gripper_angle,  1000, 0x01, 0)
+        gripper_value = int(gripper_angle * self.factor_degree)
+        print(gripper_value)
+        self.robot.GripperCtrl(gripper_value,  1000, 0x01, 0)
 
     def gripper_ctrl_puppet(self, gripper_angle):
         gripper_scale_value = round(self.map_value(gripper_angle, -50, 0, 0, 100)*self.factor_degree)
@@ -166,3 +235,10 @@ class PiperSubController:
 
     def custom_command(self, command):
         print("CUSTOM COMMAND")
+
+
+if __name__ == '__main__':
+    piper = PiperSubController('piper_gyd')
+    piper.connect()
+    piper.initialize()
+    piper.get_joint_angles()

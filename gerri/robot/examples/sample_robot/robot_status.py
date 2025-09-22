@@ -29,7 +29,8 @@ class RobotStatus:
                 "y": None,
                 "th": None
             }
-        }
+        },
+
         self.velocity = {
             "linear": {
                 "x": None,
