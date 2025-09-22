@@ -27,6 +27,7 @@ class CameraManager:
         self.last_frame_time = None
         self.cap = None
         self.thread = None
+        self._lock = threading.Lock()
 
 
         # ✅ PubSub 구독 (외부 요청이 오면 save_frame 실행)
@@ -35,10 +36,12 @@ class CameraManager:
         if auto_start:
             self.start()
 
-    def set_resolution(self, width: int, height: int) -> Tuple[int, int]:
+    def set_resolution(self, width: int, height: int) -> Tuple[int, int]:  
         if self.cap is not None and self.cap.isOpened():
+            self._lock.acquire()
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+            self._lock.release()
             self.width = self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)
             self.height = self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
         else:
@@ -46,6 +49,7 @@ class CameraManager:
             self.height = height
         logger.info(f'camera {self.camera_index} set resolution to {self.width}X{self.height}')
         return int(self.width), int(self.height)
+
 
     def set_fps(self, fps: int) -> int:
         if self.cap is not None and self.cap.isOpened():
@@ -76,7 +80,9 @@ class CameraManager:
     def _capture_loop(self):
         while self.running:
             try:
+                self._lock.acquire()
                 ret, frame = self.cap.read()
+                self._lock.release()
                 if not ret:
                     raise RuntimeError("❌ 프레임 읽기 실패")
                 self.last_frame = frame
@@ -99,6 +105,7 @@ class CameraManager:
         if self.cap:
             self.cap.release()
         logger.info("🛑 카메라 중지됨")
+        self.thread.join()
 
 
     def print_feature(self):

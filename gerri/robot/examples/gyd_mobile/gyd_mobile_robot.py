@@ -14,8 +14,8 @@ daemon = AdaptiveNetworkDaemon(
     robot_info=ROBOT_INFO,
     network='ketirtc',
     command="command",
-    video=VIDEO_INFO,
-    audio=AUDIO_INFO,
+    video_info=VIDEO_INFO,
+    audio_info=AUDIO_INFO,
 )
 daemon.connect()
 
