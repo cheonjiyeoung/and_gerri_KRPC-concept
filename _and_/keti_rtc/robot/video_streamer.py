@@ -1,9 +1,12 @@
+from typing import Tuple, Optional
+
 import cv2
 import numpy as np
 import time
 from aiortc import VideoStreamTrack
 from aiortc.mediastreams import MediaStreamError
 from av import VideoFrame
+from ketirtc.core.camera import Camera
 
 
 class VideoStreamTrackWrapper(VideoStreamTrack):
@@ -37,7 +40,7 @@ class VideoStreamTrackWrapper(VideoStreamTrack):
         return video_frame
 
 
-class VideoStreamer:
+class VideoStreamer(Camera):
     """
     ✅ 범용 스트리머
     - CameraManager, StereoCameraCombiner, VRProcessor 등 어떤 영상 클래스든 스트리밍 가능
@@ -47,8 +50,24 @@ class VideoStreamer:
         :param source: .last_frame 또는 .get_frame()을 가진 객체
         :param fps: 스트림 프레임률
         """
+        super().__init__()
         self.source = source
         self.fps = fps
 
     def get_video_stream_track(self):
         return VideoStreamTrackWrapper(self.source, fps=self.fps)
+
+    def get_video_stream_track_advance(self, stream_index=0,
+                                         resolution: Tuple[int, int] = None,
+                                         fpt: Optional[int] = None) -> VideoStreamTrack:
+        raise NotImplementedError(f"get_video_stream_track_advantage is not implemented by {self.__class__.__name__}")
+
+    def set_resolution(self, width: int, height: int) -> Tuple[int, int]:
+        if hasattr(self.source, "set_resolution") and callable(self.source.set_resolution):
+            return self.source.set_resolution(width, height)
+        raise NotImplementedError(f"Change Resolution is not implemented by subclass {self.__class__.__name__}")
+
+    def set_fps(self, fps: int) -> int:
+        if hasattr(self.source, "set_fps") and callable(self.source.set_fps):
+            return self.source.set_fps(fps)
+        raise NotImplementedError(f"Change FPS is not implemented by subclass {self.__class__.__name__}")

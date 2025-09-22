@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import cv2
 import time
 import threading
@@ -32,6 +34,27 @@ class CameraManager:
 
         if auto_start:
             self.start()
+
+    def set_resolution(self, width: int, height: int) -> Tuple[int, int]:
+        if self.cap is not None and self.cap.isOpened():
+            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+            self.width = self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+            self.height = self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        else:
+            self.width = width
+            self.height = height
+        logger.info(f'camera {self.camera_index} set resolution to {self.width}X{self.height}')
+        return int(self.width), int(self.height)
+
+    def set_fps(self, fps: int) -> int:
+        if self.cap is not None and self.cap.isOpened():
+            self.cap.set(cv2.CAP_PROP_FPS, fps)
+            self.fps = self.cap.get(cv2.CAP_PROP_FPS)
+        else:
+            self.fps = fps
+        logger.info(f'camera {self.camera_index} set fps to {self.fps}')
+        return int(self.fps)
 
     def start(self):
         if self.running:
