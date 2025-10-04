@@ -8,11 +8,13 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable),
 from gerri.robot.status_manager import StatusManager
 
 
-class SampleBaseController:
+class ZoomBaseController:
     def __init__(self, robot_info, **params):
         self.robot_id = robot_info['id']
         self.robot_category = robot_info['category']
         self.robot_model = robot_info['model']
+
+        self.zoom_factor = 1.0
 
         if 'use_bridge' in params and params['use_bridge']:
             self.bridge = True
@@ -39,6 +41,8 @@ class SampleBaseController:
             self.last_interface_value = None
 
         pub.subscribe(self.receive_message,"receive_message")
+        pub.subscribe(self.set_zoom_level, "zoom_level")
+
 
     def init_sub_controller(self, **params):
         """
@@ -63,10 +67,17 @@ class SampleBaseController:
                     try:
                         if topic == self.interface.name:
                             self.interface.update(value)
+                            if self.interface.button_left_menu :
+                                pub.sendMessage('zoom_step_control', step=self.interface.right_axis_Y)
+
                     except AttributeError as e:
                         print(f"❌ Controller does not support topic '{topic}': {e}")
                     except Exception as e:
                         print(f"❌ Error processing topic '{topic}': {e}")
+
+    def set_zoom_level(self, level):
+        self.zoom_level = level
+        print("zoom_level:", self.zoom_level)
 
 
     def send_message(self, message):

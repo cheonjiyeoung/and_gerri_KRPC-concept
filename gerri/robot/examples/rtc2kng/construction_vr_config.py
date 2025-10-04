@@ -6,11 +6,16 @@ ROBOT_INFO = {
     "port": 502,
 }
 
+from _and_.rtc2kng.vr_zed_camera_manager import VRZEDCameraManager
 # Camera settings: device index and resolution
 VIDEO_INFO = {
-    "main": {"source": 0, "width": 9999, "height": 9999},
-    "left": {"source": 2, "width": 640, "height": 480},
-    "right": {"source": 4, "width": 640, "height": 480},
+    'zed_vr_cam': {'manager': VRZEDCameraManager, 'source': 0,
+                   'capture_width': 3840, 'capture_height': 1080,
+                   'output_width': 1280, 'output_height': 360,
+                   'fps': 30
+                   },
+    # "left": {"source": 2, "width": 640, "height": 480},
+    # "right": {"source": 4, "width": 640, "height": 480},
     # "rear": {"source": 2, "width": 1280, "height": 720},
 }
 
@@ -21,8 +26,8 @@ AUDIO_INFO = {
 }
 
 SERVER_INFO = {
-    # "server_ip": '125.131.105.165',
-    "server_ip": '172.20.1.250',
+    "server_ip": '125.131.105.165',
+    # "server_ip": '172.20.1.250',
     "server_port": 25000,
     "room_id": 'test_room',
 }

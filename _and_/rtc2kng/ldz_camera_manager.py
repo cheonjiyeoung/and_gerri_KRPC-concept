@@ -3,6 +3,7 @@ import cv2
 import logging
 import threading
 import numpy as np
+from pubsub import pub
 
 # 같은 폴더에 있는 camera_manager에서 CameraManager 클래스를 가져옴
 from .camera_manager import CameraManager
@@ -29,6 +30,9 @@ class LDZCameraManager(CameraManager):
         self.max_zoom_level = 1.0
         self.actual_capture_width = 0
         self.actual_capture_height = 0
+
+
+        pub.subscribe(self.zoom_step_control, "zoom_step_control")
 
     def start(self):
         super().start()
@@ -99,6 +103,17 @@ class LDZCameraManager(CameraManager):
             logger.info(f"🔎 줌 레벨 변경: {self.zoom_level:.2f}x")
         if self.zoom_level == self.max_zoom_level:
             logger.info("👍 최대 줌 레벨에 도달했습니다.")
+
+    def zoom_control(self, level):
+        if level:
+            self.set_zoom(level)
+            pub.sendMessage('zoom_level', self.zoom_level)
+
+    def zoom_step_control(self, step = 0):
+        if step:
+            zoom_level = self.zoom_level + step
+            self.set_zoom(zoom_level)
+            pub.sendMessage('zoom_level', self.zoom_level)
 
     def print_feature(self):
         super().print_feature()
