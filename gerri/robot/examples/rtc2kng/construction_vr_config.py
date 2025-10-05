@@ -1,16 +1,17 @@
 ROBOT_INFO = {
     "id": "gc_dual",
-    "model": "doosan_m1509_dual",
+    "model": "gerri",
+    # "model": "doosan_m1509_dual",
     "category": "manipulator",
     "ip": "192.168.10.119",
     "port": 502,
 }
 
-from _and_.rtc2kng.vr_zed_camera_manager import VRZEDCameraManager
+from _and_.rtc2kng.ldz_camera_manager import LDZCameraManager
 # Camera settings: device index and resolution
 VIDEO_INFO = {
-    'zed_vr_cam': {'manager': VRZEDCameraManager, 'source': 0,
-                   'capture_width': 3840, 'capture_height': 1080,
+    'zed_vr_cam': {'manager': LDZCameraManager, 'source': 0,
+                   'input_width': 3840, 'input_height': 1080,
                    'output_width': 1280, 'output_height': 360,
                    'fps': 30
                    },

@@ -37,9 +37,12 @@ daemon.connect()
 
 from gerri.robot.interface.vr_controller import VRController
 from gerri.robot.examples.rtc2kng.zoom_test_base_controller import ZoomBaseController
-
+from gerri.robot.examples.sample_robot.sample_sub_controller import SampleSubController
 vr_ctrl_interface = VRController()
 sample_base_controller = ZoomBaseController(ROBOT_INFO, interface=vr_ctrl_interface)
+sample_sub_controller = SampleSubController()
+sample_base_controller.sub_controller = sample_sub_controller
+sample_sub_controller.base_controller = sample_base_controller
 sample_base_controller.connect()
 
 

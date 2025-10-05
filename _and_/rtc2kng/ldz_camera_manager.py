@@ -15,21 +15,21 @@ class LDZCameraManager(CameraManager):
     """
     기존 CameraManager를 상속받아 무손실 디지털 줌(LDZ) 기능을 추가한 특화 클래스.
     """
-    def __init__(self, **kwargs):
-        self.capture_width = kwargs.get('capture_width', 3840)
-        self.capture_height = kwargs.get('capture_height', 1080)
-        self.output_width = kwargs.get('output_width', 1280)
-        self.output_height = kwargs.get('output_height', 360)
 
-        kwargs['width'] = self.capture_width
-        kwargs['height'] = self.capture_height
-        
-        super().__init__(**kwargs)
+    def __init__(self, source=0, input_width=3840, input_height=1080, fps=30,
+                 output_width=1280, output_height=360, debug=False, **kwargs):
+
+        super().__init__(source=source, width=input_width, height=input_height, fps=fps, debug=debug)
+
+        self.input_width = input_width
+        self.input_height = input_height
+        self.output_width = output_width
+        self.output_height = output_height
 
         self.zoom_level = 1.0
         self.max_zoom_level = 1.0
-        self.actual_capture_width = 0
-        self.actual_capture_height = 0
+        self.actual_input_width = 0
+        self.actual_input_height = 0
 
 
         pub.subscribe(self.zoom_step_control, "zoom_step_control")
@@ -37,20 +37,20 @@ class LDZCameraManager(CameraManager):
     def start(self):
         super().start()
         time.sleep(1)
-        self.actual_capture_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        self.actual_capture_height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.actual_input_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.actual_input_height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-        if self.actual_capture_width == 0:
+        if self.actual_input_width == 0:
             logger.warning("⚠️ 카메라 실제 해상도 획득 실패. 요청 값으로 대체합니다.")
-            self.actual_capture_width = self.capture_width
-            self.actual_capture_height = self.capture_height
+            self.actual_input_width = self.input_width
+            self.actual_input_height = self.input_height
         
         self._calculate_max_zoom()
         self.print_feature()
 
     def _calculate_max_zoom(self):
-        source_w_eye = self.actual_capture_width // 2
-        source_h_eye = self.actual_capture_height
+        source_w_eye = self.actual_input_width // 2
+        source_h_eye = self.actual_input_height
         target_w_eye = self.output_width // 2
         target_h_eye = self.output_height
 

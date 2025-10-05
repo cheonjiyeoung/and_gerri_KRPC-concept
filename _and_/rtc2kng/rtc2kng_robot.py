@@ -53,6 +53,7 @@ def create_channels(robot_info, server_info, video_info, audio_info, command = N
                     
                     #  2. 가져온 클래스(ManagerClass)로 객체를 생성
                     video_tracks_dict[cam_label] = ManagerClass(**cam_config)
+                    video_tracks_dict[cam_label].start()
                     
                     print(f"  비디오 트랙 '{cam_label}'용 {ManagerClass.__name__} 생성 완료.")
                 except Exception as e:

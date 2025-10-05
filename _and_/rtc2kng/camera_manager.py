@@ -12,13 +12,12 @@ from _and_.rtc2kng.video_manager import VideoManager
 logger = logging.getLogger(__name__)
 
 class CameraManager(VideoManager):
-    def __init__(self, source=0, name='cam', **kwargs):
-        super().__init__(**kwargs)
+
+    def __init__(self, source=0, name='cam', width=1920, height=1080, fps=30, debug=False, **kwargs):
+        super().__init__(width=width, height=height, fps=fps, debug=debug)
         self.source = source
         self.name = name
-
         self.running = False
-        self.start()
 
     def _open_capture(self, source):
         system = platform.system()
@@ -54,7 +53,6 @@ class CameraManager(VideoManager):
                 self.last_frame_time = time.time()
                 # if self.debug:
                 #     cv2.imshow(self.name, frame)
-                time.sleep(0.01)
             except Exception as e:
                 logger.error(f"⚠️ 캡처 오류 발생: {e}")
                 self.restart()
