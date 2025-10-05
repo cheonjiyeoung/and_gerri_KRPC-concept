@@ -70,6 +70,7 @@ class LDZCameraManager(VideoManager):
                 if not ret: raise RuntimeError("❌ 프레임 읽기 실패")
                 self.last_frame = self._ldz_zoom_process(raw_frame)
                 self.last_frame_time = time.time()
+                time.sleep(0.01)
 
             except Exception as e:
                 logger.error(f"⚠️ 캡처 오류 발생: {e}")

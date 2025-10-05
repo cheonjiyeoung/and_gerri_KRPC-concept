@@ -38,8 +38,9 @@ class ZoomBaseController(ManipulatorFunction,MobileFunction):
                     try:
                         if topic == self.interface.name:
                             self.interface.update(value)
-                            if self.interface.button_left_menu:
-                                pub.sendMessage('zoom_step_control', step=self.interface.right_axis_Y)
+                            print(value)
+                            if self.interface.button_left_thumbstick:
+                                pub.sendMessage('zoom_step_control', step=self.interface.left_axis_Y/10)
 
                     except AttributeError as e:
                         print(f"❌ Controller does not support topic '{topic}': {e}")
