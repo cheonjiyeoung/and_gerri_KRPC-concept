@@ -19,6 +19,8 @@ class CameraManager(VideoManager):
         self.name = name
         self.running = False
 
+        self.start()
+
     def _open_capture(self, source):
         system = platform.system()
         if system == "Windows":
