@@ -20,10 +20,8 @@ class LDZCameraManager(VideoManager):
 
     def __init__(self, source=0, input_width=3840, input_height=1080, fps=30,
                  output_width=1280, output_height=360, debug=False, **kwargs):
-        # ✨ VideoManager의 init 호출
         super().__init__(width=output_width, height=output_height, fps=fps, debug=debug)
 
-        # 필요한 모든 속성을 여기서 직접 정의
         self.source = source
         self.input_width = input_width
         self.input_height = input_height
@@ -36,7 +34,6 @@ class LDZCameraManager(VideoManager):
         self.max_zoom_level = 1.0
 
         self.start()
-
         pub.subscribe(self.zoom_step_control, "zoom_step_control")
 
     def _open_capture(self, source):
@@ -60,7 +57,6 @@ class LDZCameraManager(VideoManager):
         self.thread = threading.Thread(target=self._capture_loop, daemon=True)
         self.thread.start()
 
-        # 해상도 확인 및 줌 레벨 계산
         time.sleep(1)
         self.actual_input_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.actual_input_height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -70,14 +66,24 @@ class LDZCameraManager(VideoManager):
     def _capture_loop(self):
         while self.running:
             try:
-                ret, frame = self.cap.read()
+                ret, raw_frame = self.cap.read()
                 if not ret: raise RuntimeError("❌ 프레임 읽기 실패")
-                self.last_frame = frame
+                self.last_frame = self._ldz_zoom_process(raw_frame)
                 self.last_frame_time = time.time()
-                time.sleep(1 / self.fps)
+
             except Exception as e:
                 logger.error(f"⚠️ 캡처 오류 발생: {e}")
                 self.restart()
+
+    def _ldz_zoom_process(self, raw_frame):
+        """고해상도 원본 프레임을 받아 줌/리사이즈 처리된 최종 프레임을 반환합니다."""
+        mid_point = raw_frame.shape[1] // 2
+        left_high_res, right_high_res = raw_frame[:, :mid_point], raw_frame[:, mid_point:]
+
+        processed_left = self._process_single_eye(left_high_res)
+        processed_right = self._process_single_eye(right_high_res)
+
+        return cv2.hconcat([processed_left, processed_right])
 
     def stop(self):
         self.running = False
@@ -90,10 +96,7 @@ class LDZCameraManager(VideoManager):
         time.sleep(1)
         self.start()
 
-    # ✨ --- 여기까지 CameraManager로부터 가져온 메서드들 ---
-
     def _calculate_max_zoom(self):
-        # ... (이전과 동일)
         source_w_eye = self.actual_input_width // 2
         source_h_eye = self.actual_input_height
         target_w_eye = self.output_width // 2
@@ -103,18 +106,7 @@ class LDZCameraManager(VideoManager):
             self.max_zoom_level = min(ratio_w, ratio_h)
         if self.max_zoom_level < 1.0: self.max_zoom_level = 1.0
 
-    def get_processed_sbs_frame(self):
-        # ... (이전과 동일)
-        high_res_frame = self.get_last_frame()
-        if high_res_frame is None: return None
-        mid_point = high_res_frame.shape[1] // 2
-        left_high_res, right_high_res = high_res_frame[:, :mid_point], high_res_frame[:, mid_point:]
-        processed_left = self._process_single_eye(left_high_res)
-        processed_right = self._process_single_eye(right_high_res)
-        return cv2.hconcat([processed_left, processed_right])
-
     def _process_single_eye(self, eye_frame):
-        # ... (이전과 동일)
         target_w, target_h = self.output_width // 2, self.output_height
         h, w, _ = eye_frame.shape
         if self.zoom_level <= 1.0:
@@ -127,12 +119,10 @@ class LDZCameraManager(VideoManager):
             return cv2.resize(cropped, (target_w, target_h), cv2.INTER_LINEAR)
 
     def set_zoom(self, level=1.0):
-        # ... (이전과 동일)
         new_level = max(1.0, min(level, self.max_zoom_level))
         if new_level != self.zoom_level: self.zoom_level = new_level
 
     def zoom_step_control(self, step=0):
-        # ... (이전과 동일)
         if step:
             self.set_zoom(self.zoom_level + step)
             pub.sendMessage('zoom_level', level=self.zoom_level)
