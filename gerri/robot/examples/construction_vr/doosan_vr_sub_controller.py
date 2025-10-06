@@ -2,10 +2,8 @@ import os, sys
 
 import numpy as np
 
-
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 from gerri.robot.examples.construction_vr.robot_status import RobotStatus
-from gerri.robot.examples.construction_vr.doosan_controller import DoosanController
 import threading
 import random
 import time
@@ -15,22 +13,50 @@ import pinocchio as pin
 from gerri.robot.function.tf_helper import *
 from gerri.robot.function.ik_solver import IKSolver
 
-urdf_path = '/home/orin2kng01/dev/and_gerri/gerri/robot/examples/construction_vr/m1509.urdf'
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../.."))
 
-class DoosanSubController:
-    def __init__(self, ip, port):
-        self.robot = DoosanController(ip, port)
+# 프로젝트 루트를 기준으로 URDF 파일의 전체 경로를 조합합니다.
+URDF_PATH = os.path.join(PROJECT_ROOT, 'gerri', 'robot', 'examples', 'construction_vr', 'm1509_urdf', 'm1509.urdf')
+
+
+class DoosanVRSubController:
+    def __init__(self, ip, port, debug=False):
         self.base_controller = None
         self._lock = threading.Lock()
+        self.debug = debug
 
-        self.ik_solver = IKSolver(urdf_path, 'joint_6')
-
-        self.status = None
-
-        self.last_robot_SE3_pose = None
-
+        # --- URDF 및 IK 솔버 초기화 (공통) ---
+        PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../.."))
+        URDF_PATH = os.path.join(PROJECT_ROOT, 'gerri', 'robot', 'examples', 'construction_vr', 'm1509_urdf',
+                                 'm1509.urdf')
+        self.ik_solver = IKSolver(URDF_PATH, 'joint_6')
         self.joint_preset = {'home': [-90.00, 0.00, 90.00, 0.00, -45.00, 0.00]}
 
+        # --- debug 플래그에 따라 모드 분기 ---
+        if self.debug:
+            try:
+                from pinocchio.visualize import MeshcatVisualizer
+                import meshcat.geometry as g
+                MESHCAT_AVAILABLE = True
+            except ImportError:
+                MESHCAT_AVAILABLE = False
+            # --- 디버그 (시각화) 모드 ---
+            if not MESHCAT_AVAILABLE:
+                raise ImportError("디버그 모드를 위해 'meshcat' 라이브러리를 설치해주세요.")
+
+            # 가상 로봇의 상태
+            from gerri.robot.examples.construction_vr.doosan_debug_controller import VisualizerController
+
+            self.robot = VisualizerController()
+            self.q_current = np.deg2rad(self.joint_preset['home'])
+            self.status = RobotStatus(robot_id="virtual_robot", model="virtual_model", category="manipulator")
+            self.status.joint_state['position'] = self.joint_preset['home']
+
+        else:
+            from gerri.robot.examples.construction_vr.doosan_controller import DoosanController
+            self.robot = DoosanController(ip, port)
+            self.status = None  # connect()에서 생성됨
+            self.viz = None
 
     def connect(self):
         self.robot.connect()
@@ -104,7 +130,6 @@ class DoosanSubController:
         # 2. IK 솔버를 이용해 관절 속도(dq) 계산
         dq = self.ik_solver.clik(current_q_rad, target_pose)
 
-        print(dq)
         # 3. 실제 로봇에 속도 명령 전달
         self.robot.joint_ctrl_vel(dq, acc, dt)
 

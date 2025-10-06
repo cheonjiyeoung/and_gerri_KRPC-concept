@@ -17,7 +17,7 @@ class IKSolver:
         self.frame_id = self.model.getFrameId(end_effector_frame_name)
 
         # 제어 파라미터
-        self.Kp = 50.0
+        self.Kp = 30.0
         self.damping = 1e-4
 
     def clik(self, q: np.ndarray, target_pose: pin.SE3) -> np.ndarray:
