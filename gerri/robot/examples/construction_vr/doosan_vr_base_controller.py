@@ -79,20 +79,19 @@ class DoosanVRBaseController:
                                     self.sub_controller.joint_ctrl_vel_stop()
 
                             if self.interface.button_right_grip and self.start_pose:
-                                # 속도 제어
-                                delta_vr = vr_ee_converter(self.interface.right_delta_pose)
+                                # 1. VR 컨트롤러의 움직임을 월드 좌표계 기준의 '움직임 변화량'으로 변환합니다.
+                                delta_ee_world = vr_ee_converter(self.interface.right_delta_pose)
 
-                                delta_position = np.round(delta_vr.translation, 2)
+                                delta_ee_cali = self.sub_controller.T_correction * delta_ee_world
 
-                                delta_vr_rotation = pin.rpy.matrixToRpy(delta_vr.rotation)
-                                delta_vr_deg = np.rad2deg(delta_vr_rotation)
-                                rpy_rounded = np.round(delta_vr_deg, 1)
 
-                                print(delta_position, rpy_rounded)
+                                # 1. 시작점 -> 월드 변환
+                                start_pose_world = self.sub_controller.T_world_base * self.start_pose
+                                # 2. 월드에서 목표점 계산
+                                target_pose_world = start_pose_world * delta_ee_cali
+                                # 3. 최종 목표점 -> 베이스 변환
+                                target_pose_base = self.sub_controller.T_world_base.inverse() * target_pose_world
 
-                                target_pose_base = self.start_pose * delta_vr
-
-                                # 6. 최종 변환된 목표 자세를 CLIK 속도 제어 함수로 전달합니다.
                                 self.sub_controller.joint_ctrl_vel(target_pose_base)
 
 

@@ -18,12 +18,24 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(sys.executable), "..
 # 프로젝트 루트를 기준으로 URDF 파일의 전체 경로를 조합합니다.
 URDF_PATH = os.path.join(PROJECT_ROOT, 'gerri', 'robot', 'examples', 'construction_vr', 'm1509_urdf', 'm1509.urdf')
 
+JOINT_LIMIT_MIN = np.deg2rad([-360, -150, -135, -360, -135, -360])
+JOINT_LIMIT_MAX = np.deg2rad([360, 150, 135, 360, 135, 360])
 
 class DoosanVRSubController:
-    def __init__(self, ip, port, debug=False):
+    def __init__(self, ip, port, joint_limit_degree=None, debug=False):
         self.base_controller = None
+        if joint_limit_degree:
+            self.joint_limit = np.deg2rad(joint_limit_degree)
+        else:
+            self.joint_limit = [JOINT_LIMIT_MIN, JOINT_LIMIT_MAX]
         self._lock = threading.Lock()
         self.debug = debug
+
+        self.default_ref = 'base'
+
+        self.T_world_base = tf_from_offset_zyz_deg(a_z_deg=0, b_y_deg=45, c_z_deg=-90)
+        self.T_correction = tf_from_offset_zyz_deg(c_z_deg=-90)
+
 
         # --- URDF 및 IK 솔버 초기화 (공통) ---
         PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../.."))
@@ -153,10 +165,9 @@ class DoosanVRSubController:
         #    이때는 절대 목표를 추종하는 clik 함수를 사용
         dq = self.ik_solver.clik(current_q_rad, target_pose)
 
+        # 4. 실제 로봇에 속도 명령 전달
         self.robot.joint_ctrl_vel(dq, acc, dt)
 
-        # 4. 실제 로봇에 속도 명령 전달
-        # self.robot.joint_ctrl_vel(dq)
 
     def get_current_SE3_pose(self):
         current_joint_rad = np.deg2rad(self.status.joint_state['position'])
