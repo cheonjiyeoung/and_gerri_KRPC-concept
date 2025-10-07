@@ -22,8 +22,6 @@ class DoosanVRBaseController:
         self.sub_controller = None
         self.start_pose = None
         self.target_pose = None
-
-
         self.zoom_level = 1.0
 
         if 'interface' in params:
@@ -83,8 +81,6 @@ class DoosanVRBaseController:
                                 delta_ee_world = vr_ee_converter(self.interface.right_delta_pose)
 
                                 delta_ee_cali = self.sub_controller.T_correction * delta_ee_world
-
-
                                 # 1. 시작점 -> 월드 변환
                                 start_pose_world = self.sub_controller.T_world_base * self.start_pose
                                 # 2. 월드에서 목표점 계산
@@ -92,7 +88,7 @@ class DoosanVRBaseController:
                                 # 3. 최종 목표점 -> 베이스 변환
                                 target_pose_base = self.sub_controller.T_world_base.inverse() * target_pose_world
 
-                                self.sub_controller.joint_ctrl_vel(target_pose_base)
+                                self.sub_controller.joint_ctrl_vel(target_pose_base, tolerance = 10)
 
 
                             self.last_interface_value = copy.deepcopy(self.interface)
