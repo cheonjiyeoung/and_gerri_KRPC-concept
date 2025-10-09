@@ -21,6 +21,9 @@ URDF_PATH = os.path.join(PROJECT_ROOT, 'gerri/robot/examples/construction_vr/m15
 JOINT_LIMIT_MIN = np.deg2rad([-360, -150, -135, -360, -135, -360])
 JOINT_LIMIT_MAX = np.deg2rad([360, 150, 135, 360, 135, 360])
 
+
+MANIPULABILITY_THRESHOLD = 0.05
+
 CONTROL_INTERVAL = 0.05
 
 class DoosanVRSubController:
@@ -147,20 +150,28 @@ class DoosanVRSubController:
         current_q_rad = np.deg2rad(self.status.joint_state['position'])
 
         # 2. IK 솔버를 이용해 관절 속도(dq) 계산
-        dq = self.ik_solver.clik(current_q_rad, target_pose, tolerance)
+        dq, manipulability = self.ik_solver.clik(current_q_rad, target_pose, tolerance)
 
         # 만약 dq가 0 벡터라면 (목표 도달)
         if np.linalg.norm(dq) < 1e-5: # dq가 거의 0이면
             return
 
+        print(f"Manipulability: {manipulability:.4f}", end='\r')
+        if manipulability < MANIPULABILITY_THRESHOLD:
+            print(f"🚨 경고: 특이점에 가깝습니다! (조작성: {manipulability:.4f})")
+
+
         q_next = pin.integrate(self.ik_solver.model, current_q_rad, dq * self.control_interval)
-        # q_next = pin.integrate(self.ik_solver.model, current_q_rad, dq * self.control_interval)
 
         # 1. 각 안전 함수는 이제 위험 여부(True/False)만 반환합니다.
         is_limit_exceeded = self.check_joint_limits(q_next)
         is_collision = self.check_self_collision(q_next)
 
         # 2. 위험이 하나라도 감지되면 '정지', 모두 안전하면 '원본 dq'를 전송합니다.
+        print(f"Manipulability: {manipulability:.4f}", end='\r')
+        if manipulability < MANIPULABILITY_THRESHOLD:
+            print(f"🚨 경고: 특이점에 가깝습니다! (조작성: {manipulability:.4f})")
+
         if is_collision or is_limit_exceeded:
             if is_collision:
                 print("🚨 충돌 감지!")
