@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable),
 from _and_.and_robot import AdaptiveNetworkDaemon
 from gerri.robot.examples.gyd_mobile.gyd_robot_config import ROBOT_INFO, VIDEO_INFO, AUDIO_INFO
 from gerri.robot.examples.gyd_mobile.utils.solar_robot_client import SolarClient
+from gerri.robot.raas_dataset_builder import RaasDatasetBuilder
 # Initialize communication module (AND)
 daemon = AdaptiveNetworkDaemon(
     robot_info=ROBOT_INFO,
@@ -32,6 +33,9 @@ gyd_base_controller.sub_controller = gyd_sub_controller
 gyd_sub_controller.base_controller = gyd_base_controller
 
 gyd_base_controller.connect()
+
+raas_dataset_builder = RaasDatasetBuilder(controller=gyd_sub_controller,
+                                          camera_info=VIDEO_INFO)
 
 solar_client = SolarClient(sub_controller=gyd_sub_controller)
 solar_thread = threading.Thread(target=lambda:asyncio.run(solar_client.main_loop()),

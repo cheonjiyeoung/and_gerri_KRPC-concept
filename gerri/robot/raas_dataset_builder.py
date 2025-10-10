@@ -14,8 +14,8 @@ from utils.time_sync_manager import TimeSyncManager
 TimeSync = TimeSyncManager(sample_count=1)
 
 class RaasDatasetBuilder:
-    def __init__(self, controller, camera_info, interval=0.1, discount_factor=1, save_dir="../../../RLDS_dataset", **kwargs):
-        self.controller = controller
+    def __init__(self, controller, camera_info, interval=0.1, discount_factor=1, save_dir="/home/keti/RaaS_dataset", **kwargs):
+        self.controller = controller.status
         self.camera_info = camera_info
         self.interval = interval
         self.status = vars(self.controller)
@@ -31,7 +31,7 @@ class RaasDatasetBuilder:
 
         self.robot_info = self.get_robot_status()
         self.last_status = self.robot_info
-        self.start_episode_timestamp = datetime.fromisoformat(TimeSync.get_scaled_server_time()).strftime("%Y%m%d_%H%M%S_%f")[:-3]
+        self.start_episode_timestamp = datetime.fromisoformat(str(TimeSync.get_scaled_server_time())).strftime("%Y%m%d_%H%M%S_%f")[:-3]
 
         # ✅ PubSub 구독
         pub.subscribe(self.start_episode, 'start_episode')
@@ -47,7 +47,7 @@ class RaasDatasetBuilder:
             self.controller.update_status()
         robot_status = vars(self.controller)
         robot_info = {
-            'robot_name': self.controller.robot_name,
+            'robot_id': self.controller.robot_id,
             'robot_type': self.controller.robot_type,
         }
         # MOBILE
@@ -82,7 +82,7 @@ class RaasDatasetBuilder:
         """📡 에피소드 정보를 JSON 파일로 저장"""
         info = {
             'robot_info': {
-                'robot_name': self.controller.robot_name,
+                'robot_name': self.controller.robot_id,
                 'robot_type': self.controller.robot_type,
             },
             'camera_info': self.camera_info,
@@ -92,7 +92,7 @@ class RaasDatasetBuilder:
             episode_info = {
                 'episode_id': self.episode_id,
                 'start_timestamp': self.start_episode_timestamp,
-                'end_timestamp': datetime.fromisoformat(TimeSync.get_scaled_server_time()).strftime("%Y%m%d_%H%M%S_%f")[:-3],
+                'end_timestamp': datetime.fromisoformat(str(TimeSync.get_scaled_server_time())).strftime("%Y%m%d_%H%M%S_%f")[:-3],
                 'time_period_seconds': self.interval,
                 'total_steps': self.step_count,
             }
@@ -158,7 +158,7 @@ class RaasDatasetBuilder:
             'reward': self.reward_function(),
             'discount': self.discount_factor,
             'metadata': {
-                'timestamp': datetime.fromisoformat(TimeSync.get_scaled_server_time()).strftime("%Y%m%d_%H%M%S_%f")[:-3],
+                'timestamp': datetime.fromisoformat(str(TimeSync.get_scaled_server_time())).strftime("%Y%m%d_%H%M%S_%f")[:-3],
                 'uuid': str(uuid.uuid4()),
             },
         }
@@ -180,18 +180,18 @@ class RaasDatasetBuilder:
         with open(step_file, "w") as f:
             json.dump(step_data, f, indent=4)
 
-        print(f"✅ Step {self.step_count} 저장 완료: {step_file}")
+        # print(f"✅ Step {self.step_count} 저장 완료: {step_file}")
 
 
 
     def start_episode(self, episode_name):
-        print('start episode', episode_name)
         """🎬 새로운 에피소드 시작"""
         if not self.now_recording:
+            print('start episode', episode_name)
             self.now_recording = True
-            self.start_episode_timestamp = datetime.fromisoformat(TimeSync.get_scaled_server_time()).strftime("%Y%m%d_%H%M%S_%f")[:-3]
+            self.start_episode_timestamp = datetime.fromisoformat(str(TimeSync.get_scaled_server_time())).strftime("%Y%m%d_%H%M%S_%f")[:-3]
             self.episode_name = episode_name
-            self.episode_id = f"{episode_name}_{self.robot_info['robot_name']}_{self.start_episode_timestamp}"
+            self.episode_id = f"{episode_name}_{self.robot_info['robot_id']}_{self.start_episode_timestamp}"
             self.setup_episode_folder()  # ✅ 폴더 생성
             self.step_count = 0
             self.save_episode_info()

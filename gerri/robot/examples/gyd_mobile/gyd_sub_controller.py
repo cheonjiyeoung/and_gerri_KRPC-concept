@@ -6,11 +6,17 @@ from gerri.robot.examples.gyd_mobile.gyd_base_controller import GydBaseControlle
 import threading
 import time
 import pprint
+from pubsub import pub
 
 class GydSubController:
     def __init__(self):
         self.base_controller:GydBaseController = None
         self._lock = threading.Lock()
+        self.nav_canceled = False
+        self.nav_started = False
+        self.nav_paused = False
+        self.nav_failed = False
+        self.nav_succed = False
 
     def connect(self):
         self.status = RobotStatus(robot_id=self.base_controller.robot_id,
@@ -19,7 +25,15 @@ class GydSubController:
         self.robot_controller = GydMobileController(robot_status=self.status)
         threading.Thread(target=self._update_loop,daemon=True).start()
 
+    def init_nav_state(self):
+        self.nav_canceled = False
+        self.nav_started = False
+        self.nav_paused = False
+        self.nav_failed = False
+        self.nav_succed = False        
+
     def _update_loop(self):
+        self.init_nav_state()
         while True:
             self._lock.acquire()
             turn_left = False
@@ -66,17 +80,35 @@ class GydSubController:
             nav_state, dist, mileage = self.robot_controller._get_nav_status()
             self.status.nav_state = nav_state
             nav_result = nav_state.get("result")
+            poi = nav_state.get("goal")
 
             if nav_result == "SUCCEED":
+                pub.sendMessage("end_episode")
+                self.init_nav_state()
                 robot_state.append("IDLE")
                 self.status.path_plan["global"] = None
+
             if nav_result == "PAUSED":
                 robot_state.append("PAUSED")
+
             if nav_result == "START":
+                self.init_nav_state()
+                if not self.nav_started:
+                    self.nav_started = True
+                    pub.sendMessage("start_episode",episode_name=f"move_to_{poi}")
+                
                 path_plan = self.robot_controller._get_path_plan()
                 if path_plan is not None:
                     self.status.path_plan["global"] = path_plan
+
             if nav_result == "FAILED" or nav_result == "CANCELED":
+                self.nav_started = False
+                if not self.nav_canceled or not self.nav_failed:
+                    self.nav_canceled = True
+                    self.nav_failed = True
+                    pub.sendMessage("fail_episode")
+                    pub.sendMessage("end_episode")
+                    
                 self.status.path_plan["global"] = None
 
             self.status.robot_state["operating_state"] = robot_state
@@ -158,6 +190,35 @@ class GydSubController:
                 self.robot_controller.reloc(name)
             else:
                 self.robot_controller.reloc_absolute(name)
+
+    def demo_coffee(self,value):
+        import asyncio
+        dest = value.get("poi")
+        print(dest)
+        if dest is not None:
+            asyncio.create_task(self._demo_coffee(dest))
+    
+    async def _demo_coffee(self,dest):
+        await self.robot_controller._move_waypoint_async("2F_E1_W")
+        self.ev_call(2,1)
+        await self.robot_controller._move_waypoint_async("2F_E1")
+        self.ev_call(3,0)
+        self.robot_controller.reloc_absolute("3F_E1")
+        await self.robot_controller._move_waypoint_async("3F_E1_E")
+        await self.robot_controller._move_waypoint_async(dest)
+
+
+    def ev_call(self,destination,dir):
+        print("evcall")
+        import requests
+        payload = {
+            "ev_id" : "1",
+            "destination" : destination,
+            "direction" : dir
+        }
+        res = requests.post("http://125.131.105.165:21114/ev/call/single",json=payload)
+        print(res.text)
+
     ### 수정 시작
     def turn_on_power(self, value = None, option = None):
         self.robot_controller.turn_on_power()

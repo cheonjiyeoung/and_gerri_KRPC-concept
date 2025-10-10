@@ -67,7 +67,18 @@ class SolarClient:
         while True:
             try:
                 message = await websocket.recv()
+                print(f"received = {message}")
                 message_dict = json.loads(message)
+                uuid = message_dict.get("uuid")
+
+                if uuid is not None:
+                    callback_message = {
+                        "topic":"received_callback",
+                        "uuid":uuid
+                    }
+                    self.send_message(callback_message)
+                    print(f"send = {callback_message}")
+
                 pub.sendMessage("receive_message", message=message_dict)
                 print(f"메시지 수신: {message_dict}")
             except json.JSONDecodeError:

@@ -48,6 +48,8 @@ class GydBaseController(MobileFunction):
                             self.sub_controller.turn_off_power()   
                         if topic == 'move_waypoint_async':
                             self.sub_controller.move_waypoint_async(value=value,option=option) 
+                        if topic == "demo_coffee":
+                            self.sub_controller.demo_coffee(value)
                         ### 수정 완료
                         else:
                             self.send_message({'topic': 'callback_'+topic, 'value': 'callback_'+value, 'target': 'all'})
