@@ -175,3 +175,8 @@ cython_debug/
 
 # Spot mission files
 ./gerri/robot/examples/spot/spot_utils/mission_files/*
+
+# ZED
+PyOpenGL-3.1.6-cp310-cp310-win_amd64.whl
+PyOpenGL_accelerate-3.1.6-cp310-cp310-win_amd64.whl
+pyzed-5.0-cp310-cp310-win_amd64.whl

@@ -12,29 +12,30 @@ from _and_.rtc2kng.video_manager import VideoManager
 logger = logging.getLogger(__name__)
 
 class CameraManager(VideoManager):
-    def __init__(self, index=0, name='cam', **kwargs):
-        super().__init__(**kwargs)
-        self.index = index
-        self.name = name
 
+    def __init__(self, source=0, name='cam', width=1920, height=1080, fps=30, debug=False, **kwargs):
+        super().__init__(width=width, height=height, fps=fps, debug=debug)
+        self.source = source
+        self.name = name
         self.running = False
+
         self.start()
 
-    def _open_capture(self, index):
+    def _open_capture(self, source):
         system = platform.system()
         if system == "Windows":
-            return cv2.VideoCapture(index, cv2.CAP_DSHOW)
+            return cv2.VideoCapture(source, cv2.CAP_DSHOW)
         elif system == "Linux":
-            return cv2.VideoCapture(index, cv2.CAP_V4L2)
+            return cv2.VideoCapture(source, cv2.CAP_V4L2)
         else:
-            return cv2.VideoCapture(index)
+            return cv2.VideoCapture(source)
 
     def start(self):
         if self.running:
             return
 
         self.running = True
-        self.cap = cv2.VideoCapture(self.index)
+        self.cap = cv2.VideoCapture(self.source)
         self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
@@ -54,7 +55,6 @@ class CameraManager(VideoManager):
                 self.last_frame_time = time.time()
                 # if self.debug:
                 #     cv2.imshow(self.name, frame)
-                time.sleep(0.01)
             except Exception as e:
                 logger.error(f"⚠️ 캡처 오류 발생: {e}")
                 self.restart()

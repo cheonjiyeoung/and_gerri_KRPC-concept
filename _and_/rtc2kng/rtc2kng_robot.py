@@ -48,22 +48,42 @@ def create_channels(robot_info, server_info, video_info, audio_info, command = N
         for cam_label, cam_config in video_info.items():
             if isinstance(cam_config, dict):
                 try:
-                    video_tracks_dict[cam_label] = CameraManager(
-                        index=cam_config.get('source', 0),
-                        width=cam_config.get('width', 1920), # 기본 해상도 설정
-                        height=cam_config.get('height', 1080),
-                        debug=cam_config.get('debug', False)
-                    )
-                    print(f"  비디오 트랙 '{cam_label}'용 CameraManager 생성 완료.")
+                    #  1. 'manager' 키를 가져오고, 없으면 기본 CameraManager를 사용
+                    ManagerClass = cam_config.pop('manager', CameraManager)
+                    
+                    #  2. 가져온 클래스(ManagerClass)로 객체를 생성
+                    video_tracks_dict[cam_label] = ManagerClass(**cam_config)
+
+                    print(f"  비디오 트랙 '{cam_label}'용 {ManagerClass.__name__} 생성 완료.")
                 except Exception as e:
-                    print(f"  오류: 비디오 트랙 '{cam_label}'용 CameraManager 생성 실패: {e}")
-            elif isinstance(cam_config, CameraManager): # 이미 CameraManager 인스턴스인 경우
-                 video_tracks_dict[cam_label] = cam_config
-                 print(f"  비디오 트랙 '{cam_label}'에 기존 CameraManager 인스턴스 사용.")
+                    print(f"  오류: 비디오 트랙 '{cam_label}'용 매니저 생성 실패: {e}")
             else:
-                print(f"  경고: VIDEO_INFO의 '{cam_label}'에 대한 설정이 올바르지 않습니다 ({type(cam_config)}). 무시합니다.")
+                print(f"  경고: VIDEO_INFO의 '{cam_label}'에 대한 설정이 올바르지 않습니다. 무시합니다.")
     else:
         print("  VIDEO_INFO가 없거나 형식이 올바르지 않아 비디오 트랙을 설정하지 않습니다.")
+
+
+    # video_tracks_dict = {}
+    # if video_info and isinstance(video_info, dict):
+    #     for cam_label, cam_config in video_info.items():
+    #         if isinstance(cam_config, dict):
+    #             try:
+    #                 video_tracks_dict[cam_label] = CameraManager(
+    #                     index=cam_config.get('source', 0),
+    #                     width=cam_config.get('width', 1920), # 기본 해상도 설정
+    #                     height=cam_config.get('height', 1080),
+    #                     debug=cam_config.get('debug', False)
+    #                 )
+    #                 print(f"  비디오 트랙 '{cam_label}'용 CameraManager 생성 완료.")
+    #             except Exception as e:
+    #                 print(f"  오류: 비디오 트랙 '{cam_label}'용 CameraManager 생성 실패: {e}")
+    #         elif isinstance(cam_config, CameraManager): # 이미 CameraManager 인스턴스인 경우
+    #              video_tracks_dict[cam_label] = cam_config
+    #              print(f"  비디오 트랙 '{cam_label}'에 기존 CameraManager 인스턴스 사용.")
+    #         else:
+    #             print(f"  경고: VIDEO_INFO의 '{cam_label}'에 대한 설정이 올바르지 않습니다 ({type(cam_config)}). 무시합니다.")
+    # else:
+    #     print("  VIDEO_INFO가 없거나 형식이 올바르지 않아 비디오 트랙을 설정하지 않습니다.")
 
     # 3. 오디오 트랙 및 플레이어 설정 (AUDIO_INFO 기반)
     audio_track_instance = None
