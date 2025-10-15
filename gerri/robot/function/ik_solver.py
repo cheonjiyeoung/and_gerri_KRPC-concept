@@ -49,7 +49,7 @@ class IKSolver:
         if distance_to_goal <= tolerance / 1000.0:
             return np.zeros(self.model.nv), 0.0  # (dq, manipulability) 형태에 맞게 반환
 
-        # --- 자코비안 계산 (단 한 번!) ---
+        # --- 자코비안 계산 ---
         J = pin.computeFrameJacobian(self.model, self.data, q, self.frame_id)
 
         # --- 1. 조작성(Manipulability) 계산 ---

@@ -141,47 +141,45 @@ class DoosanVRSubController:
         # print(f"Target Pose List: {pose_list}")
         self.robot.end_pose_ctrl(pose_list)
 
-    def joint_ctrl_vel(self, target_pose: pin.SE3, acc=250, dt=0.05, tolerance=0):
+    def joint_ctrl_clik(self, target_pose: pin.SE3, vel=100, acc=250, dt=CONTROL_INTERVAL, tolerance=10):
         """
-        최종 목표 자세(target_pose)를 받아 해당 지점으로 이동하기 위한
-        관절 속도를 계산하고 로봇을 제어합니다.
+        목표 자세(target_pose)를 받아 CLIK으로 목표 관절 '위치'를 계산하고
+        로봇을 위치 제어 방식으로 구동합니다.
         """
-        # 1. 현재 관절 각도 가져오기
+        # 1. 현재 관절 각도 가져오기 (radian)
+        # self.status.joint_state['position']이 degree 단위이므로 rad로 변환
         current_q_rad = np.deg2rad(self.status.joint_state['position'])
 
-        # 2. IK 솔버를 이용해 관절 속도(dq) 계산
+        # 2. IK 솔버를 이용해 관절 속도(dq) 및 조작성(manipulability) 계산
+        # ik_solver.py의 clik 함수는 이제 (dq, manipulability) 튜플을 반환합니다.
         dq, manipulability = self.ik_solver.clik(current_q_rad, target_pose, tolerance)
 
-        # 만약 dq가 0 벡터라면 (목표 도달)
-        if np.linalg.norm(dq) < 1e-5: # dq가 거의 0이면
-            return
-
+        # 3. 조작성 및 목표 도달 여부 체크
         print(f"Manipulability: {manipulability:.4f}", end='\r')
         if manipulability < MANIPULABILITY_THRESHOLD:
             print(f"🚨 경고: 특이점에 가깝습니다! (조작성: {manipulability:.4f})")
+            # 특이점 근처에서는 움직임을 멈추거나 매우 느리게 할 수 있습니다.
+            # self.robot.joint_ctrl_vel_stop() # 예시: 속도 0으로 정지
 
 
-        q_next = pin.integrate(self.ik_solver.model, current_q_rad, dq * self.control_interval)
+        # pin.integrate는 현재 각도 q에서 dq * dt 만큼 움직였을 때의 다음 각도를 계산해줍니다.
+        q_next_rad = pin.integrate(self.ik_solver.model, current_q_rad, dq * dt)
 
-        # 1. 각 안전 함수는 이제 위험 여부(True/False)만 반환합니다.
-        is_limit_exceeded = self.check_joint_limits(q_next)
-        is_collision = self.check_self_collision(q_next)
-
-        # 2. 위험이 하나라도 감지되면 '정지', 모두 안전하면 '원본 dq'를 전송합니다.
-        print(f"Manipulability: {manipulability:.4f}", end='\r')
-        if manipulability < MANIPULABILITY_THRESHOLD:
-            print(f"🚨 경고: 특이점에 가깝습니다! (조작성: {manipulability:.4f})")
+        # 5. 안전성 검사 (관절 제한, 자기 충돌)
+        is_limit_exceeded = self.check_joint_limits(q_next_rad)
+        is_collision = self.check_self_collision(q_next_rad)
 
         if is_collision or is_limit_exceeded:
             if is_collision:
-                print("🚨 충돌 감지!")
+                print("🚨 충돌 감지! ")
             if is_limit_exceeded:
-                print("🚨 관절 범위 초과!")
-            # self.robot.joint_ctrl_vel(dq, acc, dt)
+                print("🚨 관절 범위 초과! ")
+            # 위험 상황에서는 현재 상태를 유지하거나 정지 명령을 보내는 것이 안전합니다.
+            return
 
-        else:
-            # 안전하므로, IK가 계산한 원본 dq를 그대로 사용합니다.
-            self.robot.joint_ctrl_vel(dq, acc, dt)
+        q_next_deg = np.rad2deg(q_next_rad)
+        self.robot.joint_ctrl(q_next_deg, vel, acc)
+
 
 
     def check_joint_limits(self, q_next):

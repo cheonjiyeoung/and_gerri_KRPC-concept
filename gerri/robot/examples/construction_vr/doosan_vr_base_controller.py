@@ -24,6 +24,7 @@ class DoosanVRBaseController:
         self.target_pose = None
         self.zoom_level = 1.0
 
+
         if 'interface' in params:
             self.interface = params['interface']
             self.last_interface_value = copy.deepcopy(self.interface)
@@ -35,7 +36,13 @@ class DoosanVRBaseController:
         pub.subscribe(self.set_zoom_level, "zoom_level")
 
     def connect(self):
-        self.sub_controller.connect()
+        if self.sub_controller:
+            self.sub_controller.connect()
+        else:
+            from gerri.robot.examples.construction_vr.construction_vr_config import ROBOT_INFO
+            from gerri.robot.examples.construction_vr.doosan_vr_sub_controller import DoosanVRSubController
+            sub_controller = DoosanVRSubController(ROBOT_INFO['ip'], ROBOT_INFO['port'], debug=True)
+            self.sub_controller = sub_controller
         self.status_manager = StatusManager(self.robot_info, self.sub_controller)
 
     def disconnect(self):
@@ -88,7 +95,7 @@ class DoosanVRBaseController:
                                 # 3. 최종 목표점 -> 베이스 변환
                                 target_pose_base = self.sub_controller.T_world_base.inverse() * target_pose_world
 
-                                self.sub_controller.joint_ctrl_vel(target_pose_base, tolerance = 10)
+                                self.sub_controller.joint_ctrl_clik(target_pose_base, tolerance = 10)
 
 
                             self.last_interface_value = copy.deepcopy(self.interface)
