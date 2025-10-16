@@ -27,8 +27,8 @@ AUDIO_INFO = {
 }
 
 SERVER_INFO = {
-    "server_ip": '125.131.105.165',
-    # "server_ip": '172.20.1.250',
+    # "server_ip": '125.131.105.165',
+    "server_ip": '172.20.1.250',
     "server_port": 25000,
     "room_id": 'test_room',
 }

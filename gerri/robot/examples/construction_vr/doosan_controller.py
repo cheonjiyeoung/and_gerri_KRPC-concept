@@ -201,7 +201,7 @@ class DoosanController:
             # drl_script_pause()
 
     def joint_ctrl(self, value, vel=120, acc=120):
-        self.set_robot_mode = 1
+        self.set_robot_mode = 3
 
         j1 = self.clamp(value[0], min_value = -360, max_value = 360)
         j2 = self.clamp(value[1], min_value = -150, max_value = 150)
@@ -212,14 +212,14 @@ class DoosanController:
 
         self.client.write_register(self.write_register_address_0, self.set_robot_mode)
 
-        joint_value = [self.modbus_encode(j1, 100),
-                     self.modbus_encode(j2, 100),
-                     self.modbus_encode(j3, 100),
-                     self.modbus_encode(j4, 100),
-                     self.modbus_encode(j5, 100),
-                     self.modbus_encode(j6, 100),
-                     self.modbus_encode(vel, 100),
-                     self.modbus_encode(acc, 100)]
+        joint_value = [self.modbus_encode(j1, 10),
+                     self.modbus_encode(j2, 10),
+                     self.modbus_encode(j3, 10),
+                     self.modbus_encode(j4, 10),
+                     self.modbus_encode(j5, 10),
+                     self.modbus_encode(j6, 10),
+                     self.modbus_encode(vel, 10),
+                     self.modbus_encode(acc, 10)]
         self.client.write_registers(self.write_register_address_j1, joint_value)
 
 

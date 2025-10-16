@@ -1,6 +1,12 @@
-HOME = posj(-90.00, 0.00, 90.00, 0.00, -45.00, 0.00)
+HOME = posj(90.00, 0.00, -90.00, 0.00, 45.00, 0.00)
 RELOADER = posj(90.00, 10.00, -80.00, 0.00, -90.00, 0.00)
 RELOADER_SLOT = [130.00, 90.00, 50.00, 10.00, -30.00, -70.00, -110.00, -150.00]
+
+
+CAM_POSE = [-40, 0, -100, 0, 0, 0]
+
+CAM_APPROCH = [0, 0, -100, 0, 0, 0]
+
 
 def convert_value(value, scale=10):
 	convert_val = []
@@ -178,17 +184,41 @@ while True:
 		dt = get_modbus_slave(154)
 		value = [v1, v2, v3, v4, v5, v6]
 		target_value = convert_value(value, 100)
-		speedj(target_value, acc, dt)
+		target_acc = from_modbus_register(acc, 100)
+		target_dt = from_modbus_register(dt, 100)
+		speedj(target_value, target_acc, target_dt)
 
-		set_modbus_slave(129, 0)
-		set_modbus_slave(147, to_modbus_register(0))
-		set_modbus_slave(148, to_modbus_register(0))
-		set_modbus_slave(149, to_modbus_register(0))
-		set_modbus_slave(150, to_modbus_register(0))
-		set_modbus_slave(151, to_modbus_register(0))
-		set_modbus_slave(152, to_modbus_register(0))
-		set_modbus_slave(153, to_modbus_register(0))
+		set_modbus_slave(129, 255)
+		# set_modbus_slave(147, to_modbus_register(0))
+		# set_modbus_slave(148, to_modbus_register(0))
+		# set_modbus_slave(149, to_modbus_register(0))
+		# set_modbus_slave(150, to_modbus_register(0))
+		# set_modbus_slave(151, to_modbus_register(0))
+		# set_modbus_slave(152, to_modbus_register(0))
 
+
+	if mode == 20:
+		x = get_modbus_slave(155)
+		y = get_modbus_slave(156)
+		z = get_modbus_slave(157)
+		rx = get_modbus_slave(158)
+		ry = get_modbus_slave(159)
+		rz = get_modbus_slave(160)
+		value = [x, y, z, rx, ry, rz]
+
+		target_val = convert_value(value,100)
+		target_pose = posx(target_val[0]+CAM_POSE[0], target_val[1]+CAM_POSE[1], target_val[2]+CAM_POSE[2], target_val[3]+CAM_POSE[3], target_val[4]+CAM_POSE[4], target_val[5]+CAM_POSE[5])
+
+		movel(target_pose, ref=DR_TOOL)
+		
+		tp_popup(message="{}".format(target_pose), pm_type=DR_PM_MESSAGE, button_type=0)
+		set_modbus_slave(129, 255)
+		
+		# current_pose, sol_space = get_current_posx(ref=DR_WORLD)
+		# z_align_vector = [0, 0, 1]
+		# align_axis(vect = z_align_vector, pos = current_pose, axis=DR_AXIS_Z, ref=DR_WORLD)
+		# # z_align_pose = [current_pose[0], current_pose[1], current_pose[2], 0, 0, 60]
+		# # movel(z_align_pose, time=5, ref=DR_WORLD)
 		
 
 	if mode == 21:
@@ -256,9 +286,9 @@ while True:
 		# WaitNode
 		wait(1.00)
 
-	# if 11 <= mode and mode < 20:
-	# 	reload(mode-11)
-	# 	set_modbus_slave(129, 0)
+	if 11 <= mode and mode < 20:
+		reload(mode-11)
+		set_modbus_slave(129, 0)
 
 
 	pose_mode = get_modbus_slave(200)
