@@ -24,7 +24,7 @@ JOINT_LIMIT_MAX = np.deg2rad([360, 150, 135, 360, 135, 360])
 
 MANIPULABILITY_THRESHOLD = 0.05
 
-CONTROL_INTERVAL = 0.05
+CONTROL_INTERVAL = 0.1
 
 class DoosanVRSubController:
     def __init__(self, ip, port, joint_limit_degree=None, control_interval=CONTROL_INTERVAL, debug=False):

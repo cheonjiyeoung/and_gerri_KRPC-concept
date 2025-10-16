@@ -30,7 +30,8 @@ from gerri.robot.interface.vr_controller import VRController
 
 vr_ctrl_interface = VRController()
 sample_base_controller = DoosanVRBaseController(ROBOT_INFO, interface=vr_ctrl_interface)
-sample_sub_controller = DoosanVRSubController(ROBOT_INFO['ip'], ROBOT_INFO['port'], debug=True)
+# sample_sub_controller = DoosanVRSubController(ROBOT_INFO['ip'], ROBOT_INFO['port'], debug=True)
+sample_sub_controller = DoosanVRSubController(ROBOT_INFO['ip'], ROBOT_INFO['port'], debug=False)
 sample_base_controller.sub_controller = sample_sub_controller
 sample_sub_controller.base_controller = sample_base_controller
 sample_base_controller.connect()
