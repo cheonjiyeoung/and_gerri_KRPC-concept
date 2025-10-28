@@ -32,8 +32,13 @@ class ZimmerDaemon:
 
             elif cmd == "release" and self.connected:
                 distance = args.get("distance", 30.0)
-                self.zimmer.release(release_distance=float(distance))
-                writer.write(f"[OK] Released to {distance}mm\n".encode())
+                try:
+                    self.zimmer.release(release_distance=float(distance))
+                    writer.write(f"[OK] Released to {distance}mm\n".encode())
+                except Exception as e:
+                    writer.write(f"[ERROR] Release failed: {e}\n".encode())
+                finally:
+                    self.zimmer.gripper_send_flag = False
 
             elif cmd == "disconnect" and self.connected:
                 self.zimmer.disconnect()

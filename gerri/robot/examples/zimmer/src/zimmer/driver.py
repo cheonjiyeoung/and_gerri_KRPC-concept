@@ -289,22 +289,64 @@ class Zimmer:
                             self.gripper_init_flag = True
 
                     elif self.gripper_comm_step == 4:
-                        if not bool(self.reg_read.registers[0] & self.DataTransferOK):
-                            if self.gripper_grip_flag:
-                                print(
-                                    f"{YELLOW}[ ZIMMER ]{NC} 4. Grip move to workposition"
-                                )
-                                self.reg_write[0] = ControlWord.MoveToWork
-                            else:
-                                if not bool(
+                        if (
+                            bool(self.reg_read.registers[0] & self.DataTransferOK)
+                            is not True
+                        ):
+                            if self.gripper_grip_flag is True:
+                                # GRIP 경로: 이미 Work에 있으면 '즉시 종료(단축 경로)'
+                                if bool(
+                                    self.reg_read.registers[0] & self.AtWorkposition
+                                ):
+                                    print(
+                                        f"{YELLOW}[ ZIMMER ]{NC} 4. Already at workposition → fast complete"
+                                    )
+                                    # 플래그 정리
+                                    self.reg_write[0] = ControlWord.ResetDirectionFlag
+                                    self.mb.write_registers(
+                                        self.ADDR_SEND, self.reg_write
+                                    )
+                                    self.gripper_comm_step = 7  # 바로 완료 판정 단계로
+                                else:
+                                    print(
+                                        f"{YELLOW}[ ZIMMER ]{NC} 4. Grip move to workposition"
+                                    )
+                                    self.reg_write[0] = ControlWord.MoveToWork
+                                    self.mb.write_registers(
+                                        self.ADDR_SEND, self.reg_write
+                                    )
+                                    self.gripper_comm_step += 1
+
+                            elif self.gripper_grip_flag is False:
+                                # RELEASE 경로: 이미 Base면 '즉시 종료(단축 경로)'
+                                if bool(
                                     self.reg_read.registers[0] & self.AtBaseposition
                                 ):
+                                    print(
+                                        f"{YELLOW}[ ZIMMER ]{NC} 4. Already at baseposition → fast complete"
+                                    )
+                                    self.reg_write[0] = ControlWord.ResetDirectionFlag
+                                    self.mb.write_registers(
+                                        self.ADDR_SEND, self.reg_write
+                                    )
+                                    self.gripper_comm_step = 7  # 바로 완료 판정
+                                else:
                                     print(
                                         f"{YELLOW}[ ZIMMER ]{NC} 4. Grip move to baseposition"
                                     )
                                     self.reg_write[0] = ControlWord.MoveToBase
-                            self.mb.write_registers(self.ADDR_SEND, self.reg_write)
-                            self.gripper_comm_step += 1
+                                    self.mb.write_registers(
+                                        self.ADDR_SEND, self.reg_write
+                                    )
+                                    self.gripper_comm_step += 1
+
+                            else:
+                                # (선택) init 컨텍스트 등: 아무 것도 안 하고 종료
+                                print(
+                                    f"{YELLOW}[ ZIMMER ]{NC} 4. No-motion context → fast complete"
+                                )
+                                self.gripper_comm_step = -1
+                                self.gripper_send_flag = False
 
                     elif self.gripper_comm_step == 5:
                         if bool(
@@ -360,7 +402,7 @@ class Zimmer:
         ) | self.gripper_velocity  # GripForce/DriveVelocity
         self.reg_write[4] = 100  # BasePosition = 1.00 mm
         self.reg_write[5] = 2000  # ShiftPosition = 20.00 mm
-        # self.reg_write[7] = self.gripper_max_distance  # WorkPosition = max stroke
+        self.reg_write[7] = self.gripper_max_distance  # WorkPosition = max stroke
 
         self.gripper_init_flag = False
         self.gripper_comm_step = 0
@@ -368,6 +410,13 @@ class Zimmer:
 
         while self.gripper_init_flag is False:
             time.sleep(0.001)
+
+        # init 이후에 '동작'은 하지 말고 시퀀스를 닫는다
+        self.gripper_comm_step = -1
+        self.gripper_send_flag = False
+        # (원하면 여기서 ResetDirectionFlag 한 번 쏴도 됨)
+        # self.reg_write[0] = ControlWord.ResetDirectionFlag
+        # self.mb.write_registers(self.ADDR_SEND, self.reg_write
         print(f"{BLUE}[ ZIMMER ]{NC} Initialized")
 
     def grip(self, grip_distance=-1, sync=True):
@@ -378,9 +427,13 @@ class Zimmer:
         - grip_distance (int): Grip distance (75 ~ max distance) [mm]
         - sync (bool): Synchronization flag
         """
+        # if abs(self.gripper_grip_distance - int(actual_position)) <= TOL:
+        #     print(f"{YELLOW}[ ZIMMER ]{NC} target≈actual → skip motion")
+        #     return
 
         if grip_distance == -1:
             actual_position = self.gripper_max_distance
+
         else:
             # convert gap[mm] to WorkPosition counts [0.01mm] (갭→워크포지션 변환)
             actual_position = (74 - grip_distance) / 2 * 100 + 100
@@ -413,8 +466,13 @@ class Zimmer:
         - release_distance (int): Release distance (75 ~ max distance) [mm]
         - sync (bool): Synchronization flag
         """
+        # if abs(self.gripper_grip_distance - int(actual_position)) <= TOL:
+        #     print(f"{YELLOW}[ ZIMMER ]{NC} target≈actual → skip motion")
+        #     return
+
         if release_distance == -1:
             actual_position = 100
+
         else:
             # convert gap[mm] to WorkPosition counts [0.01mm] (갭→워크포지션 변환)
             actual_position = (74 - release_distance) / 2 * 100 + 150

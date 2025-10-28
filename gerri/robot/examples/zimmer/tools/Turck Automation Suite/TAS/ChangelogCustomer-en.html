@@ -1,0 +1,179 @@
+<h2 id="changelogversion11000">Changelog Version 1.10.0.0</h2>
+<h3 id="added">Added</h3>
+<ul>
+<li><p>Profinet View &amp; DCP (requires Npcap or Winpcap):</p>
+<ul>
+<li>Scans and displays all DCP-enabled devices on the network</li>
+<li>Identifies specific information about connected Profinet devices</li>
+<li>Performs specific device actions:<ul>
+<li>Customizes IP Address, Profinet Device Name, Subnet Mask, Gateway</li>
+<li>Different Reset Modes </li>
+<li>Wink for visual identification</li></ul></li></ul></li>
+<li><p>Diagnose View:</p>
+<ul>
+<li>Scans the Turck devices on the network and flags devices with existing diagnostics</li>
+<li>Displays the device status or diagnostic message</li>
+<li>Direct link to the creation of the diagnostic report </li>
+<li>Accessing the detailed diagnostics page of the affected device</li></ul></li>
+<li><p>Monitoring and visualization of EZ-Array light curtain with light beams that can be switched on and off.</p></li>
+<li><p>Optional: start of a DHCP server with the following functions</p>
+<ul>
+<li>DHCP Scan List</li>
+<li>DHCP Start/Stop</li>
+<li>DHCP Get Adapter List</li></ul></li>
+<li><p>Visualizes the time sequence of process input data of connected analog devices/sensors</p></li>
+<li><p>CODESYS recipes  and/or log files (USB data) are uploaded to the PC</p></li>
+</ul>
+<h3 id="changed">Changed</h3>
+<ul>
+<li>Automatic checking and display of new TAS versions</li>
+<li>The execution of TAS to set the firewall rules without administrator rights can be stopped without the TAS being executed</li>
+<li>Bar graphs for the display of the RFID tags in the read/write area and the detuning of the RF read/write head in the HF RFID tag actions </li>
+<li>IP 0.0.0.0 is treated as a default IP address in the network view</li>
+<li>For compatible IO-Link devices, the product variant ID or description ID is also displayed in the IO-Link Web Part when changing the DeviceID</li>
+<li>View IP address and Profinet device name when a device is opened via TAS</li>
+<li>An ARGEE project in the device can be overwritten via the ARGEE view without prior deletion if no protection is set</li>
+<li>Backup name of the CODESYS application is made up of the name of the CODESYS application, IP address and date</li>
+<li>Support for Q180/Q300-LNX UHF readers</li>
+<li>Customization of different icons and texts</li>
+<li>Adjustments to the website layout</li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li>Malfunction due to CODESYS user login on certain firmware versions</li>
+<li>Compatibility problems with existing backups of the CODESYS application</li>
+<li>If more IODDs are linked than the memory size of the web browser allows, the oldest IODD is replaced</li>
+<li>Fixed Modbus TCP and EtherNet/IP™ memory mapping in web client</li>
+<li>Added missing channel numbers in Modbus TCP and EtherNet/IP™ memory mapping</li>
+<li>Display of BEEP support of the FEN20-4DIP-4DOP</li>
+<li>Incorrect sorting of IP addresses in IO-Link and CODESYS views</li>
+<li>Excom Gen: Failsafe mode is not displayed on all modules</li>
+<li>Updated some text messages and tooltips</li>
+</ul>
+<h2 id="changelogversion1910">Changelog Version 1.9.1.0</h2>
+<h3 id="changed-1">Changed</h3>
+<ul>
+<li>Output of further messages in the CODESYS view </li>
+<li>Display of signal quality and antenna detuning only with compatible read/write heads</li>
+<li>FFT scaling in the Radar Monitor</li>
+</ul>
+<h3 id="fixed-1">Fixed</h3>
+<ul>
+<li>Missing ASCII characters in the HF tag actions</li>
+<li>Adjustment of the scrollbar</li>
+<li>Some text messages and tooltips updated</li>
+<li>Multiple display of the vibration monitor</li>
+</ul>
+<h2 id="changelogversion1900">Changelog Version 1.9.0.0</h2>
+<h3 id="added-1">Added</h3>
+<ul>
+<li>CODESYS View:</li>
+<li>Scans and displays all CODESYS devices on the network<ul>
+<li>Retrieves specific information about connected CODESYS devices</li>
+<li>Performs specific device actions:<ul>
+<li>Saves application to CODESYS device (Restore 1)</li>
+<li>Downloads application from CODESYS device (Backup 1) </li>
+<li>Warm start of the application </li>
+<li>Cold start the application </li>
+<li>Stops the application</li></ul></li>
+<li>Supports CODESYS user and password handling</li>
+<li>Save application to the device as a batch function</li></ul></li>
+<li>Change language to Chinese, French or Spanish</li>
+<li>Cable Monitor for the M12Plus connector</li>
+<li>Vision Monitor for intelligent cameras </li>
+<li>Extension of the RFID tag actions HF to include visualization of signal quality and antenna detuning</li>
+<li>Extension of the RFID tag actions HF by the number of readings </li>
+<li>Manually added devices in the network view are also displayed in the BEEP, ARGEE and CODESYS view and actions can be performed</li>
+<li>Polling option to prevent resetting of the IO-Link process output data after 20sec</li>
+</ul>
+<h3 id="changed-2">Changed</h3>
+<ul>
+<li>Adaptation of the top-level navigation</li>
+<li>The user is informed if the started TAS version is still blocked by an older instance</li>
+<li>The link to the downloads on the product website is country-specific</li>
+<li>Further differentiation in the address mode between rotary switches and dip switches</li>
+<li>Adaptation of the design of the web pages</li>
+</ul>
+<h3 id="fixed-2">Fixed</h3>
+<ul>
+<li>Updated some text messages and tooltips</li>
+<li>Repeated capturing of the same HF tag is not indicated</li>
+<li>Incorrect block transfer with inconsistent parameter sets</li>
+<li>Incorrect redirection to the device web page after IP address changes or a reset</li>
+</ul>
+<h2 id="changelogversion1810">Changelog version 1.8.1.0</h2>
+<h3 id="fixed-3">Fixed</h3>
+<ul>
+<li>Supports Reader ID for TN-UHF-Q180L300-AUS-CDS and TN-UHF-Q300-AUS-CDS</li>
+</ul>
+<h2 id="changelogversion1800">Changelog version 1.8.0.0</h2>
+<h3 id="added-2">Added</h3>
+<ul>
+<li>Switching language to German</li>
+<li>New Radar Monitor 2.0 with angle measurement</li>
+<li>Magnet Monitor to represent the magnetic field strength in all three axes as well as the magnitude vector and sum vector</li>
+<li>Exports configuration from connected IO-Link devices</li>
+<li>Imports configuration into one or several connected IO-Link devices in a batch</li>
+<li>Sets Real Time Clock to one or several devices in a batch</li>
+<li>Supports use of network card with several IP addresses</li>
+<li>Supports firmware updates for devices with old firmware version within 180 seconds, after a power reset has been performed</li>
+<li>Supports open device webserver for devices with old firmware</li>
+<li>Shows Turck cloud settings in TAS</li>
+<li>Exports or prints list of scanned UIDs of HF Tags </li>
+</ul>
+<h3 id="changed-3">Changed</h3>
+<ul>
+<li>Global password can be set or deleted via action in the toolbar</li>
+<li>Run firmware updates via the single device actions</li>
+<li>Device name added in IO-Link view</li>
+<li>Information on waiting time issued after download of a ARGEE program</li>
+<li>Some icons replaced and reordered </li>
+<li>Entry of a valid subnet mask checked</li>
+<li>Shows EtherNet/IP and Modbus TCP mapping in GEN device documentation, if the station is configured without connected hardware</li>
+</ul>
+<h3 id="fixed-4">Fixed</h3>
+<ul>
+<li>Reloading of "IODD Configurator - Observation Tab" after changing parameters</li>
+<li>Some text messages and tooltips updated</li>
+<li>Supports firmware updates for all hardware versions of TBEN-L…-8IOL</li>
+<li>Incorrect assignment of ID and device type for Q300</li>
+<li>IODD Configurator: Parameters that control the scope of process data are also supported under "Observation". </li>
+<li>Under the GEN device documentation a diagnostic word is to be considered in the EtherNet/IP mapping if the slot is configured as 'empty slot' and is located within the module list</li>
+</ul>
+<h2 id="changelogversion1700">Changelog version 1.7.0.0</h2>
+<h3 id="added-3">Added</h3>
+<ul>
+<li>IO-Link View:<ul>
+<li>Scans and views Turck IO-Link masters and all connected IO-Link devices in the network</li>
+<li>Gets specific information about connected IO-Link devices</li>
+<li>Executes specific device actions, like Wink, open IO-Link Master in TAS, open IODD Configurator and IO-Link device monitor</li>
+<li>Filters for specific IO-Link devices</li></ul></li>
+<li>RFID Tag Actions HF:<ul>
+<li>Scans UIDs of HF tags and creates a list</li>
+<li>Gets tag information about tag type, memory size and supported features</li>
+<li>Reads tag memory in Hex and ASCII</li>
+<li>Edits data and writes to tag in Hex</li>
+<li>Sets specific data to the complete or a selected memory area of the tag</li></ul></li>
+<li>Diagnostic report to export or print all device settings, status and diagnostics </li>
+<li>Configuration mode for inductive coupler with IO-link</li>
+<li>Additional plot for suppression FFT in the Radar Monitor</li>
+<li>Checks and informs if an addressing conflict occured for the used network adapters</li>
+<li>Supports factory reset, sets IP address and accesses system settings of TX devices </li>
+<li>Supports new hardware version of BL20-E-GW-EN and BL67-GW-EN</li>
+<li>Supports to “go online” with a device automatically, if it isn´t connected to a plc</li>
+<li>Supports to activate Force Mode to get access to the device, if it is connected to a plc</li>
+</ul>
+<h3 id="changed-4">Changed</h3>
+<ul>
+<li>Improved update process of TAS, which replace the files, stops the old TAS instance and restarts new version of TAS automatically </li>
+<li>Changes default settings in RFID application “Tag Trace”</li>
+<li>Devices with running ARGEE or CODESYS programs supports edit device, reset and firmware update </li>
+<li>Uncheck the import of unique device data by default</li>
+</ul>
+<h3 id="fixed-5">Fixed</h3>
+<ul>
+<li>Prevents that process data won´t be updated by using the USB IO-Link Master</li>
+<li>Size of the navigation bar changed</li>
+<li>Some text messages and tooltips updated</li>
+</ul>
+<h2 id="initialversion1600">Initial version 1.6.0.0</h2>
