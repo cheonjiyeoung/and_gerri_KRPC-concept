@@ -1,16 +1,40 @@
 ROBOT_INFO = {
     "id": "gc_dual",
-    "model": "gerri",
-    # "model": "doosan_m1509_dual",
+    "model": "doosan_m1509_dual",
+    "category": "manipulator",
+}
+
+LEFT_ROBOT_INFO = {
+    "id": "gc_left",
+    "model": "doosan_m1509",
+    "category": "manipulator",
+    "ip": "192.168.10.118",
+    "port": 502,
+}
+
+RIGHT_ROBOT_INFO = {
+    "id": "gc_right",
+    "model": "doosan_m1509",
     "category": "manipulator",
     "ip": "192.168.10.119",
     "port": 502,
 }
 
+
+PAN_TILT_INFO = {
+    "id": "pan_tilt",
+    "model": "pan_tilt",
+    "category": "pan_tilt",
+    "port": "/dev/ttyUSB0",
+}
+
+
+from utils.cam_finder import *
+zed_camera = find_camera_indices_by_name()
 from _and_.rtc2kng.ldz_camera_manager import LDZCameraManager
 # Camera settings: device index and resolution
 VIDEO_INFO = {
-    'zed_vr_cam': {'manager': LDZCameraManager, 'source': 0,
+    'zed_vr_cam': {'manager': LDZCameraManager, 'source': zed_camera,
                    'input_width': 3840, 'input_height': 1080,
                    'output_width': 1280, 'output_height': 360,
                    'fps': 30

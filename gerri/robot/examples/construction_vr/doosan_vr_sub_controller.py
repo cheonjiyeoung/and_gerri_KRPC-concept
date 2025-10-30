@@ -43,7 +43,10 @@ class DoosanVRSubController:
         self.default_ref = 'base'
 
         self.T_world_base = tf_from_offset_zyz_deg(a_z_deg=0, b_y_deg=45, c_z_deg=-90)
-        self.T_correction = tf_from_offset_zyz_deg(c_z_deg=-90)
+        self.z_cali = 0
+
+        self.joint_preset = {'home': [0.00, 0.00, 0.00, 0.00, 0.00, 0.00]}
+        self.q_sim_rad = np.deg2rad(self.joint_preset['home']) # 초기값 설정 (radian)
 
 
         # --- URDF 및 IK 솔버 초기화 (공통) ---
@@ -52,7 +55,6 @@ class DoosanVRSubController:
                                  'm1509.urdf')
         self.ik_solver = IKSolver(URDF_PATH, 'joint_6')
 
-        self.joint_preset = {'home': [-90.00, 0.00, 90.00, 0.00, -45.00, 0.00]}
 
         # --- debug 플래그에 따라 모드 분기 ---
         if self.debug:
@@ -82,10 +84,20 @@ class DoosanVRSubController:
 
     def connect(self):
         self.robot.connect()
-        self.status = RobotStatus(robot_id=self.base_controller.robot_id,
-                                  model=self.base_controller.robot_model,
-                                  category=self.base_controller.robot_category)
-        threading.Thread(target=self._update_loop,daemon=True).start()
+        if self.base_controller:
+            if 'left' in self.base_controller.robot_id: 
+                self.joint_preset = {'home': [90.00, 15.00, -120.00, 0.00, 60.00, 0.00]}
+                self.z_cali = 90
+                self.T_correction = tf_from_offset_zyz_deg(c_z_deg=90)
+            elif 'right' in self.base_controller.robot_id:
+                self.joint_preset = {'home': [-90.00, -15.00, 120.00, 0.00, -60.00, 0.00]}
+                self.z_cali = -90
+            self.T_correction = tf_from_offset_zyz_deg(c_z_deg=self.z_cali)
+            self.q_sim_rad = np.deg2rad(self.joint_preset['home']) # 초기값 설정 (radian)
+            self.status = RobotStatus(robot_id=self.base_controller.robot_id,
+                                    model=self.base_controller.robot_model,
+                                    category=self.base_controller.robot_category)
+            threading.Thread(target=self._update_loop,daemon=True).start()
 
     def _update_loop(self):
         while True:
@@ -148,7 +160,8 @@ class DoosanVRSubController:
         """
         # 1. 현재 관절 각도 가져오기 (radian)
         # self.status.joint_state['position']이 degree 단위이므로 rad로 변환
-        current_q_rad = np.deg2rad(self.status.joint_state['position'])
+        # current_q_rad = np.deg2rad(self.status.joint_state['position'])
+        current_q_rad = self.q_sim_rad
 
         # 2. IK 솔버를 이용해 관절 속도(dq) 및 조작성(manipulability) 계산
         # ik_solver.py의 clik 함수는 이제 (dq, manipulability) 튜플을 반환합니다.
@@ -177,7 +190,9 @@ class DoosanVRSubController:
             # 위험 상황에서는 현재 상태를 유지하거나 정지 명령을 보내는 것이 안전합니다.
             return
 
+        self.q_sim_rad = q_next_rad
         q_next_deg = np.rad2deg(q_next_rad)
+        q_next_deg[5] -= self.z_cali
         self.robot.joint_ctrl(q_next_deg, vel, acc)
 
 

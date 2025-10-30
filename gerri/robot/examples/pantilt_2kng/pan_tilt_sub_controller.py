@@ -11,31 +11,35 @@ FACTOR_DEGREE = 1000 # 1도는 1000펄스임
 class PanTiltSubController:
     def __init__(self, port):
         self.robot = PanTiltController(port)
-
-        self.status.joint_state = {
-            'name': ['pan', 'tilt'],
-            'position': [int(self.map_value(self.robot.last_pan_value, 0, 4096, -180, 180)),
-                         int(self.map_value(self.robot.last_tilt_value, 0, 4096, -180, 180))]
-        }
+        self.status = None
+        # self.status.joint_state = {
+        #     'name': ['pan', 'tilt'],
+        #     'position': [int(self.map_value(self.robot.last_pan_value, 0, 4096, -180, 180)),
+        #                  int(self.map_value(self.robot.last_tilt_value, 0, 4096, -180, 180))]
+        # }
 
     def init_base_controller(self, base_controller):
         self.status = RobotStatus(robot_id=base_controller.robot_info["id"],
                                   model=base_controller.robot_info["model"],
                                   category=base_controller.robot_info["category"],)
 
-        self._status_thread = threading.Thread(target=self._update_loop, daemon=True)
+        # self._status_thread = threading.Thread(target=self._update_loop, daemon=True)
         self._lock = threading.Lock()
-        self._status_thread.start()
-
+        # self._status_thread.start()
+        self.status.joint_state = {
+            'name': ['pan', 'tilt'],
+            'position': [int(self.map_value(self.robot.last_pan_value, 0, 4096, -180, 180)),
+                         int(self.map_value(self.robot.last_tilt_value, 0, 4096, -180, 180))]
+        }
 
     def _update_loop(self):
         while True:
             self._lock.acquire()
             ### STATUS UPDATE
-            self.status.joint_state = [
-                int(self.map_value(self.robot.last_pan_value, 0, 4096, -180, 180)),
-                int(self.map_value(self.robot.last_tilt_value, 0, 4096, -180, 180))
-            ]
+            # self.status.joint_state = [
+            #     int(self.map_value(self.robot.last_pan_value, 0, 4096, -180, 180)),
+            #     int(self.map_value(self.robot.last_tilt_value, 0, 4096, -180, 180))
+            # ]
             self._lock.release()
             time.sleep(1)
 
@@ -43,7 +47,7 @@ class PanTiltSubController:
         pan_angle = pan_tilt_angle[0]
         tilt_angle = pan_tilt_angle[1]
 
-        pan_value = int(self.map_value(pan_angle, -180, 180, 0, 4096))
+        pan_value = int(self.map_value(pan_angle, 180, -180, 0, 4096))
         tilt_value = int(self.map_value(tilt_angle, -180, 180, 0, 4096))
         if self.robot.last_pan_value != pan_value or self.robot.last_tilt_value != tilt_value:
             self.robot.pan_tilt_control(pan_value, tilt_value)

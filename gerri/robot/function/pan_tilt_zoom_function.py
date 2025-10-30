@@ -13,7 +13,8 @@ class PTZFunction:
                 if message['target'] in self.robot_id or message['target'] == 'all':
                     try:
                         if topic == 'pan_tilt':
-                            self.sub_controller.pan_tilt(value,option)
+                            print(message)
+                            self.sub_controller.pan_tilt(value)
                         elif topic == 'pan_tilt_step':
                             self.sub_controller.pan_tilt_step(value,option)
                         elif topic == 'pan_tilt_zoom':

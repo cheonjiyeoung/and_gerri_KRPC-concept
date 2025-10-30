@@ -53,7 +53,7 @@ def tf_compose(se3_list: list) -> pin.SE3:
     return final_transform
 
 
-def vr_ee_converter(delta_vr: pin.SE3) -> pin.SE3:
+def vr_ee_converter(delta_vr: pin.SE3, scale_factor = 1) -> pin.SE3:
     """
     VR 모션을 로봇 EE 모션으로 변환하는 최종 분리 제어(decoupled) 함수.
     - 위치: 고정된 행렬로 변환
@@ -64,7 +64,7 @@ def vr_ee_converter(delta_vr: pin.SE3) -> pin.SE3:
     R_pos_fixed = np.array([[-1, 0, 0],  # +x to -x
                             [0, 0, 1],   # +y to +z
                             [0, -1, 0]]) # +z to -y
-    p_final = R_pos_fixed @ delta_vr.translation
+    p_final = R_pos_fixed @ delta_vr.translation * scale_factor
 
     # --- 2. 회전 변환 (분리 제어 방식) ---
     # (a) VR 컨트롤러의 회전 변화량을 [rx, ry, rz] 각도로 분해합니다.
@@ -74,9 +74,9 @@ def vr_ee_converter(delta_vr: pin.SE3) -> pin.SE3:
     # 예시: VR의 rx(0) -> 로봇의 rx, VR의 ry(1) -> 로봇의 ry, VR의 rz(2) -> 로봇의 rz
     # 이 순서를 바꾸면 조작계를 완전히 커스터마이징할 수 있습니다.
     # 회전 방향은 반대이므로 - 를 항상 포함하고 계산
-    ee_rx = rpy_vr[0]  # 로봇의 Roll은 VR의 Roll 값을 사용
-    ee_ry = -rpy_vr[2]  # 로봇의 Pitch는 VR의 Pitch 값을 사용
-    ee_rz = rpy_vr[1]  # 로봇의 Yaw는 VR의 Yaw 값을 사용
+    ee_rx = rpy_vr[0] * scale_factor  # 로봇의 Roll은 VR의 Roll 값을 사용
+    ee_ry = -rpy_vr[2] * scale_factor  # 로봇의 Pitch는 VR의 Pitch 값을 사용
+    ee_rz = rpy_vr[1] * scale_factor  # 로봇의 Yaw는 VR의 Yaw 값을 사용
 
     # (c) 위에서 매핑한 각도들을 기준으로 로봇 EE의 최종 회전 행렬을 '재조립'합니다.
     R_final = pin.rpy.rpyToMatrix(ee_rx, ee_ry, ee_rz)

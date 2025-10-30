@@ -13,6 +13,8 @@ class PanTiltBaseController(PTZFunction):
         self.robot_model = robot_info['model']
         self.sub_controller = None
 
+        pub.subscribe(self.receive_message,"receive_message")
+
     def receive_message(self, message):
         PTZFunction.receive_message(self, message=message)
         # if 'topic' in message:
@@ -36,7 +38,7 @@ class PanTiltBaseController(PTZFunction):
 
     def connect(self):
         self.sub_controller.connect()
-        self.status_manager = StatusManager(self.robot_info, self.sub_controller)
+        # self.status_manager = StatusManager(self.robot_info, self.sub_controller)
 
     def disconnect(self):
         self.sub_controller.disconnect()

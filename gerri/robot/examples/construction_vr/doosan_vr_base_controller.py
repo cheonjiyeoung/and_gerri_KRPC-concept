@@ -74,28 +74,58 @@ class DoosanVRBaseController:
                             if self.interface.button_A:
                                 self.sub_controller.joint_ctrl(self.sub_controller.joint_preset['home'])
 
-                            if self.interface.button_right_grip != self.last_interface_value.button_right_grip:
-                                self.interface.reset_initial_pose('right')
-                                if self.interface.button_right_grip:
-                                    self.start_pose = self.sub_controller.get_current_SE3_pose()
+                            
 
-                                else:
-                                    self.start_pose = None
-                                    self.sub_controller.joint_ctrl_vel_stop()
+                            if 'left' in self.robot_id:
+                                if self.interface.button_left_grip != self.last_interface_value.button_left_grip:
+                                    self.interface.reset_initial_pose('left')
+                                    if self.interface.button_left_grip:
+                                        self.start_pose = self.sub_controller.get_current_SE3_pose()
 
-                            if self.interface.button_right_grip and self.start_pose:
-                                # 1. VR 컨트롤러의 움직임을 월드 좌표계 기준의 '움직임 변화량'으로 변환합니다.
-                                delta_ee_world = vr_ee_converter(self.interface.right_delta_pose)
+                                    else:
+                                        self.start_pose = None
+                                        self.sub_controller.joint_ctrl_vel_stop()
 
-                                delta_ee_cali = self.sub_controller.T_correction * delta_ee_world
-                                # 1. 시작점 -> 월드 변환
-                                start_pose_world = self.sub_controller.T_world_base * self.start_pose
-                                # 2. 월드에서 목표점 계산
-                                target_pose_world = start_pose_world * delta_ee_cali
-                                # 3. 최종 목표점 -> 베이스 변환
-                                target_pose_base = self.sub_controller.T_world_base.inverse() * target_pose_world
+                                if self.interface.button_left_grip and self.start_pose:
+                                    # 1. VR 컨트롤러의 움직임을 월드 좌표계 기준의 '움직임 변화량'으로 변환합니다.
+                                    delta_ee_world = vr_ee_converter(self.interface.left_delta_pose, scale_factor=1/self.zoom_level)
+                                    print(delta_ee_world)
 
-                                self.sub_controller.joint_ctrl_clik(target_pose_base, tolerance = 10)
+                                    delta_ee_cali = self.sub_controller.T_correction * delta_ee_world
+                                    # 1. 시작점 -> 월드 변환
+                                    start_pose_world = self.sub_controller.T_world_base * self.start_pose
+                                    # 2. 월드에서 목표점 계산
+                                    target_pose_world = start_pose_world * delta_ee_cali
+                                    # 3. 최종 목표점 -> 베이스 변환
+                                    target_pose_base = self.sub_controller.T_world_base.inverse() * target_pose_world
+
+                                    self.sub_controller.joint_ctrl_clik(target_pose_base, tolerance = 10)
+                                
+                            if 'right' in self.robot_id:
+
+                                if self.interface.button_right_grip != self.last_interface_value.button_right_grip:
+                                    self.interface.reset_initial_pose('right')
+                                    if self.interface.button_right_grip:
+                                        self.start_pose = self.sub_controller.get_current_SE3_pose()
+
+                                    else:
+                                        self.start_pose = None
+                                        self.sub_controller.joint_ctrl_vel_stop()
+
+                                if self.interface.button_right_grip and self.start_pose:
+                                    # 1. VR 컨트롤러의 움직임을 월드 좌표계 기준의 '움직임 변화량'으로 변환합니다.
+                                    delta_ee_world = vr_ee_converter(self.interface.right_delta_pose, scale_factor=1/self.zoom_level)
+                                    print(delta_ee_world)
+
+                                    delta_ee_cali = self.sub_controller.T_correction * delta_ee_world
+                                    # 1. 시작점 -> 월드 변환
+                                    start_pose_world = self.sub_controller.T_world_base * self.start_pose
+                                    # 2. 월드에서 목표점 계산
+                                    target_pose_world = start_pose_world * delta_ee_cali
+                                    # 3. 최종 목표점 -> 베이스 변환
+                                    target_pose_base = self.sub_controller.T_world_base.inverse() * target_pose_world
+
+                                    self.sub_controller.joint_ctrl_clik(target_pose_base, tolerance = 10)
 
 
                             self.last_interface_value = copy.deepcopy(self.interface)
