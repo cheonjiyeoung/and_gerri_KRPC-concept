@@ -1,4 +1,5 @@
 import os, sys
+from enum import Enum
 
 import numpy as np
 
@@ -26,6 +27,24 @@ MANIPULABILITY_THRESHOLD = 0.05
 
 CONTROL_INTERVAL = 0.1
 
+
+class RobotMode(str, Enum):
+    """로봇의 동작 모드를 정의합니다."""
+
+    # 1. 동작 없음
+    IDLE = "IDLE"
+
+    # 2. MASTER
+    MASTER = "MASTER"
+
+    # 3. MOVE
+    MOVE = "MOVE"
+
+    # 4. FORCE
+    FORCE = "FORCE"
+
+
+
 class DoosanVRSubController:
     def __init__(self, ip, port, joint_limit_degree=None, control_interval=CONTROL_INTERVAL, debug=False):
         self.base_controller = None
@@ -47,6 +66,8 @@ class DoosanVRSubController:
 
         self.joint_preset = {'home': [0.00, 0.00, 0.00, 0.00, 0.00, 0.00]}
         self.q_sim_rad = np.deg2rad(self.joint_preset['home']) # 초기값 설정 (radian)
+
+        self.control_mode = RobotMode.IDLE
 
 
         # --- URDF 및 IK 솔버 초기화 (공통) ---
@@ -295,3 +316,9 @@ class DoosanVRSubController:
         map_value = self.clamp((value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min, out_min, out_max)
 
         return map_value
+
+    def change_mode(self, value):
+        self.robot.change_mode(value)
+
+    def xyz_move(self, xyz_list):
+        self.robot.xyz_move(xyz_list)

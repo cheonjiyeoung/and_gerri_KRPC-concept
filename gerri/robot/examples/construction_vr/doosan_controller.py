@@ -4,8 +4,11 @@ import time
 import math
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 from pymodbus.client import ModbusTcpClient
+from gerri.robot.function.modbus_helper import ModbusHelper
 import time
 import threading
+
+modbus_helper = ModbusHelper()
 
 class DoosanController:
     def __init__(self, ip, port):
@@ -74,6 +77,13 @@ class DoosanController:
         self.write_register_address_vacc = 153
         self.write_register_address_vdt = 154
 
+
+        self.write_register_address_tool_ref = 155
+
+        self.write_register_address_key_control= 161
+
+        self.mode_register = 0
+
         self.client = None
 
     def connect(self):
@@ -141,7 +151,7 @@ class DoosanController:
             if not result_joint.isError():
                 # print("[READ] Joint values:")
                 for i in range(self.read_joint_register_count):
-                    self.joint_state['position'][i] = self.modbus_decode(result_joint.registers[i])
+                    self.joint_state['position'][i] = modbus_helper.modbus_decode(result_joint.registers[i])
             else:
                 print("joint state read fail")
 
@@ -149,49 +159,13 @@ class DoosanController:
                 # print("[READ] Joint values:")
                 for i in range(self.read_pose_register_count):
                     if i < 3:
-                        self.pose['position'][i] = self.modbus_decode(result_pose.registers[i])
+                        self.pose['position'][i] = modbus_helper.modbus_decode(result_pose.registers[i])
                     else:
-                        self.pose['orientation'][i-3] = self.modbus_decode(result_pose.registers[i])
+                        self.pose['orientation'][i-3] = modbus_helper.modbus_decode(result_pose.registers[i])
                 # for j in range(6):
-                #     print(j, ": ", self.modbus_decode(offset_result_pose.registers[j]))
+                #     print(j, ": ", modbus_helper.modbus_decode(offset_result_pose.registers[j]))
             else:
                 print("pose state read fail")
-
-    # def convert_to_int_joint(self, val):
-    #     if val >= 0x8000:
-    #         val = val - 0x10000
-    #     if -3600 <= val <= 3600:
-    #         return val / 10.
-    #     else:
-    #         return val
-    # 
-    # def convert_to_int_pose(self, val):
-    #     if val >= 0x8000:
-    #         val = val - 0x10000
-    #     if -9000 <= val <= 9000:
-    #         return val / 10.
-    #     else:
-    #         return val
-    # 
-    # def convert_to_hex_joint(self, value):
-    #     scaled = int(round(value * 10))
-    #     if not -3600 <= scaled <= 3600:
-    #         raise ValueError("over Value")
-    #     return scaled & 0xFFFF
-    # 
-    # def convert_to_hex_pose(self, value):
-    #     scaled = int(round(value * 10))
-    #     if not -9000 <= scaled <= 9000:
-    #         raise ValueError("over Value")
-    #     return scaled & 0xFFFF
-
-    def modbus_encode(self, value, scale = 10):
-        scaled_value = int(round(value * scale))
-        return scaled_value & 0xFFFF
-
-    def modbus_decode(self, raw_value, scale = 10):
-        signed_value = raw_value if raw_value < 0x8000 else raw_value - 0x10000
-        return float(signed_value) / scale
 
     def stop_robot(self, value):
         print("stop Left Robot", value)
@@ -212,14 +186,14 @@ class DoosanController:
 
         self.client.write_register(self.write_register_address_0, self.set_robot_mode)
 
-        joint_value = [self.modbus_encode(j1, 10),
-                     self.modbus_encode(j2, 10),
-                     self.modbus_encode(j3, 10),
-                     self.modbus_encode(j4, 10),
-                     self.modbus_encode(j5, 10),
-                     self.modbus_encode(j6, 10),
-                     self.modbus_encode(vel, 10),
-                     self.modbus_encode(acc, 10)]
+        joint_value = [modbus_helper.modbus_encode(j1, 10),
+                     modbus_helper.modbus_encode(j2, 10),
+                     modbus_helper.modbus_encode(j3, 10),
+                     modbus_helper.modbus_encode(j4, 10),
+                     modbus_helper.modbus_encode(j5, 10),
+                     modbus_helper.modbus_encode(j6, 10),
+                     modbus_helper.modbus_encode(vel, 10),
+                     modbus_helper.modbus_encode(acc, 10)]
         self.client.write_registers(self.write_register_address_j1, joint_value)
 
 
@@ -234,14 +208,14 @@ class DoosanController:
         rz = value['angle'][2]
 
         self.client.write_register(self.write_register_address_0, self.set_robot_mode)
-        self.client.write_register(self.write_register_address_x, self.modbus_encode(x))
-        self.client.write_register(self.write_register_address_y, self.modbus_encode(y))
-        self.client.write_register(self.write_register_address_z, self.modbus_encode(z))
-        self.client.write_register(self.write_register_address_rx, self.modbus_encode(rx))
-        self.client.write_register(self.write_register_address_ry, self.modbus_encode(ry))
-        self.client.write_register(self.write_register_address_rz, self.modbus_encode(rz))
-        self.client.write_register(self.write_register_address_lvel, self.modbus_encode(value['velocity']))
-        self.client.write_register(self.write_register_address_lacc, self.modbus_encode(value['acceleration']))
+        self.client.write_register(self.write_register_address_x, modbus_helper.modbus_encode(x))
+        self.client.write_register(self.write_register_address_y, modbus_helper.modbus_encode(y))
+        self.client.write_register(self.write_register_address_z, modbus_helper.modbus_encode(z))
+        self.client.write_register(self.write_register_address_rx, modbus_helper.modbus_encode(rx))
+        self.client.write_register(self.write_register_address_ry, modbus_helper.modbus_encode(ry))
+        self.client.write_register(self.write_register_address_rz, modbus_helper.modbus_encode(rz))
+        self.client.write_register(self.write_register_address_lvel, modbus_helper.modbus_encode(value['velocity']))
+        self.client.write_register(self.write_register_address_lacc, modbus_helper.modbus_encode(value['acceleration']))
         self.client.write_register(self.write_register_address_rel, 0)
 
     def joint_ctrl_master(self, value):
@@ -254,14 +228,14 @@ class DoosanController:
         j6 = self.clamp(value[5], min_value = -360, max_value = 360)
 
         self.client.write_register(self.write_register_address_0, self.set_robot_mode)
-        self.client.write_register(self.write_register_address_j1, self.modbus_encode(j1))
-        self.client.write_register(self.write_register_address_j2, self.modbus_encode(j2))
-        self.client.write_register(self.write_register_address_j3, self.modbus_encode(j3))
-        self.client.write_register(self.write_register_address_j4, self.modbus_encode(j4))
-        self.client.write_register(self.write_register_address_j5, self.modbus_encode(j5))
-        self.client.write_register(self.write_register_address_j6, self.modbus_encode(j6))
-        self.client.write_register(self.write_register_address_jvel, self.modbus_encode(value['joint_velocity']))
-        self.client.write_register(self.write_register_address_jacc, self.modbus_encode(value['joint_acceleration']))
+        self.client.write_register(self.write_register_address_j1, modbus_helper.modbus_encode(j1))
+        self.client.write_register(self.write_register_address_j2, modbus_helper.modbus_encode(j2))
+        self.client.write_register(self.write_register_address_j3, modbus_helper.modbus_encode(j3))
+        self.client.write_register(self.write_register_address_j4, modbus_helper.modbus_encode(j4))
+        self.client.write_register(self.write_register_address_j5, modbus_helper.modbus_encode(j5))
+        self.client.write_register(self.write_register_address_j6, modbus_helper.modbus_encode(j6))
+        self.client.write_register(self.write_register_address_jvel, modbus_helper.modbus_encode(value['joint_velocity']))
+        self.client.write_register(self.write_register_address_jacc, modbus_helper.modbus_encode(value['joint_acceleration']))
 
     def end_pose_ctrl(self, pose, vel=100, acc=200, dt=0.1):
         self.set_robot_mode = 4
@@ -269,16 +243,20 @@ class DoosanController:
         x, y, z, rx, ry, rz = pose
 
         self.client.write_register(self.write_register_address_0, self.set_robot_mode)
-        self.client.write_register(self.write_register_address_x, self.modbus_encode(x))
-        self.client.write_register(self.write_register_address_y, self.modbus_encode(y))
-        self.client.write_register(self.write_register_address_z, self.modbus_encode(z))
-        self.client.write_register(self.write_register_address_rx, self.modbus_encode(rx))
-        self.client.write_register(self.write_register_address_ry, self.modbus_encode(ry))
-        self.client.write_register(self.write_register_address_rz, self.modbus_encode(rz))
-        self.client.write_register(self.write_register_address_lvel, self.modbus_encode(vel))
-        self.client.write_register(self.write_register_address_lacc, self.modbus_encode(acc))
-        self.client.write_register(self.write_register_address_rel, self.modbus_encode(dt))
+        self.client.write_register(self.write_register_address_x, modbus_helper.modbus_encode(x))
+        self.client.write_register(self.write_register_address_y, modbus_helper.modbus_encode(y))
+        self.client.write_register(self.write_register_address_z, modbus_helper.modbus_encode(z))
+        self.client.write_register(self.write_register_address_rx, modbus_helper.modbus_encode(rx))
+        self.client.write_register(self.write_register_address_ry, modbus_helper.modbus_encode(ry))
+        self.client.write_register(self.write_register_address_rz, modbus_helper.modbus_encode(rz))
+        self.client.write_register(self.write_register_address_lvel, modbus_helper.modbus_encode(vel))
+        self.client.write_register(self.write_register_address_lacc, modbus_helper.modbus_encode(acc))
+        self.client.write_register(self.write_register_address_rel, modbus_helper.modbus_encode(dt))
 
+
+    def xyz_move(self, value):
+        pose_value = modbus_helper.modbus_encode(value, 100)
+        self.client.write_registers(self.write_register_address_key_control, pose_value)
 
 
     def joint_ctrl_vel(self, value, acc=250, dt=0.1):
@@ -287,26 +265,26 @@ class DoosanController:
 
         self.client.write_register(self.write_register_address_0, self.set_robot_mode)
 
-        vel_value = [self.modbus_encode(v1, 100),
-                     self.modbus_encode(v2, 100),
-                     self.modbus_encode(v3, 100),
-                     self.modbus_encode(v4, 100),
-                     self.modbus_encode(v5, 100),
-                     self.modbus_encode(v6, 100),
-                     self.modbus_encode(acc, 100),
-                     self.modbus_encode(dt, 100)]
+        vel_value = [modbus_helper.modbus_encode(v1, 100),
+                     modbus_helper.modbus_encode(v2, 100),
+                     modbus_helper.modbus_encode(v3, 100),
+                     modbus_helper.modbus_encode(v4, 100),
+                     modbus_helper.modbus_encode(v5, 100),
+                     modbus_helper.modbus_encode(v6, 100),
+                     modbus_helper.modbus_encode(acc, 100),
+                     modbus_helper.modbus_encode(dt, 100)]
         self.client.write_registers(self.write_register_address_v1, vel_value)
 
     def joint_ctrl_vel_stop(self):
         self.set_robot_mode = 0
 
         self.client.write_register(self.write_register_address_0, self.set_robot_mode)
-        self.client.write_register(self.write_register_address_v1, self.modbus_encode(0, 100))
-        self.client.write_register(self.write_register_address_v2, self.modbus_encode(0, 100))
-        self.client.write_register(self.write_register_address_v3, self.modbus_encode(0, 100))
-        self.client.write_register(self.write_register_address_v4, self.modbus_encode(0, 100))
-        self.client.write_register(self.write_register_address_v5, self.modbus_encode(0, 100))
-        self.client.write_register(self.write_register_address_v6, self.modbus_encode(0, 100))
+        self.client.write_register(self.write_register_address_v1, modbus_helper.modbus_encode(0, 100))
+        self.client.write_register(self.write_register_address_v2, modbus_helper.modbus_encode(0, 100))
+        self.client.write_register(self.write_register_address_v3, modbus_helper.modbus_encode(0, 100))
+        self.client.write_register(self.write_register_address_v4, modbus_helper.modbus_encode(0, 100))
+        self.client.write_register(self.write_register_address_v5, modbus_helper.modbus_encode(0, 100))
+        self.client.write_register(self.write_register_address_v6, modbus_helper.modbus_encode(0, 100))
 
 
     def gripper_ctrl(self, value):
@@ -315,7 +293,7 @@ class DoosanController:
         self.client.write_register(self.write_register_address_0, self.set_robot_mode)
         self.client.write_register(self.write_register_address_x, 0)
         self.client.write_register(self.write_register_address_y, 0)
-        self.client.write_register(self.write_register_address_z, self.modbus_encode(value))
+        self.client.write_register(self.write_register_address_z, modbus_helper.modbus_encode(value))
         self.client.write_register(self.write_register_address_rx, 0)
         self.client.write_register(self.write_register_address_ry, 0)
         self.client.write_register(self.write_register_address_rz, 0)
@@ -334,6 +312,15 @@ class DoosanController:
     def custom_command(self, command):
         return command
 
+
+    def change_mode(self, value):
+        self.set_robot_mode = value
+        self.client.write_register(self.write_register_address_0, self.set_robot_mode)
+
+
+    def get_robot_mode(self):
+        print(self.mode_register)
+        return self.mode_register
 
 if __name__ == '__main__':
     robot = DoosanController('172.20.1.247', 502)
