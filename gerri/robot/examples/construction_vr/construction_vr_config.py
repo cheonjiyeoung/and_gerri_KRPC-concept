@@ -28,6 +28,13 @@ PAN_TILT_INFO = {
     "port": "/dev/ttyUSB0",
 }
 
+GRIPPER_INFO = {
+    "id": "zimmer_gripper",
+    "model": "zimmer_gripper",
+    "category": "gripper",
+    "ip": "192.168.10.120",
+    "port": 502,
+}
 
 from utils.cam_finder import *
 zed_camera = find_camera_indices_by_name()

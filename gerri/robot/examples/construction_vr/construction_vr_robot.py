@@ -6,7 +6,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable),
 
 
 from _and_.and_robot import AdaptiveNetworkDaemon
-from gerri.robot.examples.construction_vr.construction_vr_config import ROBOT_INFO, LEFT_ROBOT_INFO, RIGHT_ROBOT_INFO, PAN_TILT_INFO, VIDEO_INFO, AUDIO_INFO, SERVER_INFO
+from gerri.robot.examples.construction_vr.construction_vr_config import ROBOT_INFO, LEFT_ROBOT_INFO, RIGHT_ROBOT_INFO, \
+    PAN_TILT_INFO, VIDEO_INFO, AUDIO_INFO, SERVER_INFO, GRIPPER_INFO
 
 # Initialize communication module (AND)
 daemon = AdaptiveNetworkDaemon(
@@ -31,9 +32,10 @@ from gerri.robot.examples.construction_vr.doosan_vr_base_controller import Doosa
 from gerri.robot.examples.construction_vr.doosan_vr_sub_controller import DoosanVRSubController
 from gerri.robot.interface.vr_controller import VRController
 
-
 from gerri.robot.examples.pantilt_2kng.pan_tilt_base_controller import PanTiltBaseController
 from gerri.robot.examples.pantilt_2kng.pan_tilt_sub_controller import PanTiltSubController
+
+from gerri.robot.examples.zimmer.zimmer_base_controller import ZimmerBaseController
 
 pan_tilt = PanTiltBaseController(PAN_TILT_INFO)
 pan_tilt.sub_controller = PanTiltSubController(PAN_TILT_INFO['port'])
@@ -52,6 +54,9 @@ right_sub_controller = DoosanVRSubController(RIGHT_ROBOT_INFO['ip'], RIGHT_ROBOT
 right_base_controller.sub_controller = right_sub_controller
 right_sub_controller.base_controller = right_base_controller
 right_base_controller.connect()
+
+zimmer_base_controller = ZimmerBaseController(GRIPPER_INFO, interface=vr_ctrl_interface)
+zimmer_base_controller.connect()
 
 # from gerri.robot.interface.vr_controller import VRController
 # from gerri.robot.examples.rtc2kng.zoom_test_base_controller import ZoomBaseController
