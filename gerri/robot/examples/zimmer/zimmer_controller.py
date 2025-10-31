@@ -181,6 +181,8 @@ class ZimmerController:
         # 그리퍼가 실제로 움직일 수 있는 거리 (카운트)
         self.MaxMoveableDistance = self.gripper_max_distance - self.gripper_min_distance
 
+        self.last_position = self.gripper_max_distance
+
     # ---------------- Connection ----------------
     def connect(self):
         """
@@ -202,7 +204,12 @@ class ZimmerController:
             self.gripper_thread.daemon = True
             self.gripper_thread.start()
 
-            time.sleep(1)
+
+            self.init()
+            self.opt_velocity(100)
+            self.opt_force(10)
+
+            time.sleep(3)
             self.move_to_percentage(0)
             self.move_to_percentage(100)
             self.move_to_percentage(0)
@@ -535,9 +542,11 @@ class ZimmerController:
             print(f'{RED}[ERROR]{NC} Gripper is not initialized.')
             return
 
+        if target_position == self.last_position:
+            return
 
         # 목표 위치가 현재 위치보다 크면 닫는 동작 (그립, WorkPosition으로 이동)
-        if target_position > current_position and target_position <= self.gripper_max_distance:
+        elif target_position > current_position and target_position <= self.gripper_max_distance:
             self.grip(target_position, sync=sync)
 
         # 목표 위치가 현재 위치보다 작으면 여는 동작 (릴리즈, BasePosition으로 이동)
@@ -547,6 +556,8 @@ class ZimmerController:
         else:
             print(f'{YELLOW}[ ZIMMER ]{NC} Target width is the same as current position or out of range. No movement.')
             return
+        
+        self.last_position = target_position
 
 
     @staticmethod

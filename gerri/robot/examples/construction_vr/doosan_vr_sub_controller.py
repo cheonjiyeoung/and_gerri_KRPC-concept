@@ -18,8 +18,8 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(sys.executable), "..
 # 프로젝트 루트를 기준으로 URDF 파일의 전체 경로를 조합합니다.
 URDF_PATH = os.path.join(PROJECT_ROOT, 'gerri/robot/examples/construction_vr/m1509_urdf/m1509.urdf')
 
-JOINT_LIMIT_MIN = np.deg2rad([-360, -150, -135, -360, -135, -360])
-JOINT_LIMIT_MAX = np.deg2rad([360, 150, 135, 360, 135, 360])
+JOINT_LIMIT_MIN = np.deg2rad([-360, -150, -135, -360, -110, -360])
+JOINT_LIMIT_MAX = np.deg2rad([360, 150, 135, 360, 110, 360])
 
 
 MANIPULABILITY_THRESHOLD = 0.05

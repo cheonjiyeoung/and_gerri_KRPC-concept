@@ -7,7 +7,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable),
 
 from gerri.robot.status_manager import StatusManager
 from gerri.robot.function.manipulator_function import ManipulatorFunction
-from gerri.robot.function.pan_tilt_zoom_function import PTZFunction
 
 from gerri.robot.function.tf_helper import *
 from gerri.robot.function.ik_solver import IKSolver
@@ -58,7 +57,6 @@ class DoosanVRBaseController:
 
     def receive_message(self, message):
         ManipulatorFunction.receive_message(self, message=message)
-        PTZFunction.receive_message(self, message)
         if 'topic' in message:
             topic = message['topic']
             value = message['value']
@@ -141,5 +139,7 @@ class DoosanVRBaseController:
                         print(f"❌ Controller does not support topic '{topic}': {e}")
                         pass
                     except Exception as e:
+                        if topic == 'pan_tilt':
+                            return
                         print(f"❌ Error processing topic '{topic}': {e}")
                         pass

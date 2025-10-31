@@ -13,7 +13,7 @@ class ZimmerBaseController():
         self.robot_category = robot_info['category']
         self.robot_model = robot_info['model']
         self.sub_controller = ZimmerController(robot_info['ip'], robot_info['port'])
-        self.last_grip_value = 0
+        self.last_gripper_value = 0
 
         if 'interface' in params:
             self.interface:VRController = params['interface']
@@ -31,16 +31,11 @@ class ZimmerBaseController():
             if 'target' in message:
                 if message['target'] in self.robot_id or message['target'] == 'all':
                     try:
-                        if topic == 'hello_universe':
-                            if topic == self.interface.name:
-                                self.interface.update(value)
-                                if self.interface.right_grip > 0.1:
-                                    right_grip_value = round(self.interface.right_grip * 100, -1)
-                                    print(right_grip_value)
-                                    if self.last_grip_value == right_grip_value:
-                                        pass
-                                    else:
-                                        self.sub_controller.move_to_percentage(right_grip_value)
+                        if topic == self.interface.name:
+                            self.interface.update(value)
+                            right_trigger_value = round(self.interface.right_trigger * 100, -1)
+                            print(self.interface.right_trigger, right_trigger_value)
+                            self.sub_controller.move_to_percentage(right_trigger_value, sync=False)
                         else:
                             self.send_message({'topic': 'callback_'+topic, 'value': 'callback_'+value, 'target': 'all'})
                     except AttributeError as e:
