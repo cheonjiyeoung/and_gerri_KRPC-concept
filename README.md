@@ -1,5 +1,4 @@
-<img width="1076" height="639" alt="image" src="https://github.com/user-attachments/assets/d3b4b1c7-ee34-448d-9d49-cf09fce233a4" />
-
+<img width="921" height="530" alt="image" src="https://github.com/user-attachments/assets/01085041-1f74-498c-8c6a-ca5d0e1534bf" />
 
 
 "사전 정의된 커맨드" 개념 제거, "로봇의 구현된 함수를 webrtc {topic:<함수명> value:<파라미터>}전송 형태로 실행할수있게 해준다" 컨셉
