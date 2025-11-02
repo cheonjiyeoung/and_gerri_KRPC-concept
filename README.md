@@ -1,7 +1,7 @@
 <img width="982" height="558" alt="image" src="https://github.com/user-attachments/assets/fdabfa86-01e7-4469-b9a4-047367365fa3" />
 
 
-"우리가 보장하는 사전 정의된 커맨드 제공" 개념 제거, "로봇의 구현된 함수를 webrtc {topic:<함수명> value:<파라미터>}전송 형태로 실행할수있게 해준다" 컨셉 (KRPC : KETI Remote Procedure Call)
+"우리가 보장하는 사전 정의된 커맨드 제공" 개념 에서, "로봇의 구현된 함수를 webrtc {topic:<함수명> value:<파라미터>}전송 형태로 실행할수있게 해준다" 컨셉 (KRPC : KETI Remote Procedure Call)
 
 ex) def move(vx,vy,vth) 함수실행시 move(vx=0.4,vy=0.0,vth=0.0) = {"topic":"move", "value":{"vx":0.4,"vy":0.0,"vth":0.0}
   - 사전 정의된 커맨드가 있어도 결국 유저가 파싱,실행 과정을 코딩해야함. 사전정의된 커맨드들을 만들고 보장한다는게 사실 크게 의미가 없는것같고 코드만 복잡해짐. 파싱,실행을 쉽고 직관적으로 만들어주는게 더 의미가 있지않나..
