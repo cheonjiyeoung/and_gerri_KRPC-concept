@@ -33,3 +33,6 @@ else:
 gerri/robot/examples/Spot_robot.py 실행
 > 실제 WebRTC를 통해 커맨드 수신을 모방하여 command_handler 실행하여 Json 형식으로 로봇 컨트롤러의 함수 실행이 가능한지 테스트 구성
 
+gerri/utils/commander_builder/README 확인 후 robot_command_builder.py 실행
+> gerri/utils/commander_builder/output에서 자동생성된 오퍼레이터용 robot_commander.py 확인 가능
+
