@@ -1,4 +1,5 @@
-<img width="982" height="558" alt="image" src="https://github.com/user-attachments/assets/fdabfa86-01e7-4469-b9a4-047367365fa3" />
+<img width="947" height="542" alt="image" src="https://github.com/user-attachments/assets/baaa2a67-fde4-4ede-ac55-7d1345f220da" />
+
 
 
 "우리가 보장하는 사전 정의된 커맨드 제공" 개념 에서, "로봇의 구현된 함수를 webrtc {topic:<함수명> value:<파라미터>}전송 형태로 실행할수있게 해준다" 컨셉 (KRPC : KETI Remote Procedure Call)
