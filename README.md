@@ -1,4 +1,5 @@
-<img width="916" height="341" alt="제목 없는 다이어그램 drawio" src="https://github.com/user-attachments/assets/64ac4986-150b-442a-9505-aa11689c2e5e" />
+<img width="1076" height="639" alt="image" src="https://github.com/user-attachments/assets/d3b4b1c7-ee34-448d-9d49-cf09fce233a4" />
+
 
 
 "사전 정의된 커맨드" 개념 제거, "로봇의 구현된 함수를 webrtc {topic:<함수명> value:<파라미터>}전송 형태로 실행할수있게 해준다" 컨셉
