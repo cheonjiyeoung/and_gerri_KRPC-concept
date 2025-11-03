@@ -5,7 +5,6 @@ from aiortc import RTCConfiguration
 import threading
 import logging
 
-
 # 로그 레벨을 ERROR로 설정하여 WARNING 이하의 로그를 표시하지 않음
 logging.basicConfig(level=logging.ERROR)
 # logging.getLogger("ketirtc").setLevel(logging.ERROR)

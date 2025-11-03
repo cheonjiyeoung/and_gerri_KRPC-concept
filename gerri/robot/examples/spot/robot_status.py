@@ -1,4 +1,13 @@
 class RobotStatus:
+    """
+    Basic robot status data format.
+
+    This class provides a convenient default structure for representing
+    robot status information such as pose, velocity, battery state, sensors,
+    and map data. You can use this format as-is or extend it by adding
+    custom attributes according to your robot's requirements.
+    """
+    
     def __init__(self,robot_id=None,model=None,category=None):
         self.robot_id = robot_id
         self.robot_type = {

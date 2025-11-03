@@ -1,11 +1,9 @@
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
 from gerri.robot.examples.spot.spot_mission_schaduler import MissionSchaduler
-from robot_status import RobotStatus
+from gerri.robot.examples.spot.robot_status import RobotStatus
 import threading
-import random
 import time
-import asyncio
 import datetime
 from pubsub import pub
 import requests
@@ -26,7 +24,6 @@ class SpotSubController:
             self.robot_controller = SpotController(spot_info)
         
         self.last_light_level = [0,0,0,0]
-        self.base_controller = None
         self.status = None
         self._lock = threading.Lock()
         self.last_fault_id = None
