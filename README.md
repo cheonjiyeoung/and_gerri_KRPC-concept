@@ -14,6 +14,10 @@
 - robot/operator_config 코드 생성
 - robot/operator_launch 코드 생성 (미구현)
 - opertor_commander 코드 생성
-- 모든 로봇이 공통적으로 사용할수있는 UI 생성 (동적 명령버튼, 키보드마우스컨트롤러 맵핑UI)
 - 결과적으로 필요한 코드가 전부 들어있는 디렉토리 생성
     - 경로 제한 필요함
+
+<img width="1451" height="905" alt="image" src="https://github.com/user-attachments/assets/dcf3df06-72db-4f58-a367-8e198ba23559" />
+
+- 모든 로봇이 공통적으로 사용할수있는 UI 생성 (동적 명령버튼, 키보드마우스컨트롤러 맵핑UI 추후 영상,오디오,스테이터스 추가)
+
