@@ -9,8 +9,8 @@
 3. first_setup 툴 추가 (UI 기반 초반세팅 툴)
 <img width="592" height="811" alt="image" src="https://github.com/user-attachments/assets/8ed2f3d3-1734-4a39-b612-80067ec37edb" />
 <img width="878" height="603" alt="image" src="https://github.com/user-attachments/assets/6a6e6f2b-2edd-4ab5-a61f-396c5392a20f" />
-- UI크기조정 필요함...
-  
+
+- UI크기조정 필요함...  
 - robot/operator_config 코드 생성
 - robot/operator_launch 코드 생성 (미구현)
 - opertor_commander 코드 생성
