@@ -29,11 +29,11 @@ def _validate_parameters(method, value):
         False
     """
     params = inspect.signature(method).parameters
-
-    # Check the validation of parameters
     for param, attr in params.items():
         if attr.default is inspect.Parameter.empty and param not in value:
             return False
+    if not set(value.keys()).issubset(params.keys()):
+        return False
     return True
 
 class KRPCRobotController:
@@ -71,7 +71,7 @@ class KRPCRobotController:
         When a message is received, it checks whether the given topic corresponds
         to a method in the robot interface. If so, the method is invoked with
         the provided parameters. Execution occurs only if the message target
-        matches the current robot’s ID.
+        matches the current robot's ID.
 
         Args:
             message (dict): The received message containing the following keys:
@@ -96,24 +96,26 @@ class KRPCRobotController:
 
         topic = message.get("topic")    # If the topic is a method of the robot interface, invoke that method.
         value = message.get("value")    # Parameters to be passed when invoking the robot interface method.
-        target = message.get("target")  # In multi-robot control, execution is performed based on the robot IDs included in the target.
-
-        # Execute only if the topic exists and the target matches this robot.
-        if topic is None or target != self.robot_id:
-            print(f"Invalid target or missing topic: {topic}")
-            return
         
-        if inspect.isclass(self.robot_interface):
+        if type(self.robot_interface) == dict:
+            target = message.get("target")  # In multi-robot control, execution is performed based on the robot IDs included in the target.
+            if not target in self.robot_interface.keys() or target is None:
+                print("""
+                    No robot matching target found.
+                    If you want to control multiple robots, pass the robot interface as a dictionary ( {<robot_id> : <instance or module>} )
+                    and enter the exact robot ID in the target field.
+                    """)
+                return
+            else:
+                target_robot_interface = self.robot_interface.get(target)
+        else:
+            target_robot_interface = self.robot_interface
+
+        if inspect.isclass(target_robot_interface):
             print("robot_interface is a class, not an instance. Did you forget to instantiate it?")
             return
         
-        elif isinstance(self.robot_interface, types.ModuleType):
-            # 모듈 기반 함수형 로봇 제어 코드
-            method = getattr(self.robot_interface, topic, None)
-
-        else:
-            # 클래스 인스턴스 기반 로봇 제어 코드
-            method = getattr(self.robot_interface, topic, None)
+        method = getattr(target_robot_interface, topic, None)
 
         # Check whether the robot interface has the method.
         if not callable(method):
