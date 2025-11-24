@@ -1,5 +1,5 @@
 from and_gerri._and_.and_robot import AdaptiveNetworkDaemon
-from and_gerri.gerri.robot.raas_dataset_builder import RaasDatasetBuilder
+from and_gerri.gerri.robot.raas_dataset.raas_dataset_builder import RaasDatasetBuilder
 from __ROBOT_CONFIG_PATH__ import ROBOT_INFO, VIDEO_INFO, AUDIO_INFO
 # Initialize communication module (AND)
 daemon = AdaptiveNetworkDaemon(
