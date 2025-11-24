@@ -13,7 +13,7 @@ class AdaptiveNetworkDaemon:
 
     def _setup_channels(self):
         if self.network == "ketirtc":
-            from _and_.keti_rtc.robot import webrtc_robot as backend
+            from and_gerri._and_.keti_rtc.robot import webrtc_robot as backend
             return backend.create_channels(
                 robot_info=self.robot_info,
                 command=self.command,
@@ -21,7 +21,7 @@ class AdaptiveNetworkDaemon:
                 audio_info=self.audio_info
             )
         elif self.network == "rtc2kng":
-            from _and_.rtc2kng import rtc2kng_robot as backend
+            from and_gerri._and_.rtc2kng import rtc2kng_robot as backend
             return backend.create_channels(
                 robot_info=self.robot_info,
                 server_info=self.server_info,

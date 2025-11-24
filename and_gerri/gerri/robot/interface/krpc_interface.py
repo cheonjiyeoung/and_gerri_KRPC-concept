@@ -95,6 +95,8 @@ class KrpcInterface:
         """
 
         topic = message.get("topic")    # If the topic is a method of the robot interface, invoke that method.
+        if topic == "/joy":
+            return
         value = message.get("value")    # Parameters to be passed when invoking the robot interface method.
         
         if type(self.robot_interface) == dict:

@@ -1,10 +1,10 @@
 ### ROBOT
 # Defines robot identity, type and classification
 ROBOT_INFO = {
-    "id": "gyd_01",
-    "model": "gyd",
+    "id": "gyd_mobile_01",
+    "model": "gyd_mobile",
     "category": "Mobile",
-    "api_key": "asd"
+    "api_key": "d1ae52308839b4c034f7a5f2c46f477a"
 }
 
 ### VIDEO

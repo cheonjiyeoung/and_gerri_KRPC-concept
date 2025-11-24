@@ -29,8 +29,8 @@ def create_channels(robot_info, command=None, video_info=None, audio_info=None, 
 
     # Video
     if video_info:
-        from _and_.keti_rtc.robot.cam_manager import CameraManager
-        from _and_.keti_rtc.robot.video_streamer import VideoStreamer
+        from and_gerri._and_.keti_rtc.robot.cam_manager import CameraManager
+        from and_gerri._and_.keti_rtc.robot.video_streamer import VideoStreamer
         for name, cfg in video_info.items():
             if type(cfg["source"]) != int:
                 cam = cfg["source"]
