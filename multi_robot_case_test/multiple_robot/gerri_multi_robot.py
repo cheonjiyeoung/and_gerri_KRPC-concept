@@ -1,7 +1,7 @@
 # from _and_ ~~~
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(sys.executable), "../..")))
-from gerri.robot.utils.krpc_robot_controller import KRPCRobotController
+from and_gerri.gerri.robot.interface.krpc_interface import KrpcInterface
 from multi_robot_case_test.multiple_robot.torso_arm import TorsoArm
 from multi_robot_case_test.multiple_robot.mobile import MobileRobot
 from multi_robot_case_test.multiple_robot.robot_config import ROBOT_INFO
@@ -20,7 +20,7 @@ robot_interfaces = {
     "mobile_2" : mobile_2
 }
 
-krpc_controller = KRPCRobotController(ROBOT_INFO, robot_interfaces)
+krpc_controller = KrpcInterface(ROBOT_INFO, robot_interfaces)
 
 # test1 send same method another robots
 command = {"topic":"move", "value":{"j1":1,"j2":2,"j3":3,"j4":4,"j5":5,"j6":6},"target":"torso_left"}

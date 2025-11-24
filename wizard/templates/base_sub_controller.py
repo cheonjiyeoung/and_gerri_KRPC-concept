@@ -86,11 +86,17 @@ class __CLASS_NAME__:
 
         self.operation_mode = "AUTO"
 
-    def connect(self):
+    def _connect(self):
         self.status = RobotStatus(robot_id=self.robot_id,
                                   model=self.robot_model,
                                   category=self.robot_category)
         threading.Thread(target=self._update_loop,daemon=True).start()
+
+    def _send_message(self, message):
+        # message will send by pypubsub to operator
+        if type(message) == dict:
+            message = json.dumps(message)
+        pub.sendMessage("send_message",message=message)
 
     def _update_loop(self):
         while True:
@@ -114,22 +120,14 @@ class __CLASS_NAME__:
         """
         self.operation_mode = "TELEOP"
 
-    def disconnect(self):
+    def _disconnect(self):
         """
         DISCONNECT FROM ROBOT
         """
 
-    def send_message(self, message):
-        # message will send by pypubsub to operator
-        if type(message) == dict:
-            message = json.dumps(message)
-        pub.sendMessage("send_message",message=message)
 # </editor-fold>
 #endregion
     # ===============================================================
     # Additional methods
     # You can define any methods and excute by KRPC Via and-gerri
     # =============================================================== 
-    def hello_universe(self):
-        message = {"topic" : "hello", "value" : "universe"}
-        self.send_message(message)

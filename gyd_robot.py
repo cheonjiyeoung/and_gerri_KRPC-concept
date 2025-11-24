@@ -1,6 +1,6 @@
 from and_gerri._and_.and_robot import AdaptiveNetworkDaemon
 from and_gerri.gerri.robot.raas_dataset_builder import RaasDatasetBuilder
-from __ROBOT_CONFIG_PATH__ import ROBOT_INFO, VIDEO_INFO, AUDIO_INFO
+from gyd.robot.gyd_config import ROBOT_INFO, VIDEO_INFO, AUDIO_INFO
 # Initialize communication module (AND)
 daemon = AdaptiveNetworkDaemon(
     robot_info=ROBOT_INFO,
@@ -15,7 +15,7 @@ daemon.connect()
 # - If the model in ROBOT_INFO is predefined, the base controller will auto-select it.
 # - Otherwise, manually specify a sub-controller as shown below.
 
-from __ROBOT_SUB_CONTROLLER_PATH__ import __ROBOT_SUB_CONTROLLER_CLASS__
+from gyd.robot.gyd_sub_controller import GydSubController
 from and_gerri.gerri.robot.interface.krpc_interface import KrpcInterface
 
 # If you want control multiple robots. you can add more subcontroller in sub_controllers
@@ -26,7 +26,7 @@ sub_controllers = {"robot_id_1 : robot_id_1_subcontroller,
                    ...}
 """
 
-sub_controllers = __SUB_CONTROLLERS__
+sub_controllers = {"gyd_01": GydSubController(ROBOT_INFO['id'], ROBOT_INFO['model'], ROBOT_INFO['category'])}
 krpc_interface = KrpcInterface(sub_controllers)
 krpc_interface.connect()
 

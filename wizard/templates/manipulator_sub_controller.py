@@ -91,24 +91,24 @@ class __CLASS_NAME__:
         self.operation_mode = "AUTO"
 
 
+    def _send_message(self, message):
+        # message will send by pypubsub to operator
+        if type(message) == dict:
+            message = json.dumps(message)
+        pub.sendMessage("send_message",message=message)
+
     def _update_loop(self):
         while True:
             with self._lock:
                 # if you want use all features we provide, please implement the logic to update your robot’s status information in our standard format.
                 time.sleep(0.1)
 
-    def disconnect(self):
+    def _disconnect(self):
         """
         DISCONNECT FROM ROBOT
         """
 
-    def send_message(self, message):
-        # message will send by pypubsub to operator
-        if type(message) == dict:
-            message = json.dumps(message)
-        pub.sendMessage("send_message",message=message)
-
-    def connect(self):
+    def _connect(self):
         self.status = RobotStatus(robot_id=self.robot_id,
                                   model=self.robot_model,
                                   category=self.robot_category)
@@ -164,6 +164,3 @@ class __CLASS_NAME__:
     # Additional methods
     # You can define any methods and excute by KRPC Via and-gerri
     # =============================================================== 
-    def hello_universe(self):
-        message = {"topic" : "hello", "value" : "universe"}
-        self.send_message(message)

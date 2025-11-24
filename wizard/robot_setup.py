@@ -1,4 +1,4 @@
-from wizard.templates import robot_config_template
+from wizard.templates import robot_config
 import os
 import re
 import json
@@ -17,8 +17,9 @@ ROBOT_TYPE_TEMPLATE_MAP = {
     4: "./wizard/templates/base_sub_controller.py"
 }
 
-context_query_robot_id = "1. What is your Robot ID ?\n >>> "
-context_query_robot_model = "2. What is your Robot Model ?\n >>> "
+context_query_robot_model = "1. What is your Robot Model ?\n >>> "
+context_query_robot_id = "2. What is your Robot ID ?\n >>> "
+
 
 context_query_robot_type = f"""
 3. What is your Robot Type ?
@@ -30,9 +31,7 @@ context_query_robot_type = f"""
 ================================
 >>> """
 
-context_query_rubberneck_id = "4. What is your RubberNeck ID ?\n >>> "
-context_query_rubberneck_pwd = "5. What is your RubberNeck Password ?\n >>> "
-context_query_rubberneck_api_key = "6. What is your RubberNeck API Key ?\n >>> "
+context_query_rubberneck_api_key = "4. What is your RubberNeck API Key ?\n >>> "
 
 # -------------------------------------------------------
 # Query functions
@@ -163,23 +162,6 @@ def query_manipulator_joint_count():
         except ValueError:
             print("Invalid number. Try again.\n")
 
-def query_rubberneck_id():
-    while True:
-        rubberneck_id = input(context_query_rubberneck_id)
-        if not rubberneck_id.strip():
-            print("Invalid RubberNeck ID. Try Again...\n")
-        else:
-            return rubberneck_id.strip()
-
-def query_rubberneck_pwd():
-    # 비밀번호는 getpass 로 숨겨 입력
-    while True:
-        rubberneck_pwd = input(context_query_rubberneck_pwd)
-        if not rubberneck_pwd.strip():
-            print("Invalid Password. Try Again...\n")
-        else:
-            return rubberneck_pwd.strip()
-
 def query_rubberneck_api_key():
     while True:
         api_key = input(context_query_rubberneck_api_key)
@@ -222,10 +204,10 @@ def format_dict_block(name, value):
 
 def make_config_file(config, path):
     # Inject values
-    robot_config_template.ROBOT_INFO["id"]       = config["robot_id"]
-    robot_config_template.ROBOT_INFO["model"]    = config["robot_model"]
-    robot_config_template.ROBOT_INFO["category"] = config["robot_type"]
-    robot_config_template.ROBOT_INFO["api_key"]  = config["rubberneck_api_key"]
+    robot_config.ROBOT_INFO["id"]       = config["robot_id"]
+    robot_config.ROBOT_INFO["model"]    = config["robot_model"]
+    robot_config.ROBOT_INFO["category"] = config["robot_type"]
+    robot_config.ROBOT_INFO["api_key"]  = config["rubberneck_api_key"]
 
     with open(path, "w", encoding="utf-8") as f:
 
@@ -234,7 +216,7 @@ def make_config_file(config, path):
         # ------------------------------
         f.write("### ROBOT\n")
         f.write("# Defines robot identity, type and classification\n")
-        f.write(format_dict_block("ROBOT_INFO", robot_config_template.ROBOT_INFO))
+        f.write(format_dict_block("ROBOT_INFO", robot_config.ROBOT_INFO))
 
         # ------------------------------
         # VIDEO_INFO
@@ -245,14 +227,14 @@ def make_config_file(config, path):
         f.write("# If top-level key = 'front_camera', it appears as <robot_id>_front_cam in RubberNeck.\n")
         f.write("# If you want to use a custom video source, set your own class at ['source'].\n")
         f.write("# If you want to use our data-collection service, add more camera data (pose, dFOV).\n")
-        f.write(format_dict_block("VIDEO_INFO", robot_config_template.VIDEO_INFO))
+        f.write(format_dict_block("VIDEO_INFO", robot_config.VIDEO_INFO))
 
         # ------------------------------
         # AUDIO_INFO
         # ------------------------------
         f.write("### AUDIO\n")
         f.write("# Audio I/O devices\n")
-        f.write(format_dict_block("AUDIO_INFO", robot_config_template.AUDIO_INFO))
+        f.write(format_dict_block("AUDIO_INFO", robot_config.AUDIO_INFO))
 
         # ------------------------------
         # Custom constants
@@ -285,7 +267,6 @@ def to_variable_name(class_name: str) -> str:
     return s2.lower()
 
 def make_sub_controller_file(config, path):
-
     robot_model = config["robot_model"]
     robot_type = config["sub_controller_template"]
     class_robot_model = to_class_name(robot_model)
@@ -340,10 +321,14 @@ def make_robot_launch_file(config, path):
     with open(template_path, "r", encoding="utf-8") as f:
         template_code = f.read()
 
-    config_path = robot_model + "_config"
-    sub_controller_path = robot_model + "_sub_controller"
-    template_code = template_code.replace("__ROBOT_CONFIG__", config_path)
-    template_code = template_code.replace("__ROBOT_SUB_CONTROLLER__", sub_controller_path)
+    # config_path = robot_model + "_config"
+    # sub_controller_path = robot_model + "_sub_controller"
+    robot_config_path = robot_model + "." + "robot." + robot_model + "_config"
+    robot_sub_controller_path = robot_model + "." + "robot." + robot_model + "_sub_controller"
+    template_code = template_code.replace("__ROBOT_CONFIG_PATH__", robot_config_path)
+    template_code = template_code.replace("__ROBOT_SUB_CONTROLLER_PATH__", robot_sub_controller_path)
+    # template_code = template_code.replace("__ROBOT_CONFIG__", config_path)
+    # template_code = template_code.replace("__ROBOT_SUB_CONTROLLER__", sub_controller_path)
     
     class_name = f"{class_robot_model}SubController"
     template_code = template_code.replace("__ROBOT_SUB_CONTROLLER_CLASS__", class_name)
@@ -359,16 +344,14 @@ def make_robot_launch_file(config, path):
 # Final Wizard execution
 # -------------------------------------------------------
 def setup_wizard():
-    robot_id = query_robot_id()
     robot_model = query_robot_model()
+    robot_id = query_robot_id()
     robot_type = query_robot_type()
     max_linear_velocity = query_max_linear_velocity() if robot_type in [1,3] else None
     min_linear_velocity = query_min_linear_velocity(max_linear_velocity) if robot_type in [1,3] else None
     max_angluar_velocity = query_max_angular_velocity() if robot_type in [1,3] else None
     min_angluar_velocity = query_min_angular_velocity(max_angluar_velocity) if robot_type in [1,3] else None
     manipulator_joint_count = query_manipulator_joint_count() if robot_type in [2,3] else None
-    rubberneck_id = query_rubberneck_id()
-    rubberneck_pwd = query_rubberneck_pwd()
     rubberneck_api_key = query_rubberneck_api_key()
 
     sub_controller_template = create_robot_sub_controller(robot_type)
@@ -377,8 +360,6 @@ def setup_wizard():
         "robot_id": robot_id,
         "robot_model": robot_model,
         "robot_type": ROBOT_TYPE_MAP[robot_type],
-        "rubberneck_id": rubberneck_id,
-        "rubberneck_pwd": rubberneck_pwd,
         "rubberneck_api_key": rubberneck_api_key,
         "sub_controller_template": sub_controller_template,
         "max_linear_velocity":max_linear_velocity,
@@ -440,7 +421,7 @@ def main(config):
     print(f"Created {robot_model}_config.py: {config_file_path}")
 
     # 4. Make robot launch code
-    launch_file_path = robot_dir + "/" + robot_model + "_robot.py"
+    launch_file_path = robot_model + "_robot.py"
     make_robot_launch_file(config, launch_file_path)
     print(f"Created {robot_model}_robot.py: {launch_file_path}")
 

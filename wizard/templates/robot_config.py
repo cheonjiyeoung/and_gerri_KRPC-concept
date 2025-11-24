@@ -11,7 +11,7 @@ ROBOT_INFO = {
 # Camera settings: device index and resolution
 VIDEO_INFO = {
     'front_camera':{
-        'name':'front_camera',
+        'name':'front_cam',
         'model': 'logitech_c922',
         'source': 0,
         'width': 640,
@@ -22,7 +22,7 @@ VIDEO_INFO = {
         'dFOV':79
     },
     'rear_camera':{
-        'name':'rear_camera',
+        'name':'rear_cam',
         'model': 'logitech_c922',
         'source': 2,
         'width': 640,

@@ -76,12 +76,12 @@ class RobotStatus:
             "resolution": None
         }
 
-MAX_LINEAR_VELOCITY = '__MAX_LINEAR_VELOCITY__'
-MIN_LINEAR_VELOCITY = '__MIN_LINEAR_VELOCITY__'
-MAX_ANGULAR_VELOCITY = '__MAX_ANGULAR_VELOCITY__'
-MIN_ANGULAR_VELOCITY = '__MIN_ANGULAR_VELOCITY__'
+MAX_LINEAR_VELOCITY = 1.0
+MIN_LINEAR_VELOCITY = 0.1
+MAX_ANGULAR_VELOCITY = 1.0
+MIN_ANGULAR_VELOCITY = 0.1
 
-class __CLASS_NAME__:
+class GydSubController:
     def __init__(self,robot_id,robot_model,robot_category):
         self.robot_id = robot_id
         self.robot_model = robot_model
